@@ -1,23 +1,82 @@
-// 附加包制作器：生成行为包/资源包/双包（.mcaddon），贴图用 Canvas 现场绘制
-// 说明：Bedrock 只执行 JSON 与 JavaScript；Python 文件会标注为“游戏不执行，仅模板/外部工具参考”
+// 基岩版附加包制作器（重置版）
+// 生成行为包 + 资源包，所有 UUID / 贴图本地生成，不依赖在线接口。
 
-const ENTITY_SIZES = {
-  pig: [64, 32], cow: [64, 32], chicken: [64, 32], creeper: [64, 32],
-  zombie: [64, 64], sheep: [64, 32], villager_v2: [64, 64]
+export const PROJECT_DEFAULTS = {
+  name: '我的附加包',
+  namespace: 'demo',
+  author: '',
+  version: [1, 0, 0],
+  texture: { size: 16, c1: '#c62828', c2: '#ff8a80' },
+  block: { enabled: true, id: 'ruby_block', zh: '红宝石方块', en: 'Ruby Block', pattern: 'stone', hardness: 1.5 },
+  item: { enabled: true, id: 'ruby', zh: '红宝石', en: 'Ruby', maxStack: 64 },
+  entity: { enabled: false, id: 'ruby_mob', zh: '红宝石生物', en: 'Ruby Mob', base: 'quadruped', health: 10, speed: 0.25 },
+  script: { enabled: false, template: 'welcome' },
 };
-export const ENTITY_LIST = Object.keys(ENTITY_SIZES);
 
-function uuid() {
-  if (crypto && crypto.randomUUID) return crypto.randomUUID();
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    const r = Math.random() * 16 | 0;
-    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-  });
+const ID_RE = /^[a-z][a-z0-9_]{0,31}$/;
+const NS_RE = /^[a-z][a-z0-9_]{1,15}$/;
+const HEX_RE = /^#[0-9a-f]{6}$/i;
+
+export function localUuid() {
+  const c = globalThis.crypto;
+  if (c && c.randomUUID) return c.randomUUID();
+  const b = new Uint8Array(16);
+  if (c && c.getRandomValues) c.getRandomValues(b);
+  else for (let i = 0; i < 16; i++) b[i] = Math.floor(Math.random() * 256);
+  b[6] = (b[6] & 0x0f) | 0x40;
+  b[8] = (b[8] & 0x3f) | 0x80;
+  const h = [...b].map(x => x.toString(16).padStart(2, '0')).join('');
+  return h.slice(0, 8) + '-' + h.slice(8, 12) + '-' + h.slice(12, 16) + '-' + h.slice(16, 20) + '-' + h.slice(20);
 }
 
-function hex(c, a) {
-  const s = c.replace('#', '');
-  return 'rgba(' + parseInt(s.slice(0, 2), 16) + ',' + parseInt(s.slice(2, 4), 16) + ',' + parseInt(s.slice(4, 6), 16) + ',' + (a ?? 1) + ')';
+export function validateProject(cfg) {
+  const errors = [];
+  const warnings = [];
+  const name = String(cfg.name || '').trim();
+  const ns = String(cfg.namespace || '').trim().toLowerCase();
+  if (!name) errors.push({ field: 'name', message: '包名不能为空' });
+  else if (name.length > 48) errors.push({ field: 'name', message: '包名不要超过 48 个字符' });
+  if (!NS_RE.test(ns)) errors.push({ field: 'namespace', message: '命名空间只能用小写字母、数字、下划线，2–16 位，且以字母开头' });
+  if (ns === 'minecraft') errors.push({ field: 'namespace', message: '命名空间不能是 minecraft' });
+  if (!HEX_RE.test(cfg.texture?.c1 || '') || !HEX_RE.test(cfg.texture?.c2 || '')) {
+    errors.push({ field: 'texture', message: '主色和副色必须是 #RRGGBB' });
+  }
+  if (![16, 32, 64].includes(Number(cfg.texture?.size))) errors.push({ field: 'texture', message: '贴图尺寸只能是 16 / 32 / 64' });
+
+  const ids = [];
+  if (cfg.block?.enabled) {
+    if (!ID_RE.test(String(cfg.block.id || ''))) errors.push({ field: 'block.id', message: '方块 ID 只能用小写字母、数字、下划线，且以字母开头' });
+    else ids.push(ns + ':' + cfg.block.id);
+    if (!String(cfg.block.zh || '').trim()) errors.push({ field: 'block.zh', message: '方块中文名不能为空' });
+    const h = Number(cfg.block.hardness);
+    if (!Number.isFinite(h) || h < 0.1 || h > 30) errors.push({ field: 'block.hardness', message: '挖掘时间需在 0.1–30 秒之间' });
+  }
+  if (cfg.item?.enabled) {
+    if (!ID_RE.test(String(cfg.item.id || ''))) errors.push({ field: 'item.id', message: '物品 ID 只能用小写字母、数字、下划线，且以字母开头' });
+    else ids.push(ns + ':' + cfg.item.id);
+    if (!String(cfg.item.zh || '').trim()) errors.push({ field: 'item.zh', message: '物品中文名不能为空' });
+    const m = Number(cfg.item.maxStack);
+    if (!Number.isInteger(m) || m < 1 || m > 64) errors.push({ field: 'item.maxStack', message: '堆叠数量需为 1–64 的整数' });
+  }
+  if (cfg.entity?.enabled) {
+    if (!ID_RE.test(String(cfg.entity.id || ''))) errors.push({ field: 'entity.id', message: '实体 ID 规则同方块' });
+    else ids.push(ns + ':' + cfg.entity.id);
+    if (!String(cfg.entity.zh || '').trim()) errors.push({ field: 'entity.zh', message: '实体中文名不能为空' });
+    const hp = Number(cfg.entity.health);
+    if (!Number.isFinite(hp) || hp < 1 || hp > 200) errors.push({ field: 'entity.health', message: '生命值需在 1–200 之间' });
+  }
+  const dup = ids.filter((v, i) => ids.indexOf(v) !== i);
+  if (dup.length) errors.push({ field: 'id', message: '方块、物品、实体不能使用同一个 ID：' + [...new Set(dup)].join('、') });
+  if (!cfg.block?.enabled && !cfg.item?.enabled && !cfg.entity?.enabled && !cfg.script?.enabled) {
+    errors.push({ field: 'content', message: '至少勾选方块、物品、实体或脚本中的一项' });
+  }
+  if (cfg.script?.enabled && !['welcome', 'scoreboard', 'particle'].includes(cfg.script.template)) {
+    errors.push({ field: 'script', message: '未知的脚本模板' });
+  }
+  if (cfg.entity?.enabled && cfg.entity.base === 'humanoid' && cfg.script?.enabled) {
+    warnings.push({ field: 'entity', message: '人形实体会使用玩家模型和 64×64 贴图，进游戏后建议再调整外观' });
+  }
+  return { errors, warnings };
 }
 
 function canvasPng(w, h, draw) {
@@ -34,9 +93,20 @@ function canvasPng(w, h, draw) {
   return out;
 }
 
-function noise(ctx, w, h, c1, c2, density) {
-  let seed = 7;
-  const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+function hex(c, a) {
+  const s = String(c || '#888888').replace('#', '');
+  return 'rgba(' + parseInt(s.slice(0, 2), 16) + ',' + parseInt(s.slice(2, 4), 16) + ',' + parseInt(s.slice(4, 6), 16) + ',' + (a ?? 1) + ')';
+}
+
+function shade(c, k) {
+  const s = String(c || '#888888').replace('#', '');
+  const p = [0, 2, 4].map(i => Math.max(0, Math.min(255, Math.round(parseInt(s.slice(i, i + 2), 16) * k))));
+  return 'rgb(' + p.join(',') + ')';
+}
+
+function noise(ctx, w, h, c1, c2, density, seed = 7) {
+  let s = seed;
+  const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
   const px = Math.max(1, Math.floor(w / 16));
   for (let y = 0; y < h; y += px) {
     for (let x = 0; x < w; x += px) {
@@ -47,36 +117,40 @@ function noise(ctx, w, h, c1, c2, density) {
 }
 
 function drawBlockTexture(ctx, w, h, kind, c1, c2) {
+  ctx.fillStyle = hex(c1); ctx.fillRect(0, 0, w, h);
   if (kind === 'wood') {
-    ctx.fillStyle = hex(c1); ctx.fillRect(0, 0, w, h);
     ctx.fillStyle = hex(c2);
-    for (let x = 0; x < w; x += Math.max(2, w / 8)) ctx.fillRect(x, 0, Math.max(1, w / 32), h);
-    ctx.fillRect(0, Math.floor(h / 2), w, Math.max(1, h / 16));
+    for (let x = 0; x < w; x += Math.max(2, Math.floor(w / 8))) ctx.fillRect(x, 0, Math.max(1, Math.floor(w / 32)), h);
+    ctx.fillRect(0, Math.floor(h / 2), w, Math.max(1, Math.floor(h / 16)));
   } else if (kind === 'metal') {
-    ctx.fillStyle = hex(c1); ctx.fillRect(0, 0, w, h);
     ctx.fillStyle = hex(c2);
-    ctx.fillRect(0, 0, w, Math.max(1, h / 8));
-    ctx.fillRect(0, h - Math.max(1, h / 8), w, Math.max(1, h / 8));
+    ctx.fillRect(0, 0, w, Math.max(1, Math.floor(h / 8)));
+    ctx.fillRect(0, h - Math.max(1, Math.floor(h / 8)), w, Math.max(1, Math.floor(h / 8)));
     ctx.fillStyle = 'rgba(255,255,255,.18)';
-    ctx.fillRect(Math.floor(w / 8), 0, Math.max(1, w / 8), h);
+    ctx.fillRect(Math.floor(w / 8), 0, Math.max(1, Math.floor(w / 8)), h);
   } else if (kind === 'crystal') {
     ctx.fillStyle = hex(c1); ctx.fillRect(0, 0, w, h);
-    for (let i = 0; i < 6; i++) {
+    const s = w / 4;
+    for (let i = 0; i < 4; i++) {
       ctx.fillStyle = hex(c2, 0.55);
-      const s = w / 4;
       ctx.beginPath();
       ctx.moveTo(w / 2, 0); ctx.lineTo(w - s, h / 2); ctx.lineTo(w / 2, h); ctx.lineTo(s, h / 2);
       ctx.closePath(); ctx.fill();
     }
+    ctx.fillStyle = 'rgba(255,255,255,.22)';
+    ctx.fillRect(Math.floor(w / 2), 0, Math.max(1, Math.floor(w / 16)), Math.max(1, Math.floor(h / 2)));
   } else if (kind === 'wool') {
     noise(ctx, w, h, c1, c2, 0.5);
     ctx.fillStyle = 'rgba(0,0,0,.12)';
     for (let i = 0; i < w; i += 4) ctx.fillRect(i, (i * 3) % h, 2, 2);
+  } else if (kind === 'leaves') {
+    noise(ctx, w, h, c1, c2, 0.72);
+    ctx.fillStyle = 'rgba(0,0,0,.18)';
+    for (let i = 0; i < w; i += Math.max(2, Math.floor(w / 8))) ctx.fillRect(i, (i * 5) % h, Math.max(1, Math.floor(w / 16)), Math.max(1, Math.floor(w / 16)));
   } else {
     noise(ctx, w, h, c1, c2, 0.4);
   }
-  // 1px 描边，让方块在低分辨率下更清晰
-  ctx.strokeStyle = hex(c2, 0.9);
+  ctx.strokeStyle = hex(c2, 0.85);
   ctx.lineWidth = 1;
   ctx.strokeRect(0.5, 0.5, w - 1, h - 1);
 }
@@ -84,37 +158,85 @@ function drawBlockTexture(ctx, w, h, kind, c1, c2) {
 function drawItemTexture(ctx, w, h, c1, c2) {
   ctx.clearRect(0, 0, w, h);
   const u = w / 16;
-  ctx.fillStyle = hex(c1);
-  ctx.fillRect(6 * u, 2 * u, 4 * u, 12 * u);
-  ctx.fillStyle = hex(c2);
-  ctx.fillRect(4 * u, 12 * u, 8 * u, 2 * u);
-  ctx.fillRect(7 * u, 0 * u, 2 * u, 2 * u);
+  const gem = [
+    [7, 1], [8, 1], [9, 1],
+    [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3],
+    [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5],
+    [5, 7], [6, 7], [7, 7], [8, 7], [9, 7], [10, 7],
+    [6, 9], [7, 9], [8, 9], [9, 9],
+    [7, 11], [8, 11],
+  ];
+  for (const [x, y] of gem) {
+    ctx.fillStyle = (x + y) % 3 === 0 ? hex(c2) : hex(c1);
+    ctx.fillRect(x * u, y * u, u, u);
+  }
+  ctx.fillStyle = 'rgba(255,255,255,.5)';
+  ctx.fillRect(6 * u, 3 * u, u, u);
+  ctx.fillRect(5 * u, 5 * u, u, u);
+  ctx.fillStyle = 'rgba(0,0,0,.25)';
+  ctx.fillRect(8 * u, 9 * u, u, u);
+  ctx.fillRect(7 * u, 11 * u, u, u);
 }
 
-function drawEntityTexture(ctx, w, h, c1, c2) {
-  // 近似原版实体图集：头部在左上 1/4 区域，身体/腿按条带填充
-  ctx.fillStyle = hex(c1); ctx.fillRect(0, 0, w, h);
-  ctx.fillStyle = hex(c2);
-  ctx.fillRect(0, h / 2, w, h / 2);
-  // 头部眼睛（按常见 64x32 布局：头 8..16,8..16）
-  const u = w / 64;
-  ctx.fillStyle = '#111';
-  ctx.fillRect(9 * u, 12 * u, 2 * u, 2 * u);
-  ctx.fillRect(14 * u, 12 * u, 2 * u, 2 * u);
-  // 嘴
-  ctx.fillStyle = '#000';
-  ctx.fillRect(11 * u, 14 * u, 3 * u, 1 * u);
-  // 纹理噪点
-  ctx.fillStyle = 'rgba(0,0,0,.12)';
-  for (let i = 0; i < w; i += Math.max(2, u * 2)) ctx.fillRect(i, (i * 5) % h, u, u);
+function drawEntityTexture(ctx, w, h, base, c1, c2) {
+  ctx.clearRect(0, 0, w, h);
+  if (base === 'humanoid') {
+    const u = w / 64;
+    const box = (x, y, bw, bh, c) => { ctx.fillStyle = hex(c); ctx.fillRect(x * u, y * u, bw * u, bh * u); };
+    box(0, 0, 32, 16, c1);
+    box(8, 8, 8, 8, shade(c1, 1.05));
+    box(10, 10, 2, 2, '#ffffff'); box(14, 10, 2, 2, '#ffffff');
+    box(11, 11, 1, 1, '#111111'); box(15, 11, 1, 1, '#111111');
+    box(16, 16, 24, 16, shade(c1, 0.92));
+    box(40, 16, 16, 16, hex(c2)); box(0, 16, 16, 16, shade(c2, 0.92));
+    box(16, 32, 24, 16, shade(c1, 1.02));
+    box(40, 32, 16, 16, shade(c2, 0.88)); box(0, 32, 16, 16, shade(c2, 0.84));
+  } else {
+    const u = w / 64;
+    const box = (x, y, bw, bh, c) => { ctx.fillStyle = hex(c); ctx.fillRect(x * u, y * u, bw * u, bh * u); };
+    box(0, 0, 64, 16, shade(c1, 1.02));
+    box(0, 0, 16, 16, shade(c1, 1.08));
+    box(4, 6, 2, 2, '#111'); box(10, 6, 2, 2, '#111');
+    box(16, 16, 16, 16, hex(c2)); box(32, 16, 16, 16, shade(c2, 0.9));
+    box(48, 16, 16, 16, shade(c2, 0.82));
+    box(0, 16, 64, 16, shade(c1, 0.92));
+  }
+}
+
+function packIcon(size, c1, c2, pattern) {
+  return canvasPng(size, size, (ctx) => {
+    ctx.fillStyle = '#10141c';
+    ctx.fillRect(0, 0, size, size);
+    const s = size / 16;
+    // 等距草方块：顶面亮、左面中、右面暗
+    const put = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x * s, y * s, w * s, h * s); };
+    for (let y = 0; y < 16; y++) {
+      for (let x = 0; x < 16; x++) {
+        if (y < 3) put(x, y, 1, 1, shade(c1, 1.15 + (x + y) % 2 * 0.08));
+        else if (y < 5) put(x, y, 1, 1, shade(c1, 1.0));
+        else put(x, y, 1, 1, shade(c1, 0.78 + (x + y) % 2 * 0.06));
+      }
+    }
+    put(3, 4, 10, 1, shade(c2, 1.1));
+    put(3, 5, 10, 4, shade(c1, 0.92));
+    put(3, 9, 10, 2, shade(c1, 0.72));
+    ctx.strokeStyle = shade(c2, 1.2);
+    ctx.lineWidth = Math.max(1, size / 64);
+    ctx.strokeRect(2.5 * s, 3.5 * s, 11 * s, 9 * s);
+  });
+}
+
+function entityTexture(base, c1, c2, size = 64) {
+  const [w, h] = base === 'humanoid' ? [64, 64] : [64, 32];
+  return canvasPng(w, h, (ctx) => drawEntityTexture(ctx, w, h, base, c1, c2));
 }
 
 export function previewTexture(kind, size, c1, c2, entity) {
-  const [w, h] = kind === 'entity' ? (ENTITY_SIZES[entity] || [64, 32]) : [size, size];
-  return canvasPng(w, h, (ctx) => {
-    if (kind === 'item') drawItemTexture(ctx, w, h, c1, c2);
-    else if (kind === 'entity') drawEntityTexture(ctx, w, h, c1, c2);
-    else drawBlockTexture(ctx, w, h, kind, c1, c2);
+  const n = Number(size) || 16;
+  if (kind === 'entity') return entityTexture(entity === 'humanoid' ? 'humanoid' : 'quadruped', c1, c2, n);
+  return canvasPng(n, n, (ctx) => {
+    if (kind === 'item') drawItemTexture(ctx, n, n, c1, c2);
+    else drawBlockTexture(ctx, n, n, kind, c1, c2);
   });
 }
 
@@ -124,132 +246,34 @@ export function pngDataUrl(bytes) {
   return 'data:image/png;base64,' + btoa(bin);
 }
 
-const SCRIPT_HEAD = `// 由 MCBE 工具箱附加包制作器生成
-import { world, system, CommandPermissionLevel } from "@minecraft/server";
-
-`;
-
-function scriptTemplate(tpl, ns) {
-  if (tpl === 'particle') return SCRIPT_HEAD + `// 每秒在玩家脚下生成粒子
-system.runInterval(() => {
-  for (const p of world.getAllPlayers()) {
-    p.dimension.spawnParticle("minecraft:campfire_tick_particle", {
-      x: p.location.x, y: p.location.y + 0.2, z: p.location.z
-    });
-  }
-}, 20);
-`;
-  if (tpl === 'welcome') return SCRIPT_HEAD + `// 玩家进服提示
-world.afterEvents.playerSpawn.subscribe((ev) => {
-  if (!ev.initialSpawn) return;
-  ev.player.sendMessage("§b欢迎来到 ${ns} 的世界");
-});
-`;
-  return SCRIPT_HEAD + `// 计分板示例：每次进服加 1 分
-world.afterEvents.playerSpawn.subscribe(({ player }) => {
-  try {
-    world.scoreboard.addObjective("points", "积分");
-    const obj = world.scoreboard.getObjective("points");
-    obj.setScore(player, (obj.getScore(player) || 0) + 1);
-    player.sendMessage("§a当前积分：" + obj.getScore(player));
-  } catch (e) {
-    console.warn(e);
-  }
-});
-`;
+function scriptBody(template, ns) {
+  const head = '// 由 MC工具箱附加包制作器生成\nimport { world, system } from "@minecraft/server";\n\n';
+  if (template === 'particle') return head + `system.runInterval(() => {\n  for (const p of world.getAllPlayers()) {\n    p.dimension.spawnParticle("minecraft:campfire_tick_particle", {\n      x: p.location.x, y: p.location.y + 0.2, z: p.location.z\n    });\n  }\n}, 20);\n`;
+  if (template === 'scoreboard') return head + `world.afterEvents.playerSpawn.subscribe(({ player }) => {\n  try {\n    world.scoreboard.addObjective("points", "积分");\n    const obj = world.scoreboard.getObjective("points");\n    obj.setScore(player, (obj.getScore(player) || 0) + 1);\n    player.sendMessage("§a当前积分：" + obj.getScore(player));\n  } catch (e) { console.warn(e); }\n});\n`;
+  return head + `world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {\n  if (!initialSpawn) return;\n  player.sendMessage("§b欢迎来到 ${ns} 的世界");\n});\n`;
 }
 
-function pyTemplate(ns) {
-  return `# 由 MCBE 工具箱附加包制作器生成
-# 注意：Minecraft 基岩版不会执行 Python。此文件仅作模板 / 外部工具（如服务端管理脚本）参考。
-# ${ns} 的自动化脚本骨架
-import json
-import os
-
-PACK_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-def read_json(rel):
-    with open(os.path.join(PACK_ROOT, rel), "r", encoding="utf-8") as f:
-        return json.load(f)
-
-def main():
-    data = read_json("manifest.json")
-    print("包名:", data["header"]["name"])
-
-if __name__ == "__main__":
-    main()
-`;
-}
-
-function tsTemplate(ns) {
-  return `// TypeScript 模板（需自行用 tsc 编译成 scripts/main.js）
-import { world, system } from "@minecraft/server";
-
-system.runInterval(() => {
-  for (const p of world.getAllPlayers()) {
-    p.onScreenDisplay.setActionBar("§e${ns} 正在运行");
-  }
-}, 40);
-`;
-}
-
-const jsonTpl = {
-  block: (ns, id) => ({
-    format_version: '1.21.0',
-    'minecraft:block': {
-      description: { identifier: `${ns}:${id}`, menu_category: { category: 'construction' } },
-      components: {
-        'minecraft:material_instances': { '*': { texture: id, render_method: 'opaque' } },
-        'minecraft:destructible_by_mining': { seconds_to_destroy: 1.5 },
-        'minecraft:destructible_by_explosion': { explosion_resistance: 3 },
-        'minecraft:light_dampening': 15,
-        'minecraft:map_color': '#8a8f98'
-      }
-    }
-  }),
-  item: (ns, id, tex) => ({
-    format_version: '1.21.0',
-    'minecraft:item': {
-      description: { identifier: `${ns}:${id}`, menu_category: { category: 'items' } },
-      components: {
-        'minecraft:icon': { texture: tex },
-        'minecraft:max_stack_size': 64
-      }
-    }
-  })
-};
-
-export function generateAddon(cfg) {
-  const ns = cfg.namespace || 'demo';
-  const name = cfg.name || '我的附加包';
-  const ver = [1, 0, 0];
-  const size = cfg.size || 16;
-  const c1 = cfg.color1 || '#7a7f8c';
-  const c2 = cfg.color2 || '#4a505c';
-  const pattern = cfg.pattern || 'stone';
-  const mode = cfg.mode || 'addon';          // addon | resource | behavior
-  const withBlock = cfg.block !== false;
-  const withItem = cfg.item !== false;
-  const entity = cfg.entity || '';
-  const lang = cfg.scriptLang || 'js';
-  const tpl = cfg.scriptTpl || 'scoreboard';
-  const ext = Array.isArray(cfg.uuids) ? cfg.uuids : [];
-  const bpUuid = ext[0] || uuid(), rpUuid = ext[1] || uuid(), modUuidB = ext[2] || uuid(), modUuidR = ext[3] || uuid(), scriptUuid = ext[4] || uuid();
-  const texIn = cfg.tex || {};
+export function buildProject(cfg) {
+  const ns = String(cfg.namespace || 'demo').trim().toLowerCase();
+  const name = String(cfg.name || '我的附加包').trim();
+  const author = String(cfg.author || '').trim() || 'MC工具箱';
+  const ver = Array.isArray(cfg.version) ? cfg.version : [1, 0, 0];
+  const t = cfg.texture || {};
+  const c1 = t.c1 || '#c62828', c2 = t.c2 || '#ff8a80';
+  const size = Number(t.size) || 16;
   const dirB = `behavior_packs/${ns}_bp`;
   const dirR = `resource_packs/${ns}_rp`;
   const entries = [];
-  // U：写入或覆盖（避免同一个 manifest 被写两次）；A：追加文本（lang 合并）
   const U = (path, text) => {
-    const i = entries.findIndex(e => e.path === path);
     const data = new TextEncoder().encode(text);
+    const i = entries.findIndex(e => e.path === path);
     if (i >= 0) entries[i].data = data; else entries.push({ path, data });
   };
   const A = (path, text) => {
     const i = entries.findIndex(e => e.path === path);
     if (i >= 0) {
       const old = new TextDecoder().decode(entries[i].data);
-      entries[i].data = new TextEncoder().encode(old.endsWith('\n') || !old ? old + text : old + '\n' + text);
+      entries[i].data = new TextEncoder().encode(old + (old.endsWith('\n') || !old ? '' : '\n') + text);
     } else entries.push({ path, data: new TextEncoder().encode(text) });
   };
   const B = (path, bytes) => {
@@ -257,88 +281,145 @@ export function generateAddon(cfg) {
     if (i >= 0) entries[i].data = bytes; else entries.push({ path, data: bytes });
   };
   const J = (path, obj) => U(path, JSON.stringify(obj, null, 2));
-  const T = (path, text) => U(path, text);
-  const log = [];
 
-  const useB = mode !== 'resource';
-  const useR = mode !== 'behavior';
+  const bpUuid = localUuid(), rpUuid = localUuid();
+  const bpModUuid = localUuid(), rpModUuid = localUuid();
+  const scriptUuid = localUuid();
+  const minEngine = [1, 21, 0];
+  const bpManifest = {
+    format_version: 2,
+    header: { name: name + ' 行为包', description: name + ' 行为包', uuid: bpUuid, version: ver, min_engine_version: minEngine },
+    modules: [{ type: 'data', uuid: bpModUuid, version: ver }],
+    metadata: { authors: [author], generated_with: { mcbe_toolbox: ['6.3.0'] } }
+  };
+  if (cfg.script?.enabled) {
+    bpManifest.modules.push({ type: 'script', language: 'javascript', uuid: scriptUuid, entry: 'scripts/main.js', version: ver });
+    bpManifest.dependencies = [{ module_name: '@minecraft/server', version: '1.11.0' }];
+  }
+  const rpManifest = {
+    format_version: 2,
+    header: { name: name + ' 资源包', description: name + ' 资源包', uuid: rpUuid, version: ver, min_engine_version: minEngine },
+    modules: [{ type: 'resources', uuid: rpModUuid, version: ver }],
+    dependencies: [{ uuid: bpUuid, version: ver }],
+    metadata: { authors: [author], generated_with: { mcbe_toolbox: ['6.3.0'] } }
+  };
 
-  if (useB) {
-    B(`${dirB}/pack_icon.png`, texIn.icon || texIn.block || previewTexture('block', 64, c1, c2));
-    J(`${dirB}/manifest.json`, {
-      format_version: 2,
-      header: {
-        name: name + ' BP', description: name + ' 行为包', uuid: bpUuid, version: ver,
-        min_engine_version: [1, 21, 0]
-      },
-      modules: [{ type: 'data', uuid: modUuidB, version: ver }],
-      metadata: { authors: [cfg.author || 'MCBE工具箱'], generated_with: { mcbe_toolbox: ['2.5.0'] } }
+  const icon = packIcon(128, c1, c2, cfg.block?.pattern || 'stone');
+  B(`${dirB}/pack_icon.png`, icon);
+  B(`${dirR}/pack_icon.png`, icon);
+  J(`${dirB}/manifest.json`, bpManifest);
+  J(`${dirR}/manifest.json`, rpManifest);
+
+  const lang = { zh: [], en: [] };
+  lang.zh.push('pack.name=' + name + ' 行为包', 'pack.description=' + name + ' 行为包');
+  lang.en.push('pack.name=' + name + ' BP', 'pack.description=' + name + ' behavior pack');
+
+  const texKeyBlock = cfg.block?.enabled ? `${ns}_${cfg.block.id}` : '';
+  if (cfg.block?.enabled) {
+    const b = cfg.block;
+    B(`${dirR}/textures/blocks/${texKeyBlock}.png`, previewTexture(b.pattern, size, c1, c2));
+    J(`${dirR}/textures/terrain_texture.json`, {
+      resource_pack_name: name, texture_name: 'atlas.terrain', padding: 8, num_mip_levels: 4,
+      texture_data: { [texKeyBlock]: { textures: [`textures/blocks/${texKeyBlock}`] } }
     });
-    if (withBlock) J(`${dirB}/blocks/${ns}_block.json`, jsonTpl.block(ns, ns + '_block'));
-    if (withItem) J(`${dirB}/items/${ns}_item.json`, jsonTpl.item(ns, ns + '_item', ns + '_item'));
-    A(`${dirB}/texts/zh_CN.lang`, `pack.name=${name} 行为包\npack.description=${name} 行为包\n`);
-    A(`${dirB}/texts/en_US.lang`, `pack.name=${name} BP\npack.description=${name} behavior pack\n`);
-
-    if (lang === 'js' || lang === 'json') {
-      // script module 需要单独的清单模块与依赖
-      const mf = JSON.parse(new TextDecoder().decode(entries.find(e => e.path === `${dirB}/manifest.json`).data));
-      mf.modules.push({ type: 'script', language: 'javascript', uuid: scriptUuid, entry: 'scripts/main.js', version: ver });
-      mf.dependencies = [{ module_name: '@minecraft/server', version: '1.11.0' }];
-      J(`${dirB}/manifest.json`, mf);
-      T(`${dirB}/scripts/main.js`, scriptTemplate(tpl, ns));
-    } else if (lang === 'ts') {
-      T(`${dirB}/scripts/main.ts`, tsTemplate(ns));
-    } else if (lang === 'py') {
-      T(`${dirB}/scripts/main.py`, pyTemplate(ns));
-    }
-    U(`${dirB}/README.md`, `# ${name}\n\n由 MCBE 工具箱生成。\n\n- 命名空间：${ns}\n- 版本：1.0.0\n- 脚本语言：${lang}\n\n安装：把整个 .mcaddon 用 Minecraft 打开即可。\n`);
+    J(`${dirR}/blocks.json`, { format_version: [1, 1, 0], [`${ns}:${b.id}`]: { textures: texKeyBlock, sound: 'stone' } });
+    J(`${dirB}/blocks/${b.id}.json`, {
+      format_version: '1.21.0',
+      'minecraft:block': {
+        description: { identifier: `${ns}:${b.id}`, menu_category: { category: 'construction' } },
+        components: {
+          'minecraft:material_instances': { '*': { texture: texKeyBlock, render_method: 'opaque' } },
+          'minecraft:destructible_by_mining': { seconds_to_destroy: Number(b.hardness) || 1.5 },
+          'minecraft:destructible_by_explosion': { explosion_resistance: 3 },
+          'minecraft:light_dampening': 15,
+          'minecraft:map_color': c1
+        }
+      }
+    });
+    lang.zh.push(`tile.${ns}:${b.id}.name=${b.zh || '自定义方块'}`);
+    lang.en.push(`tile.${ns}:${b.id}.name=${b.en || 'Custom Block'}`);
   }
 
-  if (useR) {
-    B(`${dirR}/pack_icon.png`, texIn.icon || texIn.block || previewTexture('block', 64, c1, c2));
-    const dep = useB ? [{ uuid: bpUuid, version: ver }] : [];
-    J(`${dirR}/manifest.json`, {
-      format_version: 2,
-      header: { name: name + ' RP', description: name + ' 资源包', uuid: rpUuid, version: ver, min_engine_version: [1, 21, 0] },
-      modules: [{ type: 'resources', uuid: modUuidR, version: ver }],
-      dependencies: dep,
-      metadata: { authors: [cfg.author || 'MCBE工具箱'], generated_with: { mcbe_toolbox: ['2.5.0'] } }
+  const texKeyItem = cfg.item?.enabled ? `${ns}_${cfg.item.id}` : '';
+  if (cfg.item?.enabled) {
+    const it = cfg.item;
+    B(`${dirR}/textures/items/${texKeyItem}.png`, previewTexture('item', size, c1, c2));
+    J(`${dirR}/textures/item_texture.json`, {
+      resource_pack_name: name, texture_name: 'atlas.items',
+      texture_data: { [texKeyItem]: { textures: [`textures/items/${texKeyItem}`] } }
     });
-    if (withBlock) {
-      B(`${dirR}/textures/blocks/${ns}_block.png`, texIn.block || previewTexture(pattern, size, c1, c2));
-      J(`${dirR}/textures/terrain_texture.json`, {
-        resource_pack_name: name, texture_name: 'atlas.terrain', padding: 8, num_mip_levels: 4,
-        texture_data: { [ns + '_block']: { textures: `textures/blocks/${ns}_block` } }
-      });
-      J(`${dirR}/blocks.json`, { format_version: [1, 1, 0], [ns + '_block']: { textures: ns + '_block', sound: 'stone' } });
-      A(`${dirR}/texts/zh_CN.lang`, `tile.${ns}_block.name=${cfg.blockName || '自定义方块'}\npack.name=${name} 资源包\npack.description=${name} 资源包\n`);
-      A(`${dirR}/texts/en_US.lang`, `tile.${ns}_block.name=${cfg.blockNameEn || 'Custom Block'}\npack.name=${name} RP\npack.description=${name} resource pack\n`);
-    }
-    if (withItem) {
-      B(`${dirR}/textures/items/${ns}_item.png`, texIn.item || previewTexture('item', size, c1, c2));
-      J(`${dirR}/textures/item_texture.json`, {
-        resource_pack_name: name, texture_name: 'atlas.items', texture_data: { [ns + '_item']: { textures: `textures/items/${ns}_item` } }
-      });
-      A(`${dirR}/texts/zh_CN.lang`, `item.${ns}_item.name=${cfg.itemName || '自定义物品'}\n`);
-      A(`${dirR}/texts/en_US.lang`, `item.${ns}_item.name=${cfg.itemNameEn || 'Custom Item'}\n`);
-    }
-    if (entity) {
-      const [w, h] = ENTITY_SIZES[entity] || [64, 32];
-      B(`${dirR}/textures/entity/${entity}/${entity}.png`, texIn.entity || previewTexture('entity', size, c1, c2, entity));
-      log.push(`实体贴图 ${entity}：${w}×${h}（覆盖原版路径 textures/entity/${entity}/${entity}.png）`);
-    }
+    J(`${dirB}/items/${it.id}.json`, {
+      format_version: '1.21.0',
+      'minecraft:item': {
+        description: { identifier: `${ns}:${it.id}`, menu_category: { category: 'items' } },
+        components: {
+          'minecraft:icon': { texture: texKeyItem },
+          'minecraft:max_stack_size': Number(it.maxStack) || 64
+        }
+      }
+    });
+    lang.zh.push(`item.${ns}:${it.id}.name=${it.zh || '自定义物品'}`);
+    lang.en.push(`item.${ns}:${it.id}.name=${it.en || 'Custom Item'}`);
   }
 
-  log.unshift(`已生成 ${entries.length} 个文件，模式 ${mode}，贴图 ${size}×${size}，脚本 ${lang}`);
-  return { entries, log, dirB, dirR };
+  if (cfg.entity?.enabled) {
+    const e = cfg.entity;
+    const base = e.base === 'humanoid' ? 'humanoid' : 'quadruped';
+    const hp = Math.max(1, Number(e.health) || 10);
+    B(`${dirR}/textures/entity/${ns}_${e.id}/${ns}_${e.id}.png`, entityTexture(base, c1, c2));
+    J(`${dirB}/entities/${e.id}.json`, {
+      format_version: '1.21.0',
+      'minecraft:entity': {
+        description: { identifier: `${ns}:${e.id}`, is_spawnable: true, is_summonable: true },
+        components: {
+          'minecraft:type_family': { family: ['custom', 'mob'] },
+          'minecraft:health': { value: hp, max: hp },
+          'minecraft:movement': { value: Number(e.speed) || 0.25 },
+          'minecraft:navigation.walk': { can_path_over_water: true },
+          'minecraft:movement.basic': {},
+          'minecraft:jump.static': {},
+          'minecraft:physics': {},
+          'minecraft:collision_box': { width: 0.9, height: 0.9 },
+          'minecraft:behavior.random_stroll': { priority: 6, speed_multiplier: 1 },
+          'minecraft:behavior.look_at_player': { priority: 7, look_distance: 6 },
+          'minecraft:behavior.random_look_around': { priority: 8 }
+        }
+      }
+    });
+    J(`${dirR}/entity/${ns}_${e.id}.json`, {
+      format_version: '1.10.0',
+      'minecraft:client_entity': {
+        description: {
+          identifier: `${ns}:${e.id}`,
+          materials: { default: 'entity_alphatest' },
+          textures: { default: `textures/entity/${ns}_${e.id}/${ns}_${e.id}` },
+          geometry: { default: base === 'humanoid' ? 'geometry.humanoid.custom' : 'geometry.pig' },
+          render_controllers: [base === 'humanoid' ? 'controller.render.humanoid' : 'controller.render.pig'],
+          spawn_egg: { base_color: c1, overlay_color: c2 }
+        }
+      }
+    });
+    lang.zh.push(`entity.${ns}:${e.id}.name=${e.zh || '自定义生物'}`);
+    lang.en.push(`entity.${ns}:${e.id}.name=${e.en || 'Custom Mob'}`);
+  }
+
+  if (cfg.script?.enabled) {
+    U(`${dirB}/scripts/main.js`, scriptBody(cfg.script.template, ns));
+  }
+
+  U(`${dirB}/texts/zh_CN.lang`, lang.zh.join('\n') + '\n');
+  U(`${dirB}/texts/en_US.lang`, lang.en.join('\n') + '\n');
+  U(`${dirR}/texts/zh_CN.lang`, lang.zh.join('\n') + '\n');
+  U(`${dirR}/texts/en_US.lang`, lang.en.join('\n') + '\n');
+  U(`${dirB}/README.md`, `# ${name}\n\n由 MC工具箱附加包制作器（重置版）生成。\n\n- 命名空间：${ns}\n- 脚本：${cfg.script?.enabled ? cfg.script.template : '无'}\n- 安装：用 Minecraft 打开 .mcaddon 即可导入。\n`);
+
+  const stats = { files: entries.length, dirB, dirR, uuids: cfg.script?.enabled ? 5 : 4 };
+  return { entries, dirB, dirR, stats };
 }
 
+export const ENTITY_LIST = ['quadruped', 'humanoid'];
 export const SNIPPETS = [
-  { lang: 'JSON', title: '方块定义（最小可运行）', code: `{\n  "format_version": "1.21.0",\n  "minecraft:block": {\n    "description": { "identifier": "demo:my_block" },\n    "components": {\n      "minecraft:material_instances": { "*": { "texture": "my_block", "render_method": "opaque" } },\n      "minecraft:destructible_by_mining": { "seconds_to_destroy": 1.5 }\n    }\n  }\n}` },
-  { lang: 'JSON', title: '物品定义', code: `{\n  "format_version": "1.21.0",\n  "minecraft:item": {\n    "description": { "identifier": "demo:my_item" },\n    "components": { "minecraft:icon": { "texture": "my_item" }, "minecraft:max_stack_size": 64 }\n  }\n}` },
+  { lang: 'JSON', title: '方块定义（最小可运行）', code: `{\n  "format_version": "1.21.0",\n  "minecraft:block": {\n    "description": { "identifier": "demo:my_block" },\n    "components": {\n      "minecraft:material_instances": { "*": { "texture": "my_block", "render_method": "opaque" } }\n    }\n  }\n}` },
   { lang: 'JS', title: '进服欢迎', code: `import { world } from "@minecraft/server";\nworld.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {\n  if (initialSpawn) player.sendMessage("§a欢迎！");\n});` },
-  { lang: 'JS', title: '定时粒子', code: `import { world, system } from "@minecraft/server";\nsystem.runInterval(() => {\n  for (const p of world.getAllPlayers()) {\n    p.dimension.spawnParticle("minecraft:campfire_tick_particle", p.location);\n  }\n}, 20);` },
-  { lang: 'JS', title: '计分板加分', code: `import { world } from "@minecraft/server";\nconst obj = world.scoreboard.getObjective("points");\nobj.setScore(player, (obj.getScore(player) || 0) + 1);` },
-  { lang: 'TS', title: '类型化事件监听', code: `import { world, Player } from "@minecraft/server";\nworld.afterEvents.playerSpawn.subscribe((ev) => {\n  const p: Player = ev.player;\n  p.sendMessage(ev.initialSpawn ? "首次进入" : "回来啦");\n});` },
-  { lang: 'PY', title: '外部工具骨架（游戏不执行）', code: `# 基岩版不执行 Python，仅供外部工具参考\nimport json, os\nROOT = os.path.dirname(os.path.dirname(__file__))\nwith open(os.path.join(ROOT, "manifest.json"), encoding="utf-8") as f:\n    print(json.load(f)["header"]["name"])\n` }
+  { lang: 'JS', title: '定时粒子', code: `import { world, system } from "@minecraft/server";\nsystem.runInterval(() => {\n  for (const p of world.getAllPlayers()) p.dimension.spawnParticle("minecraft:campfire_tick_particle", p.location);\n}, 20);` },
 ];

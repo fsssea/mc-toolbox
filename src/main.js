@@ -11,7 +11,8 @@ import { analyzeWorld, zh } from './world.js';
 import { localizeArchive, localizeUiJson } from './lang.js';
 import { blockName, entityName, initNames, getNameFixText, saveNameFix } from './langdict.js';
 import { writeNBT } from './nbt.js';
-import { generateAddon, previewTexture, pngDataUrl, ENTITY_LIST, SNIPPETS } from './addongen.js';
+import { SNIPPETS } from './addongen.js';
+import { openMakerStudio } from './makerstudio.js';
 import { openSkinStudio } from './skin.js';
 import { openJavaTools, openJavaModStudio } from './java.js';
 import { openConverter } from './converter.js';
@@ -226,13 +227,10 @@ function renderTree() {
     return;
   }
   const nodes = state.archive.tree();
-  // 只渲染展开层级内的节点：1586 个文件默认只画顶层 10 行
-  const anc = [];
+  // 只渲染展开层级内的节点；父目录直接从路径推，避免连续文件跨根目录时用到上一条的祖先
   const frag = document.createDocumentFragment();
   for (const n of nodes) {
-    if (n.depth === 0) anc[0] = n.path;
-    else { anc.length = n.depth; anc[n.depth] = n.path; }
-    const parent = n.depth ? anc[n.depth - 1] : null;
+    const parent = n.depth ? n.path.slice(0, n.path.lastIndexOf('/')) : null;
     if (n.depth && !state.expanded.has(parent)) continue;
     const row = document.createElement('div');
     row.className = 'node ' + n.type + (state.selected === n.path ? ' active' : '');
@@ -1777,134 +1775,9 @@ async function creatorUuid() {
   document.getElementById('uuClose').onclick = () => { $('modal').style.display = 'none'; };
 }
 
-// ---- 附加包制作器（2.5.0）----
-let makerEls = null;
-
-function makerPreview() {
-  if (!makerEls) return;
-  const kind = makerEls.pattern.value === 'item' ? 'item' : (makerEls.entity.value ? 'entity' : makerEls.pattern.value);
-  try {
-    const bytes = previewTexture(kind === 'item' ? 'item' : (makerEls.entity.value ? 'entity' : makerEls.pattern.value),
-      Number(makerEls.size.value), makerEls.c1.value, makerEls.c2.value, makerEls.entity.value);
-    makerEls.preview.src = pngDataUrl(bytes);
-  } catch (e) { /* 预览失败不影响生成 */ }
-}
-
+// ---- 附加包制作器（重置版入口）----
 function openMaker() {
-  const body = $('modalBody');
-  body.innerHTML = `
-    <h3>附加包制作器</h3>
-    <p class="muted">离线生成行为包 + 资源包，贴图现场绘制，导出的 .mcaddon 可直接用 Minecraft 打开。</p>
-    <div class="form">
-      <div class="row2"><input id="mkName" placeholder="包名" value="我的附加包"><input id="mkNs" placeholder="命名空间" value="demo"></div>
-      <div class="row2">
-        <select id="mkMode"><option value="addon">双包 .mcaddon</option><option value="resource">仅资源包</option><option value="behavior">仅行为包</option></select>
-        <select id="mkSize"><option value="16">16×16</option><option value="32">32×32</option><option value="64">64×64</option></select>
-      </div>
-      <div class="row2">
-        <select id="mkPattern"><option value="stone">石质噪点</option><option value="wood">木纹</option><option value="metal">金属</option><option value="crystal">水晶</option><option value="wool">羊毛</option></select>
-        <select id="mkEntity"><option value="">不生成实体贴图</option>${ENTITY_LIST.map(e => `<option value="${e}">${e}</option>`).join('')}</select>
-      </div>
-      <div class="row2"><input id="mkC1" type="color" value="#7a7f8c"><input id="mkC2" type="color" value="#4a505c"></div>
-      <div class="row2">
-        <label class="chk"><input type="checkbox" id="mkBlock" checked> 生成方块</label>
-        <label class="chk"><input type="checkbox" id="mkItem" checked> 生成物品</label>
-      </div>
-      <div class="row2">
-        <label class="chk"><input type="checkbox" id="mkOnlineUuid" checked> 在线 UUID</label>
-        <label class="chk"><input type="checkbox" id="mkOnlineTex"> 在线贴图（公共接口，默认关）</label>
-      </div>
-      <input id="mkPrompt" placeholder="在线贴图提示词（英文效果更好，可空）">
-      <div class="row2">
-        <select id="mkLang"><option value="js">JavaScript（游戏可执行）</option><option value="ts">TypeScript（源码模板）</option><option value="json">JSON（仅数据）</option><option value="py">Python（游戏不执行，仅参考）</option><option value="none">不生成脚本</option></select>
-        <select id="mkTpl"><option value="scoreboard">计分板</option><option value="particle">粒子</option><option value="welcome">进服提示</option></select>
-      </div>
-      <div class="mapwrap" style="text-align:center;background:#0d1219"><img id="mkPrev" style="width:96px;height:96px;image-rendering:pixelated"><div class="muted" id="mkPrevInfo"></div></div>
-      <input id="mkBlockName" placeholder="方块中文名（默认 自定义方块）" value="自定义方块">
-      <input id="mkItemName" placeholder="物品中文名（默认 自定义物品）" value="自定义物品">
-      <div class="edbar"><button id="mkBuild">生成并打开</button><button id="mkPng" class="ghost">只保存这张贴图</button></div>
-    </div>
-    <div class="modalbtns"><button id="mkClose" class="ghost">关闭</button></div>`;
-  $('modal').style.display = 'flex';
-  makerEls = {
-    name: document.getElementById('mkName'), ns: document.getElementById('mkNs'),
-    mode: document.getElementById('mkMode'), size: document.getElementById('mkSize'),
-    pattern: document.getElementById('mkPattern'), entity: document.getElementById('mkEntity'),
-    c1: document.getElementById('mkC1'), c2: document.getElementById('mkC2'),
-    block: document.getElementById('mkBlock'), item: document.getElementById('mkItem'),
-    lang: document.getElementById('mkLang'), tpl: document.getElementById('mkTpl'),
-    preview: document.getElementById('mkPrev'), info: document.getElementById('mkPrevInfo')
-  };
-  const refresh = () => {
-    makerPreview();
-    const kind = makerEls.entity.value ? '实体 ' + makerEls.entity.value : makerEls.pattern.options[makerEls.pattern.selectedIndex].text;
-    makerEls.info.textContent = kind + '　' + makerEls.size.value + '×' + makerEls.size.value;
-  };
-  ['mkName', 'mkNs', 'mkMode', 'mkSize', 'mkPattern', 'mkEntity', 'mkC1', 'mkC2', 'mkBlock', 'mkItem', 'mkLang', 'mkTpl'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('change', refresh), el.addEventListener('input', refresh);
-  });
-  refresh();
-  document.getElementById('mkClose').onclick = () => { $('modal').style.display = 'none'; };
-  document.getElementById('mkPng').onclick = async () => {
-    const kind = makerEls.entity.value ? 'entity' : (makerEls.pattern.value === 'item' ? 'item' : makerEls.pattern.value);
-    const bytes = previewTexture(kind, Number(makerEls.size.value), makerEls.c1.value, makerEls.c2.value, makerEls.entity.value);
-    await saveBytes((makerEls.entity.value || makerEls.pattern.value || 'texture') + '.png', bytes);
-  };
-  document.getElementById('mkBuild').onclick = async () => {
-    const btn = document.getElementById('mkBuild');
-    btn.disabled = true; btn.textContent = '生成中…';
-    try {
-      const cfg = {
-        name: makerEls.name.value.trim() || '我的附加包',
-        namespace: (makerEls.ns.value.trim() || 'demo').replace(/[^a-z0-9_]/gi, '_').toLowerCase(),
-        mode: makerEls.mode.value, size: Number(makerEls.size.value),
-        pattern: makerEls.pattern.value, color1: makerEls.c1.value, color2: makerEls.c2.value,
-        block: makerEls.block.checked, item: makerEls.item.checked,
-        entity: makerEls.entity.value, scriptLang: makerEls.lang.value, scriptTpl: makerEls.tpl.value,
-        blockName: document.getElementById('mkBlockName').value.trim(),
-        itemName: document.getElementById('mkItemName').value.trim()
-      };
-      const onlineUuidOn = document.getElementById('mkOnlineUuid').checked;
-      const onlineTexOn = document.getElementById('mkOnlineTex').checked;
-      const promptBase = document.getElementById('mkPrompt').value.trim() || (cfg.name + ' ' + cfg.pattern + ' minecraft texture');
-      if (onlineUuidOn) {
-        const uuids = [];
-        for (let i = 0; i < 5; i++) {
-          let u = null;
-          try { u = await onlineUuid(); } catch (e) { }
-          uuids.push(u || uuid());
-        }
-        cfg.uuids = uuids;
-        log('UUID：已向在线生成器请求，失败项用本地 v4 兜底');
-      }
-      if (onlineTexOn && (cfg.block || cfg.item || cfg.entity)) {
-        const size = cfg.size;
-        const tex = {};
-        let api = 0, local = 0;
-        const getTex = async (p, k) => {
-          const r = await apiTexture(p, size, k);
-          if (r.source === 'api') api++; else local++;
-          return r.data;
-        };
-        try { tex.block = await getTex(promptBase + ' block', 'block'); } catch (e) { local++; }
-        try { tex.item = await getTex(promptBase + ' item icon', 'item'); } catch (e) { local++; }
-        if (cfg.entity) { try { tex.entity = await getTex(promptBase + ' ' + cfg.entity + ' skin', 'entity'); } catch (e) { local++; } }
-        cfg.tex = tex;
-        log('贴图：在线接口 ' + api + ' 张，本地像素图 ' + local + ' 张');
-      }
-      const out = generateAddon(cfg);
-      state.archive = new Archive('zip', out.entries);
-      state.texIndex = null; state.texCache = new Map(); state.texPending = new Set(); state.texPacks = [];
-      state.statsDirty = true;
-      $('modal').style.display = 'none';
-      setupArchive('', '');
-      log('生成完成：' + out.entries.length + ' 个文件，命名空间 ' + cfg.namespace);
-      out.log.forEach(l => log('· ' + l));
-      log('点右上角“导出 / 另存”保存为 .mcaddon 即可安装');
-    } catch (e) { showError('生成失败：' + e.message); }
-    btn.disabled = false; btn.textContent = '生成并打开';
-  };
+  openMakerStudio({ state, Archive, setupArchive, log, $ });
 }
 
 // ---- 附加包制作器 / 贴图生成 / 代码高亮（2.5.0）----
@@ -2208,8 +2081,7 @@ function openTools() {
     ['书内容编辑', '读取玩家背包里的成书，改页面/书名/作者', openBooks],
     ['背包槽位调整', '改物品在背包里的槽位，自动交换不丢物品', openInventorySlots],
     ['新建附加包（制作器）', '从零生成行为包 + 资源包', openMaker],
-    ['创作工坊', '按模板往当前包写内容', openStudio],
-    ['附加包生成器', '自动生成 manifest / 脚本 / 贴图 / 语言文件', openPackStudio],
+    ['创作工坊', '贴图生成 / 语法模板 / 代码片段', openStudio],
     ['贴图生成器', '16/32/64/128 方块、物品、实体立绘', openTextureStudio],
     ['语法模板库', 'JSON / JS / TS / Python 代码片段', toolSnippets],
     ['皮肤制作器', '64×64 手动像素绘制 / 代码生成 / 导出 PNG', () => openSkinStudio('skin')],
@@ -2458,8 +2330,8 @@ async function toolSnippets() {
 }
 
 function openStudio() {
-  $('modalBody').innerHTML = `<h3>附加包制作器</h3><p class="muted">贴图、脚本、清单、语言文件一次生成，导出即 .mcaddon。</p>
-    <button class="toolitem" id="stPack"><b>新建附加包</b><span>行为包/资源包、manifest、UUID、脚本骨架、包图标</span></button>
+  $('modalBody').innerHTML = `<h3>创作工坊</h3><p class="muted">从模板往当前包写内容；新建完整附加包请用“附加包制作器（重置版）”。</p>
+    <button class="toolitem" id="stPack"><b>新建附加包（重置版）</b><span>方块/物品/生物/脚本完整生成，自动写 manifest 与语言文件</span></button>
     <button class="toolitem" id="stTex"><b>贴图生成器</b><span>16/32/64/128，方块/物品/实体立绘</span></button>
     <button class="toolitem" id="stSnip"><b>语法模板库</b><span>JSON / JS / TS / Python / Lua / mcfunction 片段</span></button>
     <div class="modalbtns"><button id="stClose" class="ghost">关闭</button></div>`;
@@ -2468,7 +2340,7 @@ function openStudio() {
       $('modalBody').querySelectorAll('.slotrow').forEach((el, idx) => {
         el.onclick = () => showStructurePreview(marks[idx]);
       });
-  document.getElementById('stPack').onclick = openPackStudio;
+  document.getElementById('stPack').onclick = openMaker;
   document.getElementById('stTex').onclick = openTextureStudio;
   document.getElementById('stSnip').onclick = toolSnippets;
 }

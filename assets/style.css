@@ -362,3 +362,65 @@ body.bigscreen .codestatus{font-size:13px}
 .mci-toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);z-index:31000;background:#2f7df6;color:#fff;padding:9px 14px;border-radius:9px;font-size:13px;opacity:0;transition:.2s;pointer-events:none;max-width:90vw;word-break:break-all}
 .mci-toast.on{opacity:1}
 body.mci-lock{overflow:hidden}
+
+/* ---- 附加包制作器（重置版） ---- */
+.modalbox.makerbox{max-width:980px;width:96vw;padding:0;display:flex;flex-direction:column;max-height:88vh;overflow:hidden}
+.mkhead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line3);background:var(--panel2)}
+.mkhead h3{margin:0;display:flex;align-items:center;gap:8px}
+.mkbadge{font-size:10.5px;font-weight:600;letter-spacing:.04em;padding:3px 7px;border-radius:6px;background:var(--badgebg);color:var(--badgetx);border:1px solid var(--line3)}
+.mkhead .muted{margin:4px 0 0;font-size:12px}
+.mkclose{flex:none;padding:8px 12px;font-size:12.5px}
+.mkbody{flex:1;min-height:0;overflow:auto;padding:0 20px;-webkit-overflow-scrolling:touch}
+.mksec{padding:18px 0;border-bottom:1px dashed var(--line2)}
+.mksec:last-child{border-bottom:0}
+.mksec-h{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.mkno{font-size:11px;font-weight:700;color:var(--muted2);border:1px solid var(--line3);border-radius:5px;padding:3px 5px;line-height:1;margin-top:2px}
+.mksec-h h4{margin:0;font-size:14px}
+.mksec-h .muted{margin:3px 0 0;font-size:11.5px}
+.mkgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px 12px}
+.mkgrid label{display:flex;flex-direction:column;gap:5px;font-size:11.5px;color:var(--label);margin:0}
+.mkgrid input,.mkgrid select{width:100%;background:var(--code);border:1px solid var(--line);border-radius:8px;color:var(--fg);padding:8px 9px;font-size:12.5px}
+.mktoggles{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.mktoggle{display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border:1px solid var(--line3);border-radius:8px;background:var(--panel3);font-size:12.5px;color:var(--node);cursor:pointer}
+.mktoggle input{width:auto;accent-color:var(--primary);margin:0}
+.mktoggle:has(input:checked){border-color:var(--primary);background:var(--active)}
+.mkcheck{display:inline-flex;margin:0 0 10px}
+.mkfields.off{display:none}
+.mkart{display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:start}
+.mkpreview{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px;border:1px solid var(--line3);border-radius:10px;background:var(--panel3)}
+.mkpreview img{width:96px;height:96px;image-rendering:pixelated;border-radius:6px;background:var(--code);border:1px solid var(--line)}
+.mkpreview .muted{font-size:11px;text-align:center;margin:0;line-height:1.4}
+.mkartfields{align-content:start}
+.mksum{border:1px solid var(--line3);border-radius:9px;background:var(--logbg);padding:10px 12px}
+.mksum-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.mksum-top b{font-size:13px}
+.mksum-top span{font-size:11.5px;color:var(--muted2)}
+.mkpaths{display:flex;flex-direction:column;gap:3px;max-height:140px;overflow:auto}
+.mkpaths code{font:11px/1.45 ui-monospace,Menlo,Consolas,monospace;color:var(--codetx);word-break:break-all}
+.mkerrors{margin-top:9px}
+.mkerr-h{color:var(--errtx);font-size:12px;font-weight:600;margin-bottom:4px}
+.mkerrors p,.mkwarn p{margin:3px 0;font-size:11.5px;line-height:1.45}
+.mkerrors p{color:var(--errtx)}
+.mkerrors:empty{display:none}
+.mkok{color:var(--dir);font-size:12px}
+.mkwarn{margin-top:7px;color:var(--muted2)}
+.mkfoot{display:flex;gap:9px;padding:12px 20px;border-top:1px solid var(--line3);background:var(--panel2)}
+.mkfoot button{flex:1;padding:10px;border-radius:9px;font-size:13px}
+.mkfoot button:disabled{opacity:.45;cursor:not-allowed}
+@media (max-width:600px){
+  .modalbox.makerbox{width:100%;max-height:92vh}
+  .mkhead{padding:12px 14px}
+  .mkhead h3{font-size:16px}
+  .mkbody{padding:0 14px}
+  .mksec{padding:14px 0}
+  .mkgrid{grid-template-columns:1fr 1fr}
+  .mkart{grid-template-columns:1fr}
+  .mkpreview{flex-direction:row;justify-content:flex-start;text-align:left}
+  .mkpreview img{width:72px;height:72px;flex:none}
+  .mkpreview .muted{text-align:left}
+  .mkfoot{padding:10px 14px}
+  .mkfoot button{font-size:12.5px}
+}
+.mkgrid input[type=color]{height:38px;padding:2px 3px;cursor:pointer}
+.mkclose{width:36px;height:36px;padding:0!important;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center}
+.mkfield-title{font-size:12px;font-weight:600;color:var(--fg2);margin:0 0 8px}

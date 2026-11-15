@@ -7,7 +7,7 @@
 
 ![Verify](https://github.com/fsssea/mc-toolbox/actions/workflows/verify.yml/badge.svg)
 
-# MC工具箱 6.2.1
+# MC工具箱 6.3.0
 
 一个完全离线的 Minecraft 工具箱：安卓 APK（WebView + Java 桥）、Windows / Linux Electron 桌面版、网页 PWA，同一套前端。
 
