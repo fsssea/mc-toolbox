@@ -1,0 +1,10 @@
+node_modules/
+build/
+dist/
+*.apk
+*.idsig
+*.zip
+*.keystore
+*.jks
+.DS_Store
+windows/assets/

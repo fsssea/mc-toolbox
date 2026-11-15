@@ -1,0 +1,17 @@
+{
+  "name": "mcbe-toolbox-linux",
+  "productName": "MC工具箱",
+  "version": "6.2.0",
+  "description": "Minecraft 存档、附加包与脚本工具箱",
+  "main": "main.js",
+  "license": "MIT",
+  "scripts": {
+    "sync": "node sync-assets.js",
+    "start": "npm run sync && electron --no-sandbox .",
+    "dist": "npm run sync && electron-packager . MC工具箱 --platform=linux --arch=x64 --out=dist --overwrite --icon=icon.png"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-packager": "^17.1.2"
+  }
+}

@@ -1,0 +1,12 @@
+/* 嵌入 MC 工具箱：去掉联网组件，适配 iframe / 手机 */
+.sponsor-btn,.led-board,#visit-counter{display:none!important}
+.topbar{position:sticky;top:0;z-index:20}
+.container{max-width:none;padding-left:14px;padding-right:14px}
+body{overscroll-behavior:contain}
+a[href^="https://"]{pointer-events:none}
+@media (max-width:600px){
+  .topbar-inner{padding:0 8px}
+  .brand-name{font-size:14px}
+  .container{padding-left:10px;padding-right:10px}
+  .subtitle{font-size:12px;margin:8px 0}
+}
