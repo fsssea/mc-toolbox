@@ -17,7 +17,7 @@ jobs:
       - name: Download APK
         run: |
           set -e
-          curl -L --retry 3 --fail -o MC-Toolbox-6.3.0.apk "https://aka.doubaocdn.com/s/FYHDtmRTjy"
+          curl -L --retry 3 --fail -o MC-Toolbox-6.3.0.apk "https://aka.doubaocdn.com/s/zqZXblTRv9"
           ls -lh MC-Toolbox-6.3.0.apk
       - name: Publish
         env:

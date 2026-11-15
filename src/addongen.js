@@ -379,7 +379,7 @@ export function buildProject(cfg) {
           'minecraft:movement.basic': {},
           'minecraft:jump.static': {},
           'minecraft:physics': {},
-          'minecraft:collision_box': { width: 0.9, height: 0.9 },
+          'minecraft:collision_box': e.base === 'humanoid' ? { width: 0.6, height: 1.8 } : { width: 0.9, height: 0.9 },
           'minecraft:behavior.random_stroll': { priority: 6, speed_multiplier: 1 },
           'minecraft:behavior.look_at_player': { priority: 7, look_distance: 6 },
           'minecraft:behavior.random_look_around': { priority: 8 }
