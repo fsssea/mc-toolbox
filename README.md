@@ -1,3 +1,10 @@
+
+## 官网与下载
+
+- 官网：https://fsssea.github.io/mc-toolbox/
+- 网页版：https://fsssea.github.io/mc-toolbox/app/
+- 下载：https://github.com/fsssea/mc-toolbox/releases/tag/v6.2.0
+
 # MC工具箱 6.2.0
 
 一个完全离线的 Minecraft 工具箱：安卓 APK（WebView + Java 桥）、Windows / Linux Electron 桌面版、网页 PWA，同一套前端。
