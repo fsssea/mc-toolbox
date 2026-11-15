@@ -1,0 +1,31 @@
+name: Release 6.2.1 Android fix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/release-6.2.1-apk.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download APK
+        run: |
+          set -e
+          curl -L --retry 3 --fail -o MC-Toolbox-6.2.1.apk "https://aka.doubaocdn.com/s/RgR1ZtqHVF"
+          ls -lh MC-Toolbox-6.2.1.apk
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          gh release create v6.2.1 \
+            --title "MC工具箱 6.2.1 安卓修复版" \
+            --notes "修复 Android WebView 初始缩放把页面压到 480px 宽、右侧留白的问题；viewport 不再强制禁缩。此包使用新签名，需卸载旧版后安装。Windows / Linux / 网页版经同宽度测试未复现该问题。" \
+            MC-Toolbox-6.2.1.apk \
+          || gh release upload v6.2.1 MC-Toolbox-6.2.1.apk --clobber

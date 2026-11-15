@@ -65,7 +65,7 @@ public class MainActivity extends Activity {
         s.setMediaPlaybackRequiresUserGesture(false);
         s.setSupportZoom(false);
         s.setUseWideViewPort(true);
-        s.setLoadWithOverviewMode(false);
+        s.setLoadWithOverviewMode(true);
         s.setTextZoom(100);
         s.setMinimumFontSize(0);
         s.setMinimumLogicalFontSize(0);
@@ -80,7 +80,6 @@ public class MainActivity extends Activity {
                 // 防止系统字号/概览模式把页面放大成“比例失衡”
                 try {
                     view.getSettings().setTextZoom(100);
-                    view.setInitialScale(100);
                 } catch (Throwable e) { }
             }
 
@@ -397,13 +396,12 @@ public class MainActivity extends Activity {
             } catch (Throwable e) { }
         }
 
-        /** 重置页面缩放，修复系统字号变化导致的比例失衡 */
+        /** 重置系统字号缩放，保持页面按视口宽度排版 */
         @JavascriptInterface
         public void resetZoom() {
             runOnUiThread(() -> {
                 try {
                     web.getSettings().setTextZoom(100);
-                    web.setInitialScale(100);
                 } catch (Throwable e) { }
             });
         }
