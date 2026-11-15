@@ -1,0 +1,49 @@
+name: Release 6.2.0
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/release-6.2.0.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        run: |
+          set -e
+          curl -L --retry 3 --fail -o MC-Toolbox-6.2.0.apk "https://aka.doubaocdn.com/s/oJ6KRiqqjx"
+          curl -L --retry 3 --fail -o MC-Toolbox-Windows-6.2.0.zip "https://aka.doubaocdn.com/s/KEyufHe0M6"
+          curl -L --retry 3 --fail -o MC-Toolbox-Linux-6.2.0.tar.gz "https://aka.doubaocdn.com/s/dUOsYToxGl"
+          curl -L --retry 3 --fail -o MC-Toolbox-Linux-6.2.0.deb "https://aka.doubaocdn.com/s/ZQVEMujeF4"
+          curl -L --retry 3 --fail -o MC-Toolbox-Web-6.2.0.zip "https://aka.doubaocdn.com/s/sFxWsUHYcU"
+          curl -L --retry 3 --fail -o MC-Toolbox-Source-6.2.0.zip "https://aka.doubaocdn.com/s/KLVgyP7yuh"
+          ls -lh MC-Toolbox-*
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          gh release create v6.2.0 \
+            --title "MC工具箱 6.2.0" \
+            --notes-file .github/RELEASE_NOTES.md \
+            MC-Toolbox-6.2.0.apk \
+            MC-Toolbox-Windows-6.2.0.zip \
+            MC-Toolbox-Linux-6.2.0.tar.gz \
+            MC-Toolbox-Linux-6.2.0.deb \
+            MC-Toolbox-Web-6.2.0.zip \
+            MC-Toolbox-Source-6.2.0.zip \
+          || gh release upload v6.2.0 \
+            MC-Toolbox-6.2.0.apk \
+            MC-Toolbox-Windows-6.2.0.zip \
+            MC-Toolbox-Linux-6.2.0.tar.gz \
+            MC-Toolbox-Linux-6.2.0.deb \
+            MC-Toolbox-Web-6.2.0.zip \
+            MC-Toolbox-Source-6.2.0.zip --clobber
