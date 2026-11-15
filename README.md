@@ -3,9 +3,11 @@
 
 - 官网：https://fsssea.github.io/mc-toolbox/
 - 网页版：https://fsssea.github.io/mc-toolbox/app/
-- 下载：https://github.com/fsssea/mc-toolbox/releases/tag/v6.2.0
+- 下载：https://github.com/fsssea/mc-toolbox/releases
 
-# MC工具箱 6.2.0
+![Verify](https://github.com/fsssea/mc-toolbox/actions/workflows/verify.yml/badge.svg)
+
+# MC工具箱 6.2.1
 
 一个完全离线的 Minecraft 工具箱：安卓 APK（WebView + Java 桥）、Windows / Linux Electron 桌面版、网页 PWA，同一套前端。
 
@@ -75,6 +77,17 @@ npm run dist  # 生成 dist/ 下的 Windows 包
 3. 修复 WebView 不兼容：用 `bridge.js` 覆写下载逻辑，安卓走 `AndroidBridge.saveBinary`，浏览器保留 Blob 下载；另加 base64 回退。
 4. 父页面用全屏 iframe 浮层接入，保留原按钮 id 以兼容压缩 bundle 的硬绑定，并拦截旧点击。
 5. 补移动端样式、返回键关闭、保存结果 toast，并跑上游测试与离线加载测试。
+
+## 回归测试
+
+```bash
+cd tests
+npm install
+npx playwright install chromium
+npm test
+```
+
+覆盖 12 种视口、连续打开与旋转、弹窗边界和 viewport / WebView 静态规则。每个修过的布局问题都应补一条用例，详见 `tests/README.md`。
 
 ## 许可
 
