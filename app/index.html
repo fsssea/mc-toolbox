@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta charset="utf-8">
+<title>MC工具箱</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="hdrtop">
+    <h1>MC工具箱</h1>
+    <div class="hdrctl">
+      <button id="btnSfx" class="ghost sfxbtn" title="按钮音效开关">音效开</button>
+      <button id="btnFull" class="ghost fullbtn" title="投屏 / 大屏全屏">全屏</button>
+      <select id="themeSel" class="themesel" aria-label="Theme"></select>
+      <select id="langSel" class="langsel" aria-label="Language"></select>
+    </div>
+  </div>
+  <p class="sub">包编辑 · 汉化 · 世界观看 · 玩家数据 · 结构编辑 · 全离线</p>
+</header>
+<button id="fsExit" class="fsexit" style="display:none">退出全屏</button>
+
+<main>
+  <div id="banner" class="banner"></div>
+
+  <section class="picker">
+    <button id="pickBtn">选择文件</button>
+    <button id="btnAppStore" class="ghost">应用存储</button>
+    <input type="file" id="fileInput" multiple accept=".mcpack,.mcaddon,.mcworld,.mctemplate,.brarchive,.mcstructure,.zip,*/*">
+  </section>
+  <p class="fname"><span id="fileName">未选择文件</span> <span id="typeBadge" class="badge"></span></p>
+
+  <div id="newPackRow" class="newpackrow">
+    <span class="muted">没有现成的包？</span>
+    <button id="btnMaker" class="primary">制作器</button>
+    <button id="btnCreator" class="ghost">创作工坊</button>
+  </div>
+
+  <div id="workspace" style="display:none">
+    <div class="toolbar">
+      <button id="btnRename">重命名</button>
+      <button id="btnDelete" class="danger">删除</button>
+      <button id="btnNewFile">新建文件</button>
+      <button id="btnNewFolder">新建文件夹</button>
+      <button id="btnExport" class="primary">导出 / 另存</button>
+      <button id="btnStats" class="ghost">世界统计</button>
+      <button id="btnLocalize" class="primary">附加包汉化</button>
+      <button id="btnNameFix" class="ghost">译名修正</button>
+      <button id="btnTools" class="ghost">更多工具</button>
+      <button id="btnMap" class="ghost">世界观看</button>
+      <button id="btnPlayer" class="ghost">玩家数据</button>
+    </div>
+    <p class="muted treehint">📁 点文件夹展开 · 📄 点文件查看 / 编辑（默认只显示顶层，避免卡顿）</p>
+    <div class="split">
+      <div id="tree" class="tree"></div>
+      <div id="editor" class="editor"></div>
+    </div>
+  </div>
+
+  <div id="structureView" style="display:none"></div>
+
+  <pre id="log" class="log"></pre>
+</main>
+
+<div id="modal" class="modal"><div id="modalBody" class="modalbox"></div></div>
+<script src="assets_app.js"></script>
+<script src="js/api-docs.js"></script>
+<script src="js/script-inspector.js"></script>
+<script src="js/addon-i18n.js"></script>
+</body>
+</html>
