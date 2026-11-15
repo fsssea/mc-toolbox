@@ -8,3 +8,7 @@ dist/
 *.jks
 .DS_Store
 windows/assets/
+
+tests/test-results/
+tests/playwright-report/
+tests/blob-report/

@@ -1,0 +1,13 @@
+{
+  "name": "mc-toolbox-regression",
+  "private": true,
+  "version": "1.0.0",
+  "description": "MC工具箱布局与发布回归测试",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}

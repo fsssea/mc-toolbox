@@ -1,0 +1,56 @@
+name: Verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  layout:
+    name: Layout regression
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install test dependencies
+        working-directory: tests
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium
+        working-directory: tests
+        run: npx playwright install --with-deps chromium
+      - name: Run tests
+        working-directory: tests
+        run: npm test
+
+  android-build:
+    name: Android build and signature
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android build tools
+        run: |
+          if [ ! -d "$ANDROID_HOME/build-tools/34.0.0" ]; then
+            yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "build-tools;34.0.0" "platforms;android-35"
+          fi
+      - name: Build and sign
+        env:
+          ANDROID_SDK: /usr/local/lib/android/sdk
+        run: |
+          chmod +x build.sh
+          bash build.sh
+      - name: Verify signature
+        run: |
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify MCBE工具箱.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mc-toolbox-debug-apk
+          path: MCBE工具箱.apk
