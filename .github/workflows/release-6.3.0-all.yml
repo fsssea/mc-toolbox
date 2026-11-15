@@ -47,3 +47,6 @@ jobs:
             MC-Toolbox-Linux-6.3.0.deb \
             MC-Toolbox-Web-6.3.0.zip \
             MC-Toolbox-Source-6.3.0.zip --clobber
+          gh release edit v6.3.0 \
+            --title "MC工具箱 6.3.0" \
+            --notes-file .github/RELEASE_NOTES.md
