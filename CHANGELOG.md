@@ -2,6 +2,24 @@
 
 三个版本共用一条时间线；BUILD 号全局递增，界面级改动按版本标注。
 
+## 6.3.0 · BUILD 76 · 2026-11-21
+
+### 修复 · 网页版（与安卓同源问题）
+
+- **网页版「附加包汉化」的下载按钮同样点了没反应。** 网页版的汉化页是在 `app/i18n/` 里以 iframe 打开的，
+  上一轮只修了 APK 内的 `assets/`，站点侧两处病灶都在：`app/i18n/index.html` 仍是那行写坏的 `<script>` 标签，
+  站点上压根没有 `bridge.js`（404）。且 `app/js/addon-i18n.js` 的 `message` 监听只在存在 `AndroidBridge` 时才处理，
+  浏览器里收到 `mc-i18n-save-b64` 直接丢弃，iframe 里的下载也常被浏览器拦住。
+- 修法：`app/i18n/index.html` 标签修正 + 补 `bridge.js`；`addon-i18n.js` 增加浏览器落盘路径
+  （base64 → Blob → 顶层文档 `<a download>`，兼容 `msSaveOrOpenBlob`，iOS 额外给出「去『文件』App 找」提示），
+  且消息只接受本 iframe 来源。
+- 实测（Playwright，同一份 `Baku投掷飞盘-1.2-伤害调整.mcaddon`）：桌面 Chromium 1440×900、Android Pixel 5、iPhone 13 三种环境，
+  点 `Download converted file` 均触发真实下载，得到 `..._i18n.mcaddon` 33,101 B / 55 个条目 / 含 `zh_CN.lang`，页面无报错。
+
+### 变更
+
+- 经典版 APK 资源随网页端修复同步，`versionCode` 75 → 76（同签名可直接覆盖升级）。
+
 ## 6.3.0 · BUILD 75 · 2026-11-21
 
 ### 修复 · 安卓（经典版）

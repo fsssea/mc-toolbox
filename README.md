@@ -9,7 +9,7 @@
 
 # MC工具箱 6.3.0
 
-## 三版本 × 三端（6.3.0 / BUILD 75）
+## 三版本 × 三端（6.3.0 / BUILD 76）
 
 | 版本 | Android | Windows | Linux | 内核源码 |
 | --- | --- | --- | --- | --- |
@@ -37,7 +37,7 @@
 
 ## 更新日志
 
-见 [CHANGELOG.md](CHANGELOG.md)：`6.3.0 · BUILD 75` 修好了安卓端汉化工具「下载」点了没反应，并补上 C++ 版 Windows 原生界面。
+见 [CHANGELOG.md](CHANGELOG.md)：`6.3.0 · BUILD 76` 修好了汉化工具「下载」点了没反应（安卓与网页端同源问题），并补上 C++ 版 Windows 原生界面。
 
 ## 目录
 
