@@ -2992,7 +2992,7 @@ function Qv(e){
 
   var tip=document.createElement("p"); tip.className="muted";
   var ta=document.createElement("textarea"); ta.className="code"; ta.spellcheck=false;
-  ta.style.cssText="width:100%;min-height:46vh;font-family:ui-monospace,Consolas,DejaVu Sans Mono,monospace;font-size:12.5px;line-height:1.6;white-space:pre;overflow:auto";
+  ta.style.cssText="width:100%;min-height:46vh;font-family:ui-monospace,Consolas,DejaVu Sans Mono,monospace;font-size:12.5px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;overflow-x:hidden;overflow-y:auto;color:var(--codetx)";ta.setAttribute("wrap","soft");
   var info=document.createElement("p"); info.className="muted";
   var bar=document.createElement("div"); bar.className="edbar";
 
@@ -3147,6 +3147,7 @@ function Qv(e){
 
   function refresh(){
     ta.value=render();
+    try{ ta.scrollTop=0; ta.scrollLeft=0; }catch(err){}
     tip.textContent=(mode==="nbt"
       ?"把 level.dat 翻成了英文代码：类型 + 路径 = 值。只改等号右边（英文串、数字、数组），类型与路径不要动；点「保存到存档」会把改完的文本重新编码成二进制 NBT 写回。"
       :"这个文件不是 NBT，把里面的英文串按 0x 偏移列出来了。引号里的英文可改，保存时按偏移拼回字节。");
