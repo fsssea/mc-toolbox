@@ -7,13 +7,13 @@
 
 ![Verify](https://github.com/fsssea/mc-toolbox/actions/workflows/verify.yml/badge.svg)
 
-# MC工具箱 6.3.0
+# MC工具箱 6.3.1
 
-## 三版本 × 三端（6.3.0 / BUILD 77）
+## 三版本 × 三端（6.3.1 / BUILD 78）
 
 | 版本 | Android | Windows | Linux | 内核源码 |
 | --- | --- | --- | --- | --- |
-| 经典版 · `com.doubao.mctoolbox` | [APK](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Classic-6.3.0-android.apk) | [ZIP](https://github.com/fsssea/mc-toolbox/releases/download/v6.3.0/MC-Toolbox-Windows-6.3.0.zip) | [TAR.GZ](https://github.com/fsssea/mc-toolbox/releases/download/v6.3.0/MC-Toolbox-Linux-6.3.0.tar.gz) · [DEB](https://github.com/fsssea/mc-toolbox/releases/download/v6.3.0/MC-Toolbox-Linux-6.3.0.deb) | `assets_app.js`（JS） |
+| 经典版 · `com.doubao.mctoolbox` | [APK](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Classic-6.3.0-android.apk) | [ZIP](https://github.com/fsssea/mc-toolbox/releases/download/v6.3.1/MC-Toolbox-Windows-6.3.1.zip) | [TAR.GZ](https://github.com/fsssea/mc-toolbox/releases/download/v6.3.1/MC-Toolbox-Linux-6.3.1.tar.gz) · [DEB](https://github.com/fsssea/mc-toolbox/releases/download/v6.3.1/MC-Toolbox-Linux-6.3.1.deb) | `assets_app.js`（JS） |
 | JAVA 重制版 · `com.mctoolbox.java` | [APK](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Java-6.3.0-android.apk) | [ZIP](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Java-Windows-6.3.0.zip) | [TAR.GZ](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Java-Linux-6.3.0.tar.gz) · [JAR](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Java-6.3.0.jar) | `kernel/java` |
 | C++ 重制版 · `com.mctoolbox.cpp` | [APK](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Cpp-6.3.0-android.apk) | [ZIP](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Cpp-Windows-6.3.0.zip) | [TAR.GZ](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Cpp-Linux-6.3.0.tar.gz) | `kernel/cpp` |
 
@@ -37,7 +37,7 @@
 
 ## 更新日志
 
-见 [CHANGELOG.md](CHANGELOG.md)：`6.3.0 · BUILD 77` 修好了汉化工具「下载」点了没反应（安卓与网页端同源问题），补上 C++ 版 Windows 原生界面；并修好 db 文件夹「点哪个文件都显示 .log」的问题，db / level.dat 现在能按十进制字节查看与编辑。
+见 [CHANGELOG.md](CHANGELOG.md)：`6.3.1 · BUILD 78` 修好经典版 Windows / Linux 两端「db 点哪个文件都显示 .log」和「导出提示成功但文件没落盘」两个同源 bug，并给桌面端补上十进制字节编辑、保存前自动备份、拖拽打开；`6.3.0 · BUILD 77` 修好了汉化工具「下载」点了没反应（安卓与网页端同源问题），补上 C++ 版 Windows 原生界面；并修好 db 文件夹「点哪个文件都显示 .log」的问题，db / level.dat 现在能按十进制字节查看与编辑。
 
 ## 目录
 
