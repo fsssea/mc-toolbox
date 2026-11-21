@@ -9,6 +9,18 @@
 
 # MC工具箱 6.3.0
 
+## 三版本 × 三端（6.3.0 / BUILD 74）
+
+| 版本 | Android | Windows | Linux | 内核源码 |
+| --- | --- | --- | --- | --- |
+| 经典版 · `com.doubao.mctoolbox` | [APK](https://github.com/fsssea/mc-toolbox/releases/download/v6.3.0/MC-Toolbox-6.3.0.apk) | [ZIP](https://github.com/fsssea/mc-toolbox/releases/download/v6.3.0/MC-Toolbox-Windows-6.3.0.zip) | [TAR.GZ](https://github.com/fsssea/mc-toolbox/releases/download/v6.3.0/MC-Toolbox-Linux-6.3.0.tar.gz) · [DEB](https://github.com/fsssea/mc-toolbox/releases/download/v6.3.0/MC-Toolbox-Linux-6.3.0.deb) | `assets_app.js`（JS） |
+| JAVA 重制版 · `com.mctoolbox.java` | [APK](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Java-6.3.0-android.apk) | [ZIP](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Java-Windows-6.3.0.zip) | [TAR.GZ](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Java-Linux-6.3.0.tar.gz) · [JAR](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Java-6.3.0.jar) | `kernel/java` |
+| C++ 重制版 · `com.mctoolbox.cpp` | [APK](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Cpp-6.3.0-android.apk) | [ZIP](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Cpp-Windows-6.3.0.zip) | [TAR.GZ](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Cpp-Linux-6.3.0.tar.gz) | `kernel/cpp` |
+
+三个 `applicationId` 互不相同，可同机共存；三套内核是各自独立重写的实现（格式规范参照公开的 brarchive 说明，未复制任何第三方应用源码），
+产出的 `.brarchive` / `.mcaddon` 逐字节一致，互相都能解开。C++ 版最强：自写 inflate/deflate、原生 GTK 界面、批量并行；安卓端同样带批量并行。
+
+
 一个完全离线的 Minecraft 工具箱：安卓 APK（WebView + Java 桥）、Windows / Linux Electron 桌面版、网页 PWA，同一套前端。
 
 ## 功能
@@ -29,7 +41,10 @@
 index.html / style.css / assets_app.js   主界面（打包后位于 assets/）
 assets/                                  Web 前端、汉化子应用、离线依赖
 src/                                     前端模块源码
-android/                                 AndroidManifest、Java 桥、资源
+android/                                 AndroidManifest、Java 桥、资源（经典版）
+kernel/cpp/                              C++ 内核（自写 inflate/deflate、zip、brarchive、converter、CLI、GTK 界面）
+kernel/java/mct/                         Java 内核（Brarchive / Converter / Tool / Gui）
+kernel/android/                          JAVA / C++ 两版安卓端工程 + build-android.sh
 build.sh                                 Android 构建
 windows/                                 Electron 主进程与打包脚本
 linux/                                   Linux Electron 打包脚本
