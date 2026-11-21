@@ -1,11 +1,13 @@
 package com.doubao.mctoolbox;
 
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.view.KeyEvent;
@@ -73,6 +75,29 @@ public class MainActivity extends Activity {
         s.setDisplayZoomControls(false);
 
         web.addJavascriptInterface(new Bridge(), "AndroidBridge");
+        // 兜底：http(s) 链接交给系统下载器（blob/data 由 Bridge.saveBinary 处理）
+        web.setDownloadListener(new android.webkit.DownloadListener() {
+            @Override
+            public void onDownloadStart(String url, String userAgent, String contentDisposition,
+                                        String mimeType, long contentLength) {
+                try {
+                    if (url == null || url.startsWith("blob:") || url.startsWith("data:")) {
+                        toast("该下载走页面桥接，请重试一次");
+                        return;
+                    }
+                    DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                    DownloadManager.Request req = new DownloadManager.Request(Uri.parse(url));
+                    req.setMimeType(mimeType);
+                    req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                    String name = android.webkit.URLUtil.guessFileName(url, contentDisposition, mimeType);
+                    req.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "MC工具箱/" + name);
+                    dm.enqueue(req);
+                    toast("已交给系统下载：" + name);
+                } catch (Throwable e) {
+                    toast("下载失败：" + e.getMessage());
+                }
+            }
+        });
         web.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
@@ -201,6 +226,14 @@ public class MainActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    private void toast(final String msg) {
+        runOnUiThread(new Runnable() {
+            @Override public void run() {
+                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
     public class Bridge {
         /** 把文本写入系统“下载”目录下的 MCBE解析 文件夹 */
         @JavascriptInterface
@@ -229,26 +262,63 @@ public class MainActivity extends Activity {
             }
         }
 
-        /** 保存二进制文件（base64）到应用专属目录，返回绝对路径 */
+        /** 保存二进制（base64）到系统「下载/MC工具箱」，装不上再退回应用目录 */
         @JavascriptInterface
         public String saveBinary(String name, String base64) {
             try {
                 byte[] data = Base64.decode(base64, Base64.DEFAULT);
-                File dir = getExternalFilesDir(null);
-                if (dir == null) return "ERR:no app dir";
+                String safeName = name == null ? "download.bin" : name.replace('\\', '/');
+                int slash = safeName.lastIndexOf('/');
+                if (slash >= 0) safeName = safeName.substring(slash + 1);
+                if (safeName.isEmpty()) safeName = "download.bin";
+                String mime = guessMime(safeName);
+
+                if (Build.VERSION.SDK_INT >= 29) {
+                    ContentValues v = new ContentValues();
+                    v.put(MediaStore.Downloads.DISPLAY_NAME, safeName);
+                    v.put(MediaStore.Downloads.MIME_TYPE, mime);
+                    v.put(MediaStore.Downloads.RELATIVE_PATH, "Download/MC工具箱");
+                    v.put(MediaStore.Downloads.IS_PENDING, 1);
+                    Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, v);
+                    if (uri != null) {
+                        OutputStream os = getContentResolver().openOutputStream(uri);
+                        os.write(data);
+                        os.flush();
+                        os.close();
+                        v.clear();
+                        v.put(MediaStore.Downloads.IS_PENDING, 0);
+                        getContentResolver().update(uri, v, null, null);
+                        String shown = "下载/MC工具箱/" + safeName;
+                        toast("已保存到 " + shown);
+                        return shown;
+                    }
+                }
+
+                File dir = new File(getExternalFilesDir(null), "Download");
                 if (!dir.exists()) dir.mkdirs();
-                File out = safeFile(name);
-                if (out == null) return "ERR:bad path";
-                File parent = out.getParentFile();
-                if (parent != null && !parent.exists()) parent.mkdirs();
+                File out = new File(dir, safeName);
                 FileOutputStream fos = new FileOutputStream(out);
                 fos.write(data);
                 fos.flush();
                 fos.close();
+                toast("已保存到 " + out.getAbsolutePath());
                 return out.getAbsolutePath();
             } catch (Throwable e) {
+                toast("保存失败：" + e.getMessage());
                 return "ERR:" + e.getMessage();
             }
+        }
+
+        private String guessMime(String n) {
+            String l = n.toLowerCase();
+            if (l.endsWith(".mcaddon") || l.endsWith(".mcpack")) return "application/zip";
+            if (l.endsWith(".zip")) return "application/zip";
+            if (l.endsWith(".json") || l.endsWith(".json5")) return "application/json";
+            if (l.endsWith(".csv")) return "text/csv";
+            if (l.endsWith(".log") || l.endsWith(".txt")) return "text/plain";
+            if (l.endsWith(".png")) return "image/png";
+            if (l.endsWith(".jpg") || l.endsWith(".jpeg")) return "image/jpeg";
+            return "application/octet-stream";
         }
 
         @JavascriptInterface

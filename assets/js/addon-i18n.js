@@ -85,10 +85,10 @@
       try {
         var path = window.AndroidBridge.saveBinary(d.name, d.b64);
         if (String(path).indexOf('ERR') === 0) toast('保存失败：' + path, true);
-        else toast('已保存到应用目录：' + path);
+        else toast('已保存到 ' + path);
       } catch (err) { toast('保存失败：' + err.message, true); }
     } else if (d.type === 'mc-i18n-saved') {
-      toast('已保存到应用目录：' + (d.path || d.name));
+      toast('已保存到 ' + (d.path || d.name));
     } else if (d.type === 'mc-i18n-error') {
       toast('保存失败：' + (d.message || '未知错误'), true);
     }
