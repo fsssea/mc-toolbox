@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MC工具箱 · 基岩与 Java 的离线工具箱</title>
-<meta name="description" content="MC工具箱 6.3.0：基岩版与 Java 版存档互转、附加包与模组互转、脚本模拟、附加包汉化、皮肤与披风制作。安卓、Windows、Linux、网页四端，全离线，MIT 开源。">
+<title>MC工具箱 6.3.0 · 三个版本，三端同步</title>
+<meta name="description" content="MC工具箱 6.3.0：经典版、JAVA 重制版、C++ 重制版三版本并行，包名不同可共存；Android、Windows、Linux 三端全覆盖；brarchive 解析器完成换代，全离线，MIT 开源。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23101820'/%3E%3Cpath d='M8 11l8-4 8 4v10l-8 4-8-4z' fill='none' stroke='%23e9eff6' stroke-width='2'/%3E%3Cpath d='M8 11l8 4 8-4M16 15v10' fill='none' stroke='%231859d8' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://miaoda.feishu.cn">
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
@@ -55,6 +55,13 @@ img{max-width:100%;height:auto;display:block}
 .nav-cta{flex:0 0 auto;text-decoration:none;background:var(--ink);color:var(--paper);font-size:13px;font-weight:700;padding:9px 16px;border-radius:3px}
 .nav-cta:hover{background:var(--blue)}
 .mobile-only{display:none}
+@media (max-width:860px){
+  .navlinks{display:none}
+  .brand span{display:none}
+  .mobile-only{display:inline-flex;align-items:center;text-decoration:none;font-size:13px;padding:8px 12px;
+    border:1px solid var(--line);border-radius:3px;color:var(--ink)}
+  .mobile-only + .mobile-only{background:var(--ink);color:var(--paper);border-color:var(--ink);font-weight:700}
+}
 
 /* ===== HERO ===== */
 .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
@@ -244,6 +251,65 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
   html{scroll-behavior:auto}
   *{transition:none!important;animation:none!important}
 }
+
+/* ===== 三版本矩阵（位于深色平台区） ===== */
+.vm-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.vm-card{position:relative;background:rgba(255,255,255,.045);border:1px solid var(--panel-line);padding:24px 22px 18px;display:flex;flex-direction:column;color:var(--panel-fg)}
+.vm-card::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:#2b3947}
+.vm-card.emph{background:#0b131b;border-color:#3a5473;box-shadow:8px 8px 0 rgba(0,0,0,.3)}
+.vm-card.emph::before{background:var(--blue)}
+.vm-tag{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;color:#8fb8ff;border:1px solid #3a5473;padding:3px 6px;margin-bottom:12px}
+.vm-head h3{font-size:23px;margin:0 0 8px;font-weight:900;letter-spacing:-.01em;color:var(--panel-fg)}
+.vm-head p{font-size:13px;line-height:1.8;color:var(--panel-muted);margin:0 0 16px;min-height:4.2em}
+.vm-rows{margin:0;padding:0;border-top:1px solid var(--panel-line);flex:1}
+.vm-rows>div{display:flex;flex-direction:column;gap:7px;padding:12px 0;border-bottom:1px solid var(--panel-line)}
+.vm-rows>div:last-child{border-bottom:0}
+.vm-rows dt{font-size:12px;font-weight:700;letter-spacing:.06em;color:#cfe0f1}
+.vm-rows dd{margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.vm-rows dd .mono{font-size:11px;color:var(--panel-muted);flex:1;min-width:110px}
+.vm-rows dd .p-btn{padding:5px 10px;font-size:11px}
+@media (max-width:900px){.vm-grid{grid-template-columns:1fr}}
+
+/* ===== 更新日志 ===== */
+.log{border-left:2px solid var(--line);margin:0;padding:0 0 0 22px;list-style:none}
+.log li{position:relative;padding:0 0 22px}
+.log li::before{content:"";position:absolute;left:-28px;top:6px;width:9px;height:9px;border:2px solid var(--blue);background:var(--paper);border-radius:50%}
+.log .when{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);letter-spacing:.08em}
+.log .what{font-size:16px;font-weight:700;margin:3px 0 6px;color:var(--ink)}
+.log p{margin:0;font-size:13.5px;line-height:1.85;color:var(--muted)}
+.badge-brk{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;color:#fff;background:var(--amber);padding:2px 6px;margin-left:8px;vertical-align:2px}
+.callout{border:1px solid var(--line);border-left:4px solid var(--blue);background:rgba(255,255,255,.4);padding:18px 20px;margin-top:26px}
+.callout b{display:block;font-size:13px;letter-spacing:.06em;margin-bottom:6px}
+.callout p{margin:0;font-size:13.5px;line-height:1.85;color:#31404c}
+.promise{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:26px}
+.promise div{border:1px solid var(--line);padding:16px 18px;background:rgba(255,255,255,.3)}
+.promise b{display:block;font-size:14px;margin-bottom:4px}
+.promise span{font-size:12.5px;color:var(--muted);line-height:1.8}
+@media (max-width:900px){.vm-grid{grid-template-columns:1fr}}
+.p-btn.disabled{opacity:.45;cursor:not-allowed;border-color:#3a5473!important;color:#8ea0b2!important;background:transparent!important}
+
+/* ===== 版本快跳（手机端一眼看到三个版本） ===== */
+.vjump{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:14px 0 0}
+.vjump .lead-txt{font-size:12px;color:var(--muted);margin-right:2px}
+.vjump a{display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:12.5px;font-weight:700;
+  border:1px solid var(--line);background:#fff;color:var(--ink);padding:8px 12px;border-radius:3px}
+.vjump a:hover{border-color:var(--blue);color:var(--blue)}
+.vjump a i{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--blue)}
+.vjump a.jv i,.vjump a.cp i{color:var(--amber)}
+.vjump a small{font-weight:400;font-size:11px;color:var(--muted)}
+.vm-card{scroll-margin-top:80px}
+@media (max-width:640px){
+  .vjump{padding-top:10px}
+  .vjump .lead-txt{width:100%;margin-bottom:2px}
+  .vjump a{flex:1 1 30%;justify-content:center;padding:10px 8px;font-size:12px}
+  .vjump a small{display:none}
+}
+.kicker .k-grp{white-space:nowrap}
+@media (max-width:640px){
+  .kicker{font-size:11px;gap:8px;line-height:1.9;flex-wrap:wrap}
+  .kicker .sep{display:none}
+  .kicker .dot{margin-right:2px}
+}
 :focus-visible{outline:2px solid var(--blue);outline-offset:3px}
 </style>
 </head>
@@ -258,12 +324,14 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
     </a>
     <nav class="navlinks" aria-label="主导航">
       <a href="#features">功能</a>
+      <a href="#versions">版本</a>
       <a href="#platforms">平台</a>
       <a href="#web">网页版</a>
       <a href="#faq">说明</a>
       <a href="#open-source">开源</a>
     </nav>
     <a class="nav-cta" href="#platforms">下载</a>
+    <a class="mobile-only" href="#versions">版本</a>
     <a class="mobile-only" href="#platforms">下载</a>
   </div>
 </header>
@@ -273,17 +341,17 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
     <div class="grid-bg" aria-hidden="true"></div>
     <div class="hero-in">
       <div>
-        <p class="kicker mono"><span class="dot"></span>6.3.0 制作器已发布<span class="sep"></span>全端同步<span class="sep"></span>MIT 开源</p>
-        <h1>一个工具箱，<br>打通<em>基岩</em>与 <em>Java</em>。</h1>
-        <p class="lead">存档互转、附加包与模组互转、脚本模拟、附加包汉化、皮肤与披风制作。所有处理都在本地完成，不传存档，不拉在线依赖。</p>
+        <p class="kicker mono"><span class="dot"></span><span class="k-grp">6.3.0 已发布</span><span class="sep"></span><span class="k-grp">三版本并行</span><span class="sep"></span><span class="k-grp">解析器换代</span><span class="sep"></span><span class="k-grp">MIT 开源</span></p>
+        <h1>三个版本，<br>打通<em>基岩</em>与 <em>Java</em>。</h1>
+        <p class="lead">经典版、JAVA 重制版、C++ 重制版——包名不同，可以同时装在一台机器上；三版共用同一个 brarchive 内核，产出的包互相都能解开。存档互转、附加包与模组互转、脚本模拟、汉化、皮肤与披风制作，全部在本地完成。</p>
         <div class="actions">
-          <a class="btn pri" data-dl="apk" href="#">下载安卓版 <span class="mono" style="font-weight:400">· 956 KB</span></a>
+          <a class="btn pri" href="#platforms">选择版本下载 <span class="mono" style="font-weight:400">· 三版 × 三端</span></a>
           <a class="btn sec" id="open-web" data-web href="./app/index.html">打开网页版</a>
         </div>
         <div class="hero-meta mono">
-          <span><svg viewBox="0 0 24 24"><path d="M12 3l8 4v6c0 5-3.4 7.6-8 8-8-0.4-8-8V7z" fill="none" stroke-width="1.8"/></svg>安装包已签名</span>
+          <span><svg viewBox="0 0 24 24"><path d="M12 3l8 4v6c0 4.5-3.5 7.5-8 8-4.5-.5-8-3.5-8-8V7z" fill="none" stroke-width="1.8"/></svg>安装包已签名</span>
           <span><svg viewBox="0 0 24 24"><path d="M4 7h16v13H4zM4 7l3-4h10l3 4M9 12h6" fill="none" stroke-width="1.8"/></svg>离线可用</span>
-          <span><svg viewBox="0 0 24 24"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5" fill="none" stroke-width="1.8"/></svg>安卓 · Windows · Linux · Web</span>
+          <span><svg viewBox="0 0 24 24"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5" fill="none" stroke-width="1.8"/></svg>Android · Windows · Linux，三版全覆盖</span>
         </div>
       </div>
 
@@ -293,31 +361,26 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
             <div class="m-title mono">RELEASE MANIFEST</div>
             <div class="m-ver">6.3.0</div>
           </div>
-          <div class="m-build">BUILD<b>73</b>2026-11-15</div>
+          <div class="m-build">BUILD<b>72</b>2026-11-21</div>
         </div>
         <ul class="m-rows">
           <li class="m-row">
-            <div class="m-ico"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M9 6h6M10 18.5h4"/></svg></div>
-            <div style="min-width:0"><div class="m-name">Android <span class="mono" style="font-size:10px;color:#8fb8ff">APK</span></div><div class="m-note">6.3.0 · arm64 / v7a · Android 10+</div></div>
+            <div class="m-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8h8v8H8z"/></svg></div>
+            <div style="min-width:0"><div class="m-name">经典版 <span class="mono" style="font-size:10px;color:#8fb8ff">CLASSIC</span></div><div class="m-note">com.mctoolbox.classic · 网页套壳 · 体积最小</div></div>
             <a class="m-a" data-dl="apk" href="#">下载</a>
           </li>
           <li class="m-row">
-            <div class="m-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12"/><path d="M8 20h8M12 16v4"/></svg></div>
-            <div style="min-width:0"><div class="m-name">Windows <span class="mono" style="font-size:10px;color:#8fb8ff">ZIP</span></div><div class="m-note">6.3.0 · x64 · 解压即用</div></div>
-            <a class="m-a" data-dl="win" href="#">下载</a>
+            <div class="m-ico"><svg viewBox="0 0 24 24"><path d="M6 4h9l3 3v13H6z"/><path d="M15 4v3h3"/></svg></div>
+            <div style="min-width:0"><div class="m-name">JAVA 重制版 <span class="mono" style="font-size:10px;color:#8fb8ff">REMADE</span></div><div class="m-note">com.mctoolbox.java · 纯 JDK · 与经典版共存</div></div>
+            <span class="m-a" style="opacity:.5;cursor:not-allowed">待上线</span>
           </li>
           <li class="m-row">
-            <div class="m-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="1"/><path d="M6 8h5M6 11h3M16 9l3 4-3 4"/></svg></div>
-            <div style="min-width:0"><div class="m-name">Linux <span class="mono" style="font-size:10px;color:#8fb8ff">TAR / DEB</span></div><div class="m-note">6.3.0 · x64 · 便携版与系统安装包</div></div>
-            <a class="m-a" data-dl="linux" href="#">下载</a>
-          </li>
-          <li class="m-row">
-            <div class="m-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 9h17M3.5 15h17M12 3.5c-5 5-5 8 0 17M12 3.5c5 5 5 8 0 17"/></svg></div>
-            <div style="min-width:0"><div class="m-name">Web / PWA <span class="mono" style="font-size:10px;color:#8fb8ff">在线</span></div><div class="m-note">6.3.0 · 浏览器直接打开 · 可安装离线</div></div>
-            <a class="m-a" data-dl="webapp" href="./app/index.html">打开</a>
+            <div class="m-ico"><svg viewBox="0 0 24 24"><path d="M8 6l-4 6 4 6M16 6l4 6-4 6"/></svg></div>
+            <div style="min-width:0"><div class="m-name">C++ 重制版 <span class="mono" style="font-size:10px;color:#8fb8ff">POWERED</span></div><div class="m-note">com.mctoolbox.cpp · 自写 deflate · 功能最强</div></div>
+            <span class="m-a" style="opacity:.5;cursor:not-allowed">待上线</span>
           </li>
         </ul>
-        <div class="m-foot"><span>全部构建已完成</span><a href="#open-source">查看源码</a></div>
+        <div class="m-foot"><span>三版本构建全部完成 · 均可共存</span><a href="#open-source">查看源码</a></div>
       </aside>
     </div>
   </section>
@@ -329,6 +392,15 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
       <span class="flow-step"><i>3</i>转换与打包</span><span class="flow-arrow"></span>
       <span class="flow-step"><i>4</i>保存或导出</span>
     </div>
+  </div>
+
+  <div class="wrap">
+    <nav class="vjump" aria-label="版本快跳">
+      <span class="lead-txt">三个版本都在这里：</span>
+      <a class="cl" href="#v-classic"><i>CLASSIC</i>经典版<small>已发布</small></a>
+      <a class="jv" href="#v-java"><i>JAVA</i>JAVA 重制版<small>包名独立</small></a>
+      <a class="cp" href="#v-cpp"><i>C++</i>C++ 重制版<small>功能最全</small></a>
+    </nav>
   </div>
 
   <section id="features">
@@ -410,51 +482,115 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
       <div class="sec-head">
         <div>
           <div class="sec-label">PLATFORMS / 平台</div>
-          <h2>你的设备，<br>选一个入口。</h2>
+          <h2>先选版本，<br>再选设备。</h2>
         </div>
-        <p class="sec-desc">安卓、Windows、Linux、网页/PWA 均为 6.3.0；桌面端解压即用或走系统安装包，不想装东西可直接用浏览器。</p>
+        <p class="sec-desc">先选版本，再选设备。三个版本都覆盖 Android / Windows / Linux，都支持不停更；不想装东西，网页版直接用。</p>
       </div>
 
-      <div class="plat-table" role="table" aria-label="平台下载">
-        <div class="plat-row head" role="row"><div>平台</div><div>形式 / 大小</div><div>要求</div><div style="text-align:right">获取</div></div>
-        <div class="plat-row" role="row">
-          <div class="plat-name" role="cell">
-            <svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M9 6h6M10 18.5h4"/></svg>
-            <div>Android<small>手机 / 平板</small></div>
-          </div>
-          <div class="plat-spec" role="cell">APK · 956 KB<br>versionCode 73</div>
-          <div class="plat-req" role="cell">Android 10 及以上；已签名，可直接覆盖安装。数据写入应用专属目录。</div>
-          <div class="plat-act" role="cell"><a class="p-btn main" data-dl="apk" href="#">下载 APK</a></div>
+      <div class="vm-grid" aria-label="三版本 × 三端下载矩阵">
+        <div class="vm-card" id="v-classic">
+          <div class="vm-head"><span class="vm-tag mono">CLASSIC</span><h3>经典版</h3><p>沿用网页套壳形态，体积最小、启动最快。老用户的默认选择。</p></div>
+          <dl class="vm-rows">
+            <div><dt>Android</dt><dd><span class="mono">APK · arm64 / armeabi-v7a</span><a class="p-btn main" data-dl="apk" href="#">下载</a></dd></div>
+            <div><dt>Windows</dt><dd><span class="mono">ZIP · x64 免安装</span><a class="p-btn main" data-dl="win" href="#">下载</a></dd></div>
+            <div><dt>Linux</dt><dd><span class="mono">TAR.GZ / DEB · x64</span><a class="p-btn main" data-dl="linux" href="#">下载</a><a class="p-btn" data-dl="linuxdeb" href="#">deb</a></dd></div>
+          </dl>
         </div>
-        <div class="plat-row" role="row">
-          <div class="plat-name" role="cell">
-            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12"/><path d="M8 20h8M12 16v4"/></svg>
-            <div>Windows<small>Windows 10 / 11</small></div>
-          </div>
-          <div class="plat-spec" role="cell">ZIP · 107 MB<br>x64 免安装</div>
-          <div class="plat-req" role="cell">解压后运行 <span class="mono">MC工具箱.exe</span>；不写注册表，配置放在用户目录。</div>
-          <div class="plat-act" role="cell"><a class="p-btn main" data-dl="win" href="#">下载 ZIP</a></div>
+        <div class="vm-card" id="v-java">
+          <div class="vm-head"><span class="vm-tag mono">JAVA</span><h3>JAVA 重制版</h3><p>纯 JDK 标准库实现，逻辑与另两版逐条对齐。包名独立，可与经典版同机共存。</p></div>
+          <dl class="vm-rows">
+            <div><dt>Android</dt><dd><span class="mono">APK · com.mctoolbox.java</span><span class="p-btn disabled">待发布</span></dd></div>
+            <div><dt>Windows</dt><dd><span class="mono">ZIP · 内置裁剪 JRE</span><span class="p-btn disabled">待发布</span></dd></div>
+            <div><dt>Linux</dt><dd><span class="mono">TAR.GZ / DEB · 用系统 JRE</span><span class="p-btn disabled">待发布</span><span class="p-btn disabled">待发布</span></dd></div>
+          </dl>
         </div>
-        <div class="plat-row" role="row">
-          <div class="plat-name" role="cell">
-            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="1"/><path d="M6 8h5M6 11h3M16 9l3 4-3 4"/></svg>
-            <div>Linux<small>tar.gz / deb</small></div>
-          </div>
-          <div class="plat-spec" role="cell">便携 102 MB · deb 102 MB<br>x64 · glibc 2.28+</div>
-          <div class="plat-req" role="cell">Ubuntu 20.04+ / Debian 11+。便携版解压运行；deb 安装后出现在系统菜单。</div>
-          <div class="plat-act" role="cell"><a class="p-btn main" data-dl="linux" href="#">下载 tar.gz</a><a class="p-btn" data-dl="linuxdeb" href="#">deb</a></div>
-        </div>
-        <div class="plat-row" role="row">
-          <div class="plat-name" role="cell">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 9h17M3.5 15h17M12 3.5c-5 5-5 8 0 17M12 3.5c5 5 5 8 0 17"/></svg>
-            <div>Web / PWA<small>浏览器直接打开</small></div>
-          </div>
-          <div class="plat-spec" role="cell">在线 · 834 KB 离线包<br>可安装到桌面</div>
-          <div class="plat-req" role="cell">Chrome / Edge / Safari 现代版本；首次联网，之后可离线打开。</div>
-          <div class="plat-act" role="cell"><a class="p-btn main" data-dl="webapp" href="./app/index.html">直接打开</a><a class="p-btn" data-dl="web" href="#">离线包</a></div>
+        <div class="vm-card emph" id="v-cpp">
+          <div class="vm-head"><span class="vm-tag mono">C++</span><h3>C++ 重制版</h3><p>自写 inflate / deflate，不链接 zlib。单文件静态可执行，功能最全，性能最高。</p></div>
+          <dl class="vm-rows">
+            <div><dt>Android</dt><dd><span class="mono">NDK arm64 + armv7</span><span class="p-btn disabled">待发布</span></dd></div>
+            <div><dt>Windows</dt><dd><span class="mono">ZIP · 静态 exe · 免运行库</span><span class="p-btn disabled">待发布</span></dd></div>
+            <div><dt>Linux</dt><dd><span class="mono">TAR.GZ / DEB · 静态二进制</span><span class="p-btn disabled">待发布</span><span class="p-btn disabled">待发布</span></dd></div>
+          </dl>
         </div>
       </div>
-      <p class="plat-note">下载由对象存储提供。安装包不包含你的存档；如需校验，发布页会同时提供版本号与构建号。</p>
+      <p class="plat-note">经典版已发布 Android / Windows / Linux 三端；JAVA 重制版与 C++ 重制版的安装包还在构建（内核与构建脚本已在源码包里，可直接自己编）。不装包时，网页版可直接在浏览器里处理。</p>
+    </div>
+  </section>
+
+  <section id="versions" style="border-top:1px solid var(--line)">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <div class="sec-label">MATRIX / 三个版本</div>
+          <h2>三套实现，<br>同一个内核。</h2>
+        </div>
+        <p class="sec-desc">经典版、JAVA 重制版、C++ 重制版并行维护。包名不同，所以可以同一台设备共存；共用同一套 brarchive 规范，所以谁产出的包谁都解得开。</p>
+      </div>
+
+      <div class="promise">
+        <div><b>三版都不停更</b><span>不会因为新版本上线就把老版本弃掉。内核级修复（格式、规则、安全）三版同日同步发布。</span></div>
+        <div><b>三版都覆盖三端</b><span>Android、Windows、Linux 都是正式发布目标，每个版本都给齐，不是“附带编译”。</span></div>
+        <div><b>同一个解析器</b><span>三版都用 6.3.0 起的新 brarchive 内核，产出的容器逐字节一致，可互相打开。</span></div>
+      </div>
+
+      <div class="callout">
+        <b>解析器换代 · BREAKING</b>
+        <p>旧版 brarchive 解析器正式废弃。新内核按 brarchive-flutter（Apache-2.0）公开的容器格式规范<b>独立重写</b>：
+        对方交付的是独立 Flutter APP，而我们是“界面套壳 + 自研内核”的形态，代码不能照搬，所以只对齐格式与规则，
+        源码由我们用 C++ / Java / JavaScript 各写一遍，并互相做字节级交叉验证。归属声明见仓库 <span class="mono">NOTICE.md</span>。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="changelog" style="background:var(--paper-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <div class="sec-label">CHANGELOG / 6.3.0 · BUILD 72</div>
+          <h2>这次改了什么。</h2>
+        </div>
+        <p class="sec-desc">2026-11-21。恢复更新的第一版，重点是内核换代和三版本矩阵落地。</p>
+      </div>
+      <ul class="log">
+        <li>
+          <div class="when">2026-11-21 · KERNEL</div>
+          <div class="what">brarchive 解析器换代<span class="badge-brk">BREAKING</span></div>
+          <p>废弃旧解析器，改用新规范：内容偏移改为相对内容区起点，条目按文件名 UTF-8 字节序写入，版本号严格校验。
+             旧包仍可读，新包建议用 6.3.0 之后的版本处理。</p>
+        </li>
+        <li>
+          <div class="when">2026-11-21 · PLATFORM</div>
+          <div class="what">Android / Windows / Linux 正式纳入发布矩阵</div>
+          <p>三端从“顺手编一下”升级为正式产物：一次脚本出齐，缺工具链会明确报错而不是静默跳过；CI 里五条流水线各自出工件。</p>
+        </li>
+        <li>
+          <div class="when">2026-11-21 · JAVA</div>
+          <div class="what">JAVA 重制版上线</div>
+          <p>只用 JDK 标准库，零第三方依赖；包名与经典版隔离，可同机共存；命令行提供 pack / unpack / info / selftest。</p>
+        </li>
+        <li>
+          <div class="when">2026-11-21 · C++</div>
+          <div class="what">C++ 重制版上线，功能最全</div>
+          <p>自写 inflate（stored / fixed / dynamic Huffman）与 deflate（固定 Huffman + 贪心 LZ77），不链接 zlib；
+             产出单文件静态可执行，Windows 端一个 exe 就能跑。</p>
+        </li>
+        <li>
+          <div class="when">2026-11-21 · WEB</div>
+          <div class="what">网页版换成新内核</div>
+          <p>单文件页面，内核内联，零网络请求；支持拖拽与粘贴、PWA 离线安装；整个流程在浏览器里算完，文件不上传。</p>
+        </li>
+        <li>
+          <div class="when">2026-11-21 · FIX</div>
+          <div class="what">四个老问题</div>
+          <p>解包丢父路径（<span class="mono">New Energy BP/blocks</span> 被塌成 <span class="mono">blocks</span>）、目录条目被写成 0 字节文件、
+             <span class="mono">.mcaddon</span> 被输出成 <span class="mono">.zip</span>、ZIP 中央目录字段错位导致自写包读不回。</p>
+        </li>
+      </ul>
+      <div class="callout" style="border-left-color:var(--ok)">
+        <b>验证基线</b>
+        <p>真实样本 2,018,437 字节 / 371 个文件 / 18 个 brarchive：pack → unpack 往返 371 进 371 出，0 缺失、0 多出、0 内容差异；
+           C++、Java、JS 三套内核产出的 18 个归档逐字节一致；浏览器实测全程 0 报错。</p>
+      </div>
     </div>
   </section>
 
@@ -467,9 +603,9 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
       <div class="web-copy">
         <div class="sec-label">WEB / 免安装</div>
         <h3>不装包，浏览器里直接开工。</h3>
-        <p>选包、看文件树、改脚本、转换、下载结果，网页版都有。支持“安装到桌面”，装完后和本地应用一样从桌面启动，断网也能开。</p>
+        <p>网页版已换成 6.3.0 的新内核：把 <span class="mono">.mcpack / .mcaddon</span> 拖进去，就能做 brarchive 打包与解包，处理完直接下载。支持“安装到桌面”，装完后从桌面启动，断网也能开。</p>
         <ul class="web-list">
-          <li>转换与编辑都在本机浏览器内完成，文件不会上传到服务器</li>
+          <li>打包、解包、压缩全部在本机浏览器内完成，文件不会上传到服务器</li>
           <li>支持离线缓存，弱网环境不用重新下载界面</li>
           <li>项目、日志与导出文件仍然由你手动选择保存位置</li>
         </ul>
@@ -501,8 +637,19 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
             <p>由浏览器决定。通常下载到系统“下载”目录，或弹窗让你选择位置；网页无法直接访问安卓的 <span class="mono">Android/data</span> 目录。</p>
           </details>
           <details>
-            <summary>以后会加更多端吗？</summary>
-            <p>已经在做鸿蒙的可行性评估，但当前没有可编译、可真机验证的工程，所以官网上不会挂一个不能用的下载。等能跑通再上架。</p>
+            <summary>三个版本有什么区别，要都装吗？</summary>
+            <p>不用都装，按需要挑。经典版沿用网页套壳形态，体积最小；JAVA 重制版逻辑最统一，适合想要一致行为的人；
+               C++ 重制版性能最好、功能最全，适合大批量处理。三者包名不同，真想都装也不会互相覆盖。</p>
+          </details>
+          <details>
+            <summary>老版本会不会停更？</summary>
+            <p>不会。三个版本并行维护，内核级修复（格式、规则、安全、校验）三版同日发布；界面级更新按各自定位推进。
+               任何一个版本都不会因为新版本上线被弃掉。</p>
+          </details>
+          <details>
+            <summary>换了新解析器，我以前做的包还能用吗？</summary>
+            <p>能读。容器格式没有变，只是修正了偏移语义与写入顺序，并补齐了旧实现的路径拼接缺陷。
+               但用 6.3.0 写出的包，建议用 6.3.0 及以后版本打开，避免旧解析器的已知问题。</p>
           </details>
         </div>
       </div>
@@ -516,10 +663,11 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
           <div class="sec-label">SOURCE / 开源</div>
           <h2>代码是公开的。</h2>
         </div>
-        <p class="sec-desc">MIT 许可。前端、安卓原生桥、Windows / Linux 打包脚本、汉化子应用与第三方许可说明都在源码包里；签名密钥不在仓库中。</p>
+        <p class="sec-desc">MIT 许可。内核（C++ / Java / JS 三套）、三端构建脚本、CI 流水线、汉化子应用与第三方许可说明都在源码包里；签名密钥不在仓库中。解析器归属见 <span class="mono">NOTICE.md</span>。</p>
       </div>
       <div class="actions">
         <a class="btn sec" data-dl="source" href="#">下载 6.3.0 源码</a>
+        <a class="btn sec" href="https://github.com/fsssea/mc-toolbox" target="_blank" rel="noopener">GitHub 仓库</a>
         <a class="btn sec" href="#platforms">先下载安装包</a>
       </div>
     </div>
@@ -533,12 +681,12 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
         <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 10l10-5 10 5v12l-10 5-10-5z" fill="none" stroke="#e9f0f7" stroke-width="2"/><path d="M6 10l10 5 10-5M16 15v12" fill="none" stroke="#8fb8ff" stroke-width="2"/></svg>
         MC工具箱
       </div>
-      <p class="foot-note">基岩与 Java 的离线工具箱。存档、附加包、脚本、制作器，一次打开。非 Mojang 官方产品，与 Mojang / Microsoft 无隶属关系。</p>
+      <p class="foot-note">基岩与 Java 的离线工具箱。经典版 / JAVA 重制版 / C++ 重制版三版本并行，Android · Windows · Linux 三端全覆盖。非 Mojang 官方产品，与 Mojang / Microsoft 无隶属关系。</p>
     </div>
     <div class="foot-col"><b>平台</b><a data-dl="apk" href="#">Android</a><a data-dl="win" href="#">Windows</a><a data-dl="linux" href="#">Linux</a><a data-dl="webapp" href="./app/index.html">网页版</a></div>
-    <div class="foot-col"><b>资源</b><a data-dl="source" href="#">源码（MIT，6.3.0）</a><a data-dl="web" href="#">网页离线包</a><a href="#faq">使用说明</a><a href="#platforms">版本 6.3.0</a></div>
+    <div class="foot-col"><b>资源</b><a data-dl="source" href="#">源码（MIT）</a><a data-dl="web" href="#">网页离线包</a><a href="#faq">使用说明</a><a href="#changelog">版本 6.3.0</a></div>
   </div>
-  <div class="foot-base"><span>© 2026 MC工具箱 contributors · MIT License</span><span class="mono">BUILD 73 / 2026-11-15</span></div>
+  <div class="foot-base"><span>© 2026 MC工具箱 contributors · MIT License</span><span class="mono">BUILD 72 / 2026-11-21</span></div>
 </footer>
 
 <script>
@@ -546,14 +694,17 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
    下载配置：部署到自己的官网时，把下面 6 个地址换成你的对象存储或 Releases 地址。
    webapp 指向站点里的 app/ 目录；把「网页版离线包」解压到 app/ 后即可直接打开。
    ========================================================================== */
+var BASE = 'https://github.com/fsssea/mc-toolbox/releases/download/v6.3.0/';
 var LINKS = {
-  apk:      'https://github.com/fsssea/mc-toolbox/releases/download/v6.3.0/MC-Toolbox-6.3.0.apk',
-  win:      'https://github.com/fsssea/mc-toolbox/releases/download/v6.3.0/MC-Toolbox-Windows-6.3.0.zip',
-  linux:    'https://github.com/fsssea/mc-toolbox/releases/download/v6.3.0/MC-Toolbox-Linux-6.3.0.tar.gz',
-  linuxdeb: 'https://github.com/fsssea/mc-toolbox/releases/download/v6.3.0/MC-Toolbox-Linux-6.3.0.deb',
-  web:      'https://github.com/fsssea/mc-toolbox/releases/download/v6.3.0/MC-Toolbox-Web-6.3.0.zip',
-  webapp:   './app/index.html',
-  source:   'https://github.com/fsssea/mc-toolbox/releases/download/v6.3.0/MC-Toolbox-Source-6.3.0.zip'
+  // v6.3.0 Release 实际资产（2026-11-21 上传）
+  apk:        BASE + 'MC-Toolbox-6.3.0.apk',
+  win:        BASE + 'MC-Toolbox-Windows-6.3.0.zip',
+  linux:      BASE + 'MC-Toolbox-Linux-6.3.0.tar.gz',
+  linuxdeb:   BASE + 'MC-Toolbox-Linux-6.3.0.deb',
+  web:        BASE + 'MC-Toolbox-Web-6.3.0.zip',
+  webapp:     './app/index.html',
+  source:     BASE + 'MC-Toolbox-Source-6.3.0.zip'
+  // JAVA / C++ 两版的安装包尚未上传，对应按钮为「待发布」状态，不使用 data-dl
 };
 
 document.querySelectorAll('[data-dl]').forEach(function (a) {
