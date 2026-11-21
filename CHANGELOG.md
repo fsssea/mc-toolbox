@@ -2,6 +2,26 @@
 
 三个版本共用一条时间线；BUILD 号全局递增，界面级改动按版本标注。
 
+## 6.3.2 · BUILD 79 · 2026-11-22
+
+### 新增 · 经典版三端（安卓 / Windows / Linux）
+
+- **英文代码视图**：`level.dat` 这类存档核心数据不再只有十进制字节。新增视图把二进制里的 NBT 摊成
+  `类型 路径 = 值` 的英文代码，`LevelName`、`GameType`、`Difficulty`、`GeneratorType`、`BiomeOverride`、
+  `CenterMapsToOrigin`、`ConfirmedPlatformLockedContent`、`lastOpenedWithVersion`、`RandomSeed`、`Time`、出生点等
+  全部明文可读可改。
+- **保存即编码回二进制**：点「保存到存档」把改完的文本重新序列化成 NBT，`level.dat` 保留原有 8 字节头与长度字段；
+  再「导出存档」生成新包。桌面端保存前照旧自动备份整包。
+- **写错不闷头写坏**：报了哪一行、错在哪都直接说清 —— 数值超范围（byte 只能 0–255 等）、字符串没带双引号、
+  路径或类型被改、数组写成非数字，都会拦下来。
+- **db 下非 NBT 文件**：`.ldb / .log` 改为按 `0x` 偏移列出文件里的英文串，引号内的文字可就地改，保存时按偏移拼回字节。
+- 入口两处：`level.dat` 表单里的「英文代码（可改后保存）」、字节编辑器里的「英文代码（可改）」；两种视图可来回切。
+
+### 变更
+
+- 经典版三端版本号统一 6.3.2 / BUILD 79（安卓 `versionCode 79`，Windows / Linux / deb 的 `resources/app` 同步）。
+- 三份发行包内的 `assets/assets_app.js` 是同一个文件，md5 一致。
+
 ## 6.3.1 · BUILD 78 · 2026-11-22
 
 ### 修复 · 经典版 Windows / Linux（与安卓同源的两个 bug）

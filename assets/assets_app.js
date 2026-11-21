@@ -2940,6 +2940,7 @@ ${i.map(([r,l])=>`| ${r} | ${l} |`).join(`
   function btn(text,cls,fnc){
     var el=document.createElement("button"); el.textContent=text; if(cls) el.className=cls; el.onclick=fnc; bar.appendChild(el); return el;
   }
+  var engv=btn("\u82F1\u6587\u4EE3\u7801\uFF08\u53EF\u6539\uFF09","ghost",function(){ try{ applyPage(); }catch(err){ return U(err.message); } Qv(e); });
   var prev=btn("\u2190 上一页","ghost",function(){ try{ applyPage(); }catch(err){ return U(err.message); } pos=Math.max(0,pos-CH); render(); });
   var next=btn("下一页 \u2192","ghost",function(){ try{ applyPage(); }catch(err){ return U(err.message); } pos=Math.min(Math.max(0,total-CH),pos+CH); render(); });
   var restore=btn("恢复本页","ghost",function(){ copy.set(new Uint8Array(raw).subarray(pos,pageEnd()),pos); render(); N("已恢复本页"); });
@@ -2977,11 +2978,214 @@ ${i.map(([r,l])=>`| ${r} | ${l} |`).join(`
   if(total<=CH){ prev.style.display="none"; next.style.display="none"; }
   render();
 }
+function Qv(e){
+  var raw=b.archive.getBytes(e), total=raw.length;
+  var host=x("editor"); host.innerHTML="";
+  var head=document.createElement("div"); head.className="edhead";
+  head.innerHTML='<div><b>'+q(e)+'</b><span class="muted">　'+Xe(total)+'　'+total+' 字节</span></div>';
+  host.appendChild(head);
+
+  var isLevel=/level\.dat$/i.test(e);
+  var tree=null, little=true;
+  if(isLevel){ try{ tree=Ot(raw,!0); }catch(err){ tree=null; } }
+  var mode=tree?"nbt":"ascii";
+
+  var tip=document.createElement("p"); tip.className="muted";
+  var ta=document.createElement("textarea"); ta.className="code"; ta.spellcheck=false;
+  ta.style.cssText="width:100%;min-height:46vh;font-family:ui-monospace,Consolas,DejaVu Sans Mono,monospace;font-size:12.5px;line-height:1.6;white-space:pre;overflow:auto";
+  var info=document.createElement("p"); info.className="muted";
+  var bar=document.createElement("div"); bar.className="edbar";
+
+  var TYPE={1:"byte",2:"short",3:"int",4:"long",5:"float",6:"double",7:"byte[]",8:"string",9:"list",10:"compound",11:"int[]",12:"long[]"};
+  var WARN="⚠️ 这里是存档最重要的数据，随便改可能导致存档报废；先「导出存档」备份一份，只改确定懂的字段。";
+
+  function esc(s){ return String(s).replace(/\\/g,"\\\\").replace(/\//g,"\\/"); }
+  function fmt(v,t){
+    if(t===4) return String(v);
+    if(t===5||t===6){ var n=Number(v); return (t===5)?String(Number(n.toPrecision(7))):String(n); }
+    if(t===8) return JSON.stringify(String(v));
+    if(t===7||t===11||t===12) return "["+Array.prototype.join.call(v,", ")+"]";
+    return String(v);
+  }
+  function walk(node,path,out){
+    var t=node.t,v=node.v;
+    if(t===10){
+      out.push("compound "+(path||"root"));
+      for(var k in v){ if(Object.prototype.hasOwnProperty.call(v,k)) walk(v[k], path?path+"/"+esc(k):esc(k), out); }
+      return;
+    }
+    if(t===9){
+      out.push("list<"+(TYPE[node.et]||node.et)+"> "+path+"  ("+v.length+" 项)");
+      for(var i=0;i<v.length;i++) walk(v[i], path+"["+i+"]", out);
+      return;
+    }
+    if((t===7||t===11||t===12)&&v.length>4096){ out.push((TYPE[t]||t)+" "+path+"  ("+v.length+" 个，太大，请用字节编辑器)"); return; }
+    out.push((TYPE[t]||("tag"+t))+" "+path+" = "+fmt(v,t));
+  }
+  function asciiRuns(){
+    var runs=[], start=-1;
+    for(var i=0;i<raw.length;i++){
+      var ok=(raw[i]>=32&&raw[i]<=126);
+      if(ok&&start<0) start=i;
+      if(!ok&&start>=0){ if(i-start>=4) runs.push({s:start,e:i}); start=-1; }
+      if(!ok) start=-1;
+    }
+    if(start>=0&&raw.length-start>=4) runs.push({s:start,e:raw.length});
+    return runs;
+  }
+  function render(){
+    if(mode==="nbt"){
+      var out=["# "+WARN,"# 只改等号右边的值（英文串带双引号、数字、数组）；类型和路径不要动。"];
+      walk({t:tree.root.type,v:tree.root.value, et:tree.root.et}, "", out);
+      return out.join("\n");
+    }
+    var runs=asciiRuns();
+    var lines=["# "+WARN,"# 这个文件不是 NBT，下面按 0x 偏移列出里面的英文串；引号里的英文可改，保存时按偏移拼回字节。"];
+    if(!runs.length){ lines.push("# 这个文件里没有足够长的 ASCII 文本，请用字节编辑器。"); return lines.join("\n"); }
+    for(var r=0;r<runs.length;r++){
+      var seg=raw.subarray(runs[r].s,runs[r].e), str="";
+      for(var j=0;j<seg.length;j++) str+=String.fromCharCode(seg[j]);
+      lines.push("0x"+("0000000"+runs[r].s.toString(16)).slice(-8)+"  "+JSON.stringify(str));
+    }
+    return lines.join("\n");
+  }
+
+  function segments(path){
+    var out=[], buf="", i=0, p=String(path);
+    while(i<p.length){
+      var c=p.charAt(i);
+      if(c==="\\"){ i++; buf+=p.charAt(i); i++; continue; }
+      if(c==="/"){ out.push(buf); buf=""; i++; continue; }
+      buf+=c; i++;
+    }
+    out.push(buf); return out;
+  }
+  function resolve(root,path){
+    var segs=segments(path), node=root;
+    for(var i=0;i<segs.length;i++){
+      var sg=segs[i], idx=-1, mm=/^(.*?)\[(\d+)\]$/.exec(sg);
+      if(mm){ sg=mm[1]; idx=Number(mm[2]); }
+      if(node.t!==10) return null;
+      node=node.v[sg];
+      if(!node) return null;
+      if(idx>=0){
+        if(node.t!==9||idx>=node.v.length) return null;
+        node=node.v[idx];
+      }
+    }
+    return node;
+  }
+  function coerce(t,val,ln){
+    var s=String(val).trim();
+    if(t===8){
+      if(s.charAt(0)!=='"') throw new Error("第 "+ln+" 行字符串要用双引号包一下");
+      try{ return JSON.parse(s); }catch(err){ throw new Error("第 "+ln+" 行字符串解析不了（注意反斜杠）"); }
+    }
+    if(t===7||t===11||t===12){
+      if(s.charAt(0)!=="["||s.charAt(s.length-1)!=="]") throw new Error("第 "+ln+" 行数组要写成 [1, 2, 3]");
+      var inner=s.slice(1,-1).trim(); if(!inner) return [];
+      var parts=inner.split(","), arr=[];
+      for(var i=0;i<parts.length;i++){
+        var num=Number(String(parts[i]).trim());
+        if(String(parts[i]).trim()===""||!isFinite(num)) throw new Error("第 "+ln+" 行数组里有不是数字的："+parts[i]);
+        if(t===7&&(num<0||num>255||num!==Math.floor(num))) throw new Error("第 "+ln+" 行 byte 数组只能 0–255 的整数");
+        arr.push(num);
+      }
+      return arr;
+    }
+    var num2=Number(s.replace(/[LlFfDd]$/,""));
+    if(s===""||!isFinite(num2)) throw new Error("第 "+ln+" 行不是数字："+s);
+    var lim={1:[-128,255],2:[-32768,32767],3:[-2147483648,2147483647]}[t];
+    if(lim&&(num2<lim[0]||num2>lim[1])) throw new Error("第 "+ln+" 行超范围："+s);
+    if(t===4) return BigInt(String(s).replace(/[Ll]/,""));
+    if(t===1||t===2||t===3) return Math.trunc(num2);
+    return num2;
+  }
+  function parseNbt(txt){
+    var root={t:tree.root.type,v:tree.root.value,et:tree.root.et}, lines=txt.split("\n");
+    for(var ln=0;ln<lines.length;ln++){
+      var line=lines[ln];
+      if(!line.trim()||line.charAt(0)==="#") continue;
+      if(/^(compound|list<)/.test(line)) continue;
+      var m=/^(\S+(?:\[\])?)\s+(\S+)\s*=\s*(.*)$/.exec(line);
+      if(!m) throw new Error("第 "+(ln+1)+" 行看不懂（应当是「类型 路径 = 值」）："+line.slice(0,40));
+      var tn=m[1], path=m[2], val=m[3], tt=0;
+      for(var kk in TYPE) if(TYPE[kk]===tn) tt=Number(kk);
+      if(!tt) throw new Error("第 "+(ln+1)+" 行类型不认识："+tn);
+      var node=resolve(root,path);
+      if(!node) throw new Error("第 "+(ln+1)+" 行路径对不上（名字、类型不能改）："+path);
+      if(node.t!==tt) throw new Error("第 "+(ln+1)+" 行类型不对：写了 "+tn+"，原文件是 "+(TYPE[node.t]||node.t));
+      node.v=coerce(tt,val,ln+1);
+    }
+    return root;
+  }
+  function parseAscii(txt){
+    var pieces=[], lines=txt.split("\n");
+    for(var i=0;i<lines.length;i++){
+      var m=/^\s*0x([0-9a-fA-F]+)\s+("(?:[^"\\]|\\.)*")\s*$/.exec(lines[i]);
+      if(!m) continue;
+      var s;
+      try{ s=JSON.parse(m[2]); }catch(err){ throw new Error("第 "+(i+1)+" 行引号里的内容没关好（反斜杠要写成两个）"); }
+      for(var z=0;z<s.length;z++){ var cc=s.charCodeAt(z); if(cc<32||cc>126) throw new Error("第 "+(i+1)+" 行只能改英文、数字、标点（ASCII）"); }
+      pieces.push({off:parseInt(m[1],16), text:s});
+    }
+    if(!pieces.length) throw new Error("没有认出可改的英文行，请先点「恢复原文」");
+    pieces.sort(function(a,b){return a.off-b.off;});
+    var buf=[], pos=0;
+    for(var p=0;p<pieces.length;p++){
+      var pc=pieces[p];
+      if(pc.off<pos) throw new Error("偏移重复或顺序不对：0x"+pc.off.toString(16)+"（别改 0x 偏移）");
+      for(var z2=pos;z2<pc.off;z2++) buf.push(raw[z2]);
+      var bytes=new TextEncoder().encode(pc.text);
+      for(var z3=0;z3<bytes.length;z3++) buf.push(bytes[z3]);
+      pos=pc.off;
+      while(pos<raw.length&&raw[pos]>=32&&raw[pos]<=126) pos++;
+    }
+    for(var z4=pos;z4<raw.length;z4++) buf.push(raw[z4]);
+    return new Uint8Array(buf);
+  }
+
+  function refresh(){
+    ta.value=render();
+    tip.textContent=(mode==="nbt"
+      ?"把 level.dat 翻成了英文代码：类型 + 路径 = 值。只改等号右边（英文串、数字、数组），类型与路径不要动；点「保存到存档」会把改完的文本重新编码成二进制 NBT 写回。"
+      :"这个文件不是 NBT，把里面的英文串按 0x 偏移列出来了。引号里的英文可改，保存时按偏移拼回字节。");
+    info.textContent=(mode==="nbt"?"模式：NBT（小端）":"模式：ASCII 文本")+"　"+ta.value.split("\n").length+" 行";
+  }
+
+  function btn(text,cls,fn){ var el=document.createElement("button"); el.textContent=text; if(cls)el.className=cls; el.onclick=fn; bar.appendChild(el); return el; }
+
+  btn("保存到存档","",async function(){
+    try{
+      var newBytes=null,newTree=null;
+      if(mode==="nbt"){ newTree=parseNbt(ta.value); }
+      else { newBytes=parseAscii(ta.value); }
+      var wrap=newTree?{root:{type:newTree.t,name:"",value:newTree.v,et:newTree.et}}:null;
+      var bytes=newBytes||(isLevel?Ko(raw,wrap):ve(wrap,little));
+      var bk="";
+      if(window.McDesktop&&window.McDesktop.backup){
+        try{ var br0=await window.McDesktop.backup((b.name||"存档").replace(/\.[^.]+$/,"")+"-备份-"+new Date().toISOString().replace(/[-:T]/g,"").slice(0,14)+".mcworld",Lm(b.archive.toBytes())); bk=(br0&&br0.ok)?"OK:"+br0.path:"ERR:"+((br0&&br0.error)||"未知"); }catch(err){ bk="ERR:"+String(err&&err.message||err); }
+      }
+      b.archive.setBytes(e,bytes); b.statsDirty=!0;
+      var sp=head.querySelector(".muted"); if(sp) sp.textContent="　"+Xe(bytes.length)+"　"+bytes.length+" 字节";
+      if(mode==="nbt"){ tree=wrap; }
+      N("已保存："+e+"（已重新编码成二进制，"+bytes.length+" 字节；点「导出存档」后生效）"+(bk.indexOf("OK:")===0?"；已自动备份到 "+bk.slice(3):(bk?"；自动备份失败："+bk.replace(/^ERR[：:]?/,""):"")));
+      U("已写回存档");
+    }catch(err){ U("保存失败："+err.message); }
+  });
+  btn("恢复原文","ghost",function(){ refresh(); N("已恢复成原文本"); });
+  btn("下载此文件","ghost",function(){ Te(me(e),raw); });
+  btn("字节编辑器（十进制）","ghost",function(){ Bv(e); });
+  if(/(^|\/)db\//.test(e)) btn("LevelDB 查看器","ghost",function(){ Rm(e); });
+
+  host.appendChild(tip); host.appendChild(bar); host.appendChild(info); host.appendChild(ta);
+  refresh();
+}
 function Hm(e){let n=x("editor");n.innerHTML="";let t=b.archive.getBytes(e),a=document.createElement("div");if(a.className="edhead",a.innerHTML=`<div><b>${q(e)}</b><span class="muted">\u3000${Xe(t.length)}</span></div>`,n.appendChild(a),/^\.?mcstructure$/.test(qt(e).toLowerCase()))try{let o=function(r){let l=vn(r.type,r.x*31+r.z*17),m=Math.max(4,Math.floor(560/l.size)),s=Wt(r.type,r.x*31+r.z*17);x("modalBody").innerHTML="<h3>"+q(r.zh)+`\uFF08\u63A8\u6D4B\u5916\u5F62\uFF09</h3>
         <p class="muted">\u5750\u6807 `+r.x+", "+r.z+"\u3000\u4F30\u7B97 y\u2248"+r.y+"\u3000\u7FA4\u7CFB "+q(r.biome)+`</p>
         <canvas id="structCv" width="`+l.size*m+'" height="'+l.size*m+`" style="width:100%;max-width:560px;image-rendering:pixelated;border-radius:8px"></canvas>
         <p class="muted">\u5916\u5F62\u6309\u7ED3\u6784\u7C7B\u578B\u89C4\u5219\u7A0B\u5E8F\u751F\u6210\uFF08\u542B\u7834\u635F/\u671D\u5411\u968F\u673A\uFF09\uFF0C\u7528\u4E8E\u770B\u5E03\u5C40\uFF0C\u4E0D\u7B49\u4E8E\u771F\u5B9E\u6A21\u677F\u3002\u5B9D\u7BB1\u53C2\u8003\uFF1A`+s.map(p=>Ke(p.name)+"\xD7"+p.count).join("\u3001")+`</p>
-        <div class="modalbtns"><button id="stClose" class="ghost">\u5173\u95ED</button></div>`,x("modal").style.display="flex";let c=document.getElementById("structCv"),d=c.getContext("2d");d.fillStyle="#0b0f15",d.fillRect(0,0,c.width,c.height);for(let p of l.blocks)d.fillStyle=Ge(p.block),d.fillRect(p.x*m,p.z*m,m,m);document.getElementById("stClose").onclick=()=>{x("modal").style.display="none"}},i=Ja(t);b.structure=i,b.structurePath=e,x("workspace").style.display="none",x("structureView").style.display="block",Gt(),N("\u5DF2\u6253\u5F00\u7ED3\u6784\uFF1A"+e+"\uFF08"+i.size.join("\xD7")+"\uFF09");return}catch(i){N("\u7ED3\u6784\u89E3\u6790\u5931\u8D25\uFF1A"+i.message)}if(Um(e)&&b.archiveKind==="world"){Bv(e);return}if(/\.nbt$/i.test(e)){El(e);return}if(me(e).toLowerCase()==="level.dat")try{let i=Wa(t);b.level={nbt:i.nbt,original:t,fields:Qo(i.plain)},n.appendChild(Zm());let rb=document.createElement("button");rb.className="ghost";rb.style.marginTop="10px";rb.textContent="原始数据（十进制编辑）";rb.onclick=()=>Bv(e);n.appendChild(rb);let rw=document.createElement("div");rw.style.cssText="margin:8px 0 0;padding:10px 12px;border-radius:9px;background:#2a1d0f;border:1px solid #6b4a1d;color:#ffcf87;font-size:13px;line-height:1.6";rw.textContent="\u26A0\uFE0F 这里是存档核心数据，改错可能开不了世界；先用上面的表单改，确实要手改字节再点“原始数据”。";n.appendChild(rw);return}catch(i){N("level.dat \u89E3\u6790\u5931\u8D25\uFF1A"+i.message)}if(Gn(e,t)){let i=b.archive.getText(e),o=600*1024,r=i.length>o;r&&N("\u6587\u4EF6\u8F83\u5927\uFF08"+Xe(t.length)+"\uFF09\uFF0C\u53EA\u8F7D\u5165\u524D 600KB \u9884\u89C8\uFF0C\u907F\u514D\u5361\u987F");let l=id(e,r?i.slice(0,o):i,r),m=l.ta;n.appendChild(l.wrap);let s=document.createElement("div");s.className="edbar";let c=document.createElement("button");c.textContent="\u4FDD\u5B58\u4FEE\u6539";let d=document.createElement("button");d.textContent="\u4E0B\u8F7D\u6B64\u6587\u4EF6",d.className="ghost",c.onclick=()=>{if(r&&m.value===i.slice(0,o))return U("\u8FD9\u662F\u622A\u65AD\u9884\u89C8\uFF0C\u672A\u6539\u52A8\u5185\u5BB9\uFF0C\u4E0D\u4FDD\u5B58\u4EE5\u514D\u622A\u6389\u540E\u534A\u90E8\u5206");b.archive.setBytes(e,new TextEncoder().encode(m.value)),b.statsDirty=!0;let p=a.querySelector(".muted");p&&(p.textContent="\u3000"+Xe(new TextEncoder().encode(m.value).length)),N("\u5DF2\u4FDD\u5B58\uFF1A"+e+"\uFF08\u8BB0\u5F97\u70B9\u53F3\u4E0A\u89D2\u201C\u5BFC\u51FA/\u53E6\u5B58\u201D\u751F\u6210\u65B0\u5305\uFF09"),le()},d.onclick=()=>la(e),s.appendChild(c),s.appendChild(d),n.appendChild(s)}else if(/^(\.png|\.jpe?g|\.gif|\.webp|\.bmp)$/i.test(qt(e))){let i=document.createElement("div");i.className="imgview";let o=document.createElement("img");o.className="pixelimg",o.style.maxHeight="320px";let r=document.createElement("p");r.className="muted",r.textContent="\u8BFB\u53D6\u56FE\u7247\u2026",o.onload=()=>{r.textContent="\u5C3A\u5BF8 "+o.naturalWidth+"\xD7"+o.naturalHeight+"\u3000\u683C\u5F0F "+qt(e).slice(1).toUpperCase()+"\u3000\u5927\u5C0F "+Xe(t.length)+"\u3000\u70B9\u201C\u653E\u5927\u201D\u770B\u50CF\u7D20\u7EC6\u8282"},o.onerror=()=>{r.textContent="\u8FD9\u5F20\u56FE\u6D4F\u89C8\u5668\u65E0\u6CD5\u76F4\u63A5\u6E32\u67D3\uFF08\u53EF\u80FD\u662F\u635F\u574F\u6587\u4EF6\u6216\u4E0D\u652F\u6301\u7684\u5B50\u683C\u5F0F\uFF09\uFF0C\u53EF\u4E0B\u8F7D\u540E\u7528\u5176\u5B83\u5DE5\u5177\u6253\u5F00"},o.src=_l(e,t),i.appendChild(o),i.appendChild(r),n.appendChild(i);let l=document.createElement("div");l.className="edbar";let m=1,s=document.createElement("button");s.textContent="\u653E\u5927 \xD72",s.className="ghost",s.onclick=()=>{m=m>=8?1:m*2,o.style.width=o.naturalWidth*m+"px",o.style.maxWidth="none",s.textContent=m===1?"\u653E\u5927 \xD72":"\u8FD8\u539F \xD71".replace("\xD71","\xD71\uFF08\u5F53\u524D \xD7"+m+"\uFF09")};let c=document.createElement("button");c.textContent="\u4E0B\u8F7D\u6B64\u6587\u4EF6",c.onclick=()=>la(e);let d=document.createElement("button");d.textContent="\u7528\u672C\u5730\u6587\u4EF6\u66FF\u6362",d.className="ghost",d.onclick=()=>vi(e),l.appendChild(s),l.appendChild(c),l.appendChild(d),n.appendChild(l);let p=document.createElement("p");p.className="muted",p.textContent="\u8FD9\u662F\u53EA\u8BFB\u9884\u89C8\uFF1A\u6539\u56FE\u8BF7\u5148\u4E0B\u8F7D\uFF0C\u6216\u70B9\u201C\u7528\u672C\u5730\u6587\u4EF6\u66FF\u6362\u201D\u5BFC\u5165\u540C\u540D\u6587\u4EF6\uFF0C\u518D\u5BFC\u51FA\u65B0\u5305\u3002",n.appendChild(p)}else if(/.(png|jpg|jpeg|gif|webp|bmp)$/i.test(e)){let i=document.createElement("img");i.src=_l(e,b.archive.getBytes(e)),i.style.maxWidth="100%",i.style.borderRadius="8px",n.appendChild(i);let o=document.createElement("p");o.className="muted",o.textContent="\u56FE\u7247\u53EA\u8BFB\u9884\u89C8\uFF0C\u53EF\u7528\u201C\u7528\u672C\u5730\u6587\u4EF6\u66FF\u6362\u201D\u6362\u56FE\u540E\u518D\u5BFC\u51FA\u3002",n.appendChild(o);let r=document.createElement("div");r.className="edbar";let l=document.createElement("button");l.textContent="\u4E0B\u8F7D\u6B64\u6587\u4EF6",l.onclick=()=>la(e);let m=document.createElement("button");m.textContent="\u7528\u672C\u5730\u6587\u4EF6\u66FF\u6362",m.className="ghost",m.onclick=()=>vi(e),r.appendChild(l),r.appendChild(m),n.appendChild(r)}else{let i=document.createElement("p");i.className="muted",i.textContent="\u4E8C\u8FDB\u5236\u6587\u4EF6\uFF0C\u65E0\u6CD5\u76F4\u63A5\u7F16\u8F91\u3002\u53EF\u4EE5\u4E0B\u8F7D\u51FA\u6765\u7528\u5176\u5B83\u5DE5\u5177\u5904\u7406\uFF0C\u6216\u7528\u201C\u5220\u9664\u201D\u540E\u91CD\u65B0\u5BFC\u5165\u540C\u540D\u6587\u4EF6\u3002",n.appendChild(i);let o=document.createElement("div");o.className="edbar";let r=document.createElement("button");r.textContent="\u4E0B\u8F7D\u6B64\u6587\u4EF6",r.onclick=()=>la(e);let l=document.createElement("button");l.textContent="\u7528\u672C\u5730\u6587\u4EF6\u66FF\u6362",l.className="ghost",l.onclick=()=>vi(e),o.appendChild(r),o.appendChild(l),n.appendChild(o)}}function _l(e,n){let t={png:"image/png",jpg:"image/jpeg",jpeg:"image/jpeg",gif:"image/gif",webp:"image/webp",bmp:"image/bmp"}[qt(e).slice(1).toLowerCase()]||"application/octet-stream",a="",i=32768;for(let o=0;o<n.length;o+=i)a+=String.fromCharCode.apply(null,n.subarray(o,o+i));return"data:"+t+";base64,"+btoa(a)}function q(e){return String(e).replace(/[&<>"']/g,n=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[n])}function Zm(){let e=b.level.fields,n=document.createElement("div");return n.className="form",n.innerHTML=`
+        <div class="modalbtns"><button id="stClose" class="ghost">\u5173\u95ED</button></div>`,x("modal").style.display="flex";let c=document.getElementById("structCv"),d=c.getContext("2d");d.fillStyle="#0b0f15",d.fillRect(0,0,c.width,c.height);for(let p of l.blocks)d.fillStyle=Ge(p.block),d.fillRect(p.x*m,p.z*m,m,m);document.getElementById("stClose").onclick=()=>{x("modal").style.display="none"}},i=Ja(t);b.structure=i,b.structurePath=e,x("workspace").style.display="none",x("structureView").style.display="block",Gt(),N("\u5DF2\u6253\u5F00\u7ED3\u6784\uFF1A"+e+"\uFF08"+i.size.join("\xD7")+"\uFF09");return}catch(i){N("\u7ED3\u6784\u89E3\u6790\u5931\u8D25\uFF1A"+i.message)}if(Um(e)&&b.archiveKind==="world"){Bv(e);return}if(/\.nbt$/i.test(e)){El(e);return}if(me(e).toLowerCase()==="level.dat")try{let i=Wa(t);b.level={nbt:i.nbt,original:t,fields:Qo(i.plain)},n.appendChild(Zm());let rb=document.createElement("button");rb.className="ghost";rb.style.marginTop="10px";rb.textContent="原始数据（十进制编辑）";rb.onclick=()=>Bv(e);n.appendChild(rb);let eb=document.createElement("button");eb.className="ghost";eb.style.marginTop="10px";eb.style.marginLeft="8px";eb.textContent="英文代码（可改后保存）";eb.onclick=()=>Qv(e);n.appendChild(eb);let rw=document.createElement("div");rw.style.cssText="margin:8px 0 0;padding:10px 12px;border-radius:9px;background:#2a1d0f;border:1px solid #6b4a1d;color:#ffcf87;font-size:13px;line-height:1.6";rw.textContent="\u26A0\uFE0F 这里是存档核心数据，改错可能开不了世界；先用上面的表单改，确实要手改字节再点“原始数据”。";n.appendChild(rw);return}catch(i){N("level.dat \u89E3\u6790\u5931\u8D25\uFF1A"+i.message)}if(Gn(e,t)){let i=b.archive.getText(e),o=600*1024,r=i.length>o;r&&N("\u6587\u4EF6\u8F83\u5927\uFF08"+Xe(t.length)+"\uFF09\uFF0C\u53EA\u8F7D\u5165\u524D 600KB \u9884\u89C8\uFF0C\u907F\u514D\u5361\u987F");let l=id(e,r?i.slice(0,o):i,r),m=l.ta;n.appendChild(l.wrap);let s=document.createElement("div");s.className="edbar";let c=document.createElement("button");c.textContent="\u4FDD\u5B58\u4FEE\u6539";let d=document.createElement("button");d.textContent="\u4E0B\u8F7D\u6B64\u6587\u4EF6",d.className="ghost",c.onclick=()=>{if(r&&m.value===i.slice(0,o))return U("\u8FD9\u662F\u622A\u65AD\u9884\u89C8\uFF0C\u672A\u6539\u52A8\u5185\u5BB9\uFF0C\u4E0D\u4FDD\u5B58\u4EE5\u514D\u622A\u6389\u540E\u534A\u90E8\u5206");b.archive.setBytes(e,new TextEncoder().encode(m.value)),b.statsDirty=!0;let p=a.querySelector(".muted");p&&(p.textContent="\u3000"+Xe(new TextEncoder().encode(m.value).length)),N("\u5DF2\u4FDD\u5B58\uFF1A"+e+"\uFF08\u8BB0\u5F97\u70B9\u53F3\u4E0A\u89D2\u201C\u5BFC\u51FA/\u53E6\u5B58\u201D\u751F\u6210\u65B0\u5305\uFF09"),le()},d.onclick=()=>la(e),s.appendChild(c),s.appendChild(d),n.appendChild(s)}else if(/^(\.png|\.jpe?g|\.gif|\.webp|\.bmp)$/i.test(qt(e))){let i=document.createElement("div");i.className="imgview";let o=document.createElement("img");o.className="pixelimg",o.style.maxHeight="320px";let r=document.createElement("p");r.className="muted",r.textContent="\u8BFB\u53D6\u56FE\u7247\u2026",o.onload=()=>{r.textContent="\u5C3A\u5BF8 "+o.naturalWidth+"\xD7"+o.naturalHeight+"\u3000\u683C\u5F0F "+qt(e).slice(1).toUpperCase()+"\u3000\u5927\u5C0F "+Xe(t.length)+"\u3000\u70B9\u201C\u653E\u5927\u201D\u770B\u50CF\u7D20\u7EC6\u8282"},o.onerror=()=>{r.textContent="\u8FD9\u5F20\u56FE\u6D4F\u89C8\u5668\u65E0\u6CD5\u76F4\u63A5\u6E32\u67D3\uFF08\u53EF\u80FD\u662F\u635F\u574F\u6587\u4EF6\u6216\u4E0D\u652F\u6301\u7684\u5B50\u683C\u5F0F\uFF09\uFF0C\u53EF\u4E0B\u8F7D\u540E\u7528\u5176\u5B83\u5DE5\u5177\u6253\u5F00"},o.src=_l(e,t),i.appendChild(o),i.appendChild(r),n.appendChild(i);let l=document.createElement("div");l.className="edbar";let m=1,s=document.createElement("button");s.textContent="\u653E\u5927 \xD72",s.className="ghost",s.onclick=()=>{m=m>=8?1:m*2,o.style.width=o.naturalWidth*m+"px",o.style.maxWidth="none",s.textContent=m===1?"\u653E\u5927 \xD72":"\u8FD8\u539F \xD71".replace("\xD71","\xD71\uFF08\u5F53\u524D \xD7"+m+"\uFF09")};let c=document.createElement("button");c.textContent="\u4E0B\u8F7D\u6B64\u6587\u4EF6",c.onclick=()=>la(e);let d=document.createElement("button");d.textContent="\u7528\u672C\u5730\u6587\u4EF6\u66FF\u6362",d.className="ghost",d.onclick=()=>vi(e),l.appendChild(s),l.appendChild(c),l.appendChild(d),n.appendChild(l);let p=document.createElement("p");p.className="muted",p.textContent="\u8FD9\u662F\u53EA\u8BFB\u9884\u89C8\uFF1A\u6539\u56FE\u8BF7\u5148\u4E0B\u8F7D\uFF0C\u6216\u70B9\u201C\u7528\u672C\u5730\u6587\u4EF6\u66FF\u6362\u201D\u5BFC\u5165\u540C\u540D\u6587\u4EF6\uFF0C\u518D\u5BFC\u51FA\u65B0\u5305\u3002",n.appendChild(p)}else if(/.(png|jpg|jpeg|gif|webp|bmp)$/i.test(e)){let i=document.createElement("img");i.src=_l(e,b.archive.getBytes(e)),i.style.maxWidth="100%",i.style.borderRadius="8px",n.appendChild(i);let o=document.createElement("p");o.className="muted",o.textContent="\u56FE\u7247\u53EA\u8BFB\u9884\u89C8\uFF0C\u53EF\u7528\u201C\u7528\u672C\u5730\u6587\u4EF6\u66FF\u6362\u201D\u6362\u56FE\u540E\u518D\u5BFC\u51FA\u3002",n.appendChild(o);let r=document.createElement("div");r.className="edbar";let l=document.createElement("button");l.textContent="\u4E0B\u8F7D\u6B64\u6587\u4EF6",l.onclick=()=>la(e);let m=document.createElement("button");m.textContent="\u7528\u672C\u5730\u6587\u4EF6\u66FF\u6362",m.className="ghost",m.onclick=()=>vi(e),r.appendChild(l),r.appendChild(m),n.appendChild(r)}else{let i=document.createElement("p");i.className="muted",i.textContent="\u4E8C\u8FDB\u5236\u6587\u4EF6\uFF0C\u65E0\u6CD5\u76F4\u63A5\u7F16\u8F91\u3002\u53EF\u4EE5\u4E0B\u8F7D\u51FA\u6765\u7528\u5176\u5B83\u5DE5\u5177\u5904\u7406\uFF0C\u6216\u7528\u201C\u5220\u9664\u201D\u540E\u91CD\u65B0\u5BFC\u5165\u540C\u540D\u6587\u4EF6\u3002",n.appendChild(i);let o=document.createElement("div");o.className="edbar";let r=document.createElement("button");r.textContent="\u4E0B\u8F7D\u6B64\u6587\u4EF6",r.onclick=()=>la(e);let l=document.createElement("button");l.textContent="\u7528\u672C\u5730\u6587\u4EF6\u66FF\u6362",l.className="ghost",l.onclick=()=>vi(e),o.appendChild(r),o.appendChild(l),n.appendChild(o)}}function _l(e,n){let t={png:"image/png",jpg:"image/jpeg",jpeg:"image/jpeg",gif:"image/gif",webp:"image/webp",bmp:"image/bmp"}[qt(e).slice(1).toLowerCase()]||"application/octet-stream",a="",i=32768;for(let o=0;o<n.length;o+=i)a+=String.fromCharCode.apply(null,n.subarray(o,o+i));return"data:"+t+";base64,"+btoa(a)}function q(e){return String(e).replace(/[&<>"']/g,n=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[n])}function Zm(){let e=b.level.fields,n=document.createElement("div");return n.className="form",n.innerHTML=`
     <h3>\u5B58\u6863\u8BBE\u7F6E\uFF08level.dat\uFF09</h3>
     <label>\u4E16\u754C\u540D\u79F0</label><input id="lvName" value="${q(e.levelName)}">
     <label>\u6E38\u620F\u6A21\u5F0F</label>
