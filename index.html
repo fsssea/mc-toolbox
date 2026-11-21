@@ -491,7 +491,7 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
         <div class="vm-card" id="v-classic">
           <div class="vm-head"><span class="vm-tag mono">CLASSIC</span><h3>经典版</h3><p>沿用网页套壳形态，体积最小、启动最快。老用户的默认选择。</p></div>
           <dl class="vm-rows">
-            <div><dt>Android</dt><dd><span class="mono">APK · 6.3.0 / BUILD 74 · 带自动换行</span><a class="p-btn main" data-dl="apk" href="#">下载</a></dd></div>
+            <div><dt>Android</dt><dd><span class="mono">APK · BUILD 75 · 换行 + 下载修复</span><a class="p-btn main" data-dl="apk" href="#">下载</a></dd></div>
             <div><dt>Windows</dt><dd><span class="mono">ZIP · x64 免安装</span><a class="p-btn main" data-dl="win" href="#">下载</a></dd></div>
             <div><dt>Linux</dt><dd><span class="mono">TAR.GZ / DEB · x64</span><a class="p-btn main" data-dl="linux" href="#">下载</a><a class="p-btn" data-dl="linuxdeb" href="#">deb</a></dd></div>
           </dl>
@@ -546,7 +546,7 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
     <div class="wrap">
       <div class="sec-head">
         <div>
-          <div class="sec-label">CHANGELOG / 6.3.0 · BUILD 74</div>
+          <div class="sec-label">CHANGELOG / 6.3.0 · BUILD 75</div>
           <h2>这次改了什么。</h2>
         </div>
         <p class="sec-desc">2026-11-21。恢复更新的第一版，重点是内核换代和三版本矩阵落地。</p>
@@ -573,6 +573,14 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
           <div class="what">C++ 重制版上线，功能最全</div>
           <p>自写 inflate（stored / fixed / dynamic Huffman）与 deflate（固定 Huffman + 贪心 LZ77），不链接 zlib；
              产出单文件静态可执行，Windows 端一个 exe 就能跑。</p>
+        </li>
+        <li>
+          <div class="when">2026-11-21 · FIX</div>
+          <div class="what">汉化工具「下载」点了没反应（安卓）</div>
+          <p>根因是 <span class="mono">assets/i18n/index.html</span> 里一行 <span class="mono">&lt;script&gt;</span> 标签被写坏，
+             负责把文件写进手机的 <span class="mono">bridge.js</span> 根本没加载，于是只剩网页自己的 <span class="mono">blob:</span> 下载动作——
+             WebView 不认这个，看着就是「点了没反应」。现在标签修正、桥补了自愈逻辑，并改成写进系统「下载/MC工具箱」并弹提示；
+             http(s) 链接另配了系统下载器兜底。</p>
         </li>
         <li>
           <div class="when">2026-11-21 · ANDROID</div>
@@ -700,7 +708,7 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
     <div class="foot-col"><b>平台</b><a data-dl="apk" href="#">Android</a><a data-dl="win" href="#">Windows</a><a data-dl="linux" href="#">Linux</a><a data-dl="webapp" href="./app/index.html">网页版</a></div>
     <div class="foot-col"><b>资源</b><a data-dl="source" href="#">源码（MIT）</a><a data-dl="web" href="#">网页离线包</a><a href="#faq">使用说明</a><a href="#changelog">版本 6.3.0</a></div>
   </div>
-  <div class="foot-base"><span>© 2026 MC工具箱 contributors · MIT License</span><span class="mono">BUILD 74 / 2026-11-21</span></div>
+  <div class="foot-base"><span>© 2026 MC工具箱 contributors · MIT License</span><span class="mono">BUILD 75 / 2026-11-21</span></div>
 </footer>
 
 <script>
