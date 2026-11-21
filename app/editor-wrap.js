@@ -73,15 +73,18 @@
 
   var bar = null;
   function ensureBar() {
-    var host = document.getElementById('editor');
-    if (!host) return;
-    if (!host.querySelector('.codeedit')) {
+    // 编辑器容器各版不同：新版网页版在 #editor 里，老版 APK 直接挂在面板里。
+    // 以「第一个 .codeedit 的父节点」为准；没有编辑器就退回到 #editor。
+    var ed = document.querySelector('.codeedit');
+    if (!ed) {
       if (bar && bar.parentNode) bar.parentNode.removeChild(bar);
       bar = null;
       return;
     }
+    var host = ed.parentNode || document.getElementById('editor');
+    if (!host) return;
     if (!bar) bar = buildBar();
-    if (host.firstElementChild !== bar) host.insertBefore(bar, host.firstChild);
+    if (bar.parentNode !== host || bar.nextElementSibling !== ed) host.insertBefore(bar, ed);
   }
 
   var timer = null;
