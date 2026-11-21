@@ -371,16 +371,16 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
           </li>
           <li class="m-row">
             <div class="m-ico"><svg viewBox="0 0 24 24"><path d="M6 4h9l3 3v13H6z"/><path d="M15 4v3h3"/></svg></div>
-            <div style="min-width:0"><div class="m-name">JAVA 重制版 <span class="mono" style="font-size:10px;color:#8fb8ff">REMADE</span></div><div class="m-note">com.mctoolbox.java · 纯 JDK · 与经典版共存</div></div>
-            <span class="m-a" style="opacity:.5;cursor:not-allowed">待上线</span>
+            <div style="min-width:0"><div class="m-name">JAVA 重制版 <span class="mono" style="font-size:10px;color:#8fb8ff">REMADE</span></div><div class="m-note">com.mctoolbox.java · Swing 界面 · 与经典版共存</div></div>
+            <a class="m-a" data-dl="javaWin" href="#">下载</a>
           </li>
           <li class="m-row">
             <div class="m-ico"><svg viewBox="0 0 24 24"><path d="M8 6l-4 6 4 6M16 6l4 6-4 6"/></svg></div>
-            <div style="min-width:0"><div class="m-name">C++ 重制版 <span class="mono" style="font-size:10px;color:#8fb8ff">POWERED</span></div><div class="m-note">com.mctoolbox.cpp · 自写 deflate · 功能最强</div></div>
-            <span class="m-a" style="opacity:.5;cursor:not-allowed">待上线</span>
+            <div style="min-width:0"><div class="m-name">C++ 重制版 <span class="mono" style="font-size:10px;color:#8fb8ff">POWERED</span></div><div class="m-note">com.mctoolbox.cpp · 自写 deflate · 静态可执行</div></div>
+            <a class="m-a" data-dl="cppWin" href="#">下载</a>
           </li>
         </ul>
-        <div class="m-foot"><span>三版本构建全部完成 · 均可共存</span><a href="#open-source">查看源码</a></div>
+        <div class="m-foot"><span>经典版三端齐备 · JAVA / C++ 桌面端已发布</span><a href="#open-source">查看源码</a></div>
       </aside>
     </div>
   </section>
@@ -497,23 +497,23 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
           </dl>
         </div>
         <div class="vm-card" id="v-java">
-          <div class="vm-head"><span class="vm-tag mono">JAVA</span><h3>JAVA 重制版</h3><p>纯 JDK 标准库实现，逻辑与另两版逐条对齐。包名独立，可与经典版同机共存。</p></div>
+          <div class="vm-head"><span class="vm-tag mono">JAVA</span><h3>JAVA 重制版</h3><p>纯 JDK 标准库实现，自带 Swing 图形界面，逻辑与另两版逐条对齐。包名独立，可与经典版同机共存。</p></div>
           <dl class="vm-rows">
-            <div><dt>Android</dt><dd><span class="mono">APK · com.mctoolbox.java</span><span class="p-btn disabled">待发布</span></dd></div>
-            <div><dt>Windows</dt><dd><span class="mono">ZIP · 内置裁剪 JRE</span><span class="p-btn disabled">待发布</span></dd></div>
-            <div><dt>Linux</dt><dd><span class="mono">TAR.GZ / DEB · 用系统 JRE</span><span class="p-btn disabled">待发布</span><span class="p-btn disabled">待发布</span></dd></div>
+            <div><dt>Android</dt><dd><span class="mono">APK · com.mctoolbox.java</span><span class="p-btn disabled">待发布 · Android 无桌面 JRE</span></dd></div>
+            <div><dt>Windows</dt><dd><span class="mono">ZIP · jar + 启动.bat · 需 JRE 17+</span><a class="p-btn" data-dl="javaWin" href="#">下载 ZIP</a></dd></div>
+            <div><dt>Linux</dt><dd><span class="mono">TAR.GZ · jar + start.sh · 用系统 JRE</span><a class="p-btn" data-dl="javaLinux" href="#">下载 TAR.GZ</a><a class="p-btn" data-dl="javaJar" href="#">单拿 JAR</a></dd></div>
           </dl>
         </div>
         <div class="vm-card emph" id="v-cpp">
-          <div class="vm-head"><span class="vm-tag mono">C++</span><h3>C++ 重制版</h3><p>自写 inflate / deflate，不链接 zlib。单文件静态可执行，功能最全，性能最高。</p></div>
+          <div class="vm-head"><span class="vm-tag mono">C++</span><h3>C++ 重制版</h3><p>自写 inflate / deflate，不链接 zlib。单文件静态可执行、免运行库；当前发布命令行内核，图形界面版在构建。</p></div>
           <dl class="vm-rows">
-            <div><dt>Android</dt><dd><span class="mono">NDK arm64 + armv7</span><span class="p-btn disabled">待发布</span></dd></div>
-            <div><dt>Windows</dt><dd><span class="mono">ZIP · 静态 exe · 免运行库</span><span class="p-btn disabled">待发布</span></dd></div>
-            <div><dt>Linux</dt><dd><span class="mono">TAR.GZ / DEB · 静态二进制</span><span class="p-btn disabled">待发布</span><span class="p-btn disabled">待发布</span></dd></div>
+            <div><dt>Android</dt><dd><span class="mono">NDK arm64 + armv7</span><span class="p-btn disabled">待发布 · 需 NDK 构建</span></dd></div>
+            <div><dt>Windows</dt><dd><span class="mono">ZIP · mctool.exe 静态命令行</span><a class="p-btn" data-dl="cppWin" href="#">下载 ZIP</a></dd></div>
+            <div><dt>Linux</dt><dd><span class="mono">TAR.GZ · mctool 静态二进制</span><a class="p-btn" data-dl="cppLinux" href="#">下载 TAR.GZ</a></dd></div>
           </dl>
         </div>
       </div>
-      <p class="plat-note">经典版已发布 Android / Windows / Linux 三端；JAVA 重制版与 C++ 重制版的安装包还在构建（内核与构建脚本已在源码包里，可直接自己编）。不装包时，网页版可直接在浏览器里处理。</p>
+      <p class="plat-note">经典版：Android / Windows / Linux 三端安装包齐备。JAVA 重制版：Windows 与 Linux 已可下载（Swing 界面，需 JRE 17 或更高），Android 因没有桌面 JRE，暂不提供。C++ 重制版：Windows 与 Linux 已提供静态命令行内核，Android 需 NDK 构建、图形界面版在继续做。三版共用同一个 brarchive 内核，产出的容器逐字节一致，互相都能解开。</p>
     </div>
   </section>
 
@@ -703,6 +703,11 @@ var LINKS = {
   linuxdeb:   BASE + 'MC-Toolbox-Linux-6.3.0.deb',
   web:        BASE + 'MC-Toolbox-Web-6.3.0.zip',
   webapp:     './app/index.html',
+  javaWin:    './dl/MC-Toolbox-Java-Windows-6.3.0.zip',
+  javaLinux:  './dl/MC-Toolbox-Java-Linux-6.3.0.tar.gz',
+  javaJar:    './dl/MC-Toolbox-Java-6.3.0.jar',
+  cppWin:     './dl/MC-Toolbox-Cpp-Windows-6.3.0.zip',
+  cppLinux:   './dl/MC-Toolbox-Cpp-Linux-6.3.0.tar.gz',
   source:     BASE + 'MC-Toolbox-Source-6.3.0.zip'
   // JAVA / C++ 两版的安装包尚未上传，对应按钮为「待发布」状态，不使用 data-dl
 };
