@@ -505,9 +505,9 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
           </dl>
         </div>
         <div class="vm-card emph" id="v-cpp">
-          <div class="vm-head"><span class="vm-tag mono">C++</span><h3>C++ 重制版</h3><p>自写 inflate / deflate，不链接 zlib；Linux 版是原生 GTK 图形界面，批量队列 + 多线程并行 + 逐包报表，不加载网页、不依赖 JVM。</p></div>
+          <div class="vm-head"><span class="vm-tag mono">C++</span><h3>C++ 重制版</h3><p>自写 inflate / deflate，不链接 zlib；Linux 版是原生 GTK 图形界面，批量队列 + 多线程并行 + 逐包报表，不加载网页、不依赖 JVM。安卓端同样带批量队列与并行。</p></div>
           <dl class="vm-rows">
-            <div><dt>Android</dt><dd><span class="mono">APK · com.mctoolbox.cpp · arm64/armv7/x86_64</span><a class="p-btn main" data-dl="cppApk" href="#">下载 APK</a></dd></div>
+            <div><dt>Android</dt><dd><span class="mono">APK · com.mctoolbox.cpp · 批量并行</span><a class="p-btn main" data-dl="cppApk" href="#">下载 APK</a></dd></div>
             <div><dt>Windows</dt><dd><span class="mono">ZIP · mctool.exe 静态 · 命令行</span><a class="p-btn" data-dl="cppWin" href="#">下载 ZIP</a></dd></div>
             <div><dt>Linux</dt><dd><span class="mono">TAR.GZ · 原生 GTK 界面 + 静态 CLI</span><a class="p-btn" data-dl="cppLinux" href="#">下载 TAR.GZ</a></dd></div>
           </dl>
@@ -579,7 +579,8 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
           <div class="what">补上 JAVA / C++ 两版的安卓端</div>
           <p>经典版一直有 APK，两版重制版之前只有桌面端。现在两份 APK 都出了：JAVA 版把内核直接编进 dex，
              C++ 版把自写内核编成 libmct.so 走 JNI；包名分别是 <span class="mono">com.mctoolbox.java</span> 与
-             <span class="mono">com.mctoolbox.cpp</span>，和经典版同机共存，互不覆盖。</p>
+             <span class="mono">com.mctoolbox.cpp</span>，和经典版同机共存，互不覆盖。C++ 安卓端还多一层批量队列：
+             一次多选几个包，按 CPU 核数开线程并行跑，结果统一导出到「下载/MC工具箱」。</p>
         </li>
         <li>
           <div class="when">2026-11-21 · WEB</div>
