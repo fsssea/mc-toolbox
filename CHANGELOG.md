@@ -3,24 +3,22 @@
 对外公开版本统一从 **1.0.0** 起算。此前的编号只用于内部迭代，没有公开下载、没有对外测试，
 也不再作为发布版本对外使用；如需追溯内部改动，可查看仓库的 git 历史。
 
-## 未发布修订 · 汉化合规整改（源码与网页版已更新，安装包待重打包）
-
-### 移除
-
-- 删除 `assets/i18n/` 整块第三方汉化子应用（`tianji-turn-addon`，MIT）及其 iframe 入口
-  `assets/js/addon-i18n.js`；发布物不再包含该项目的页面、样式、AST 脚本与世界存档代码。
-- 移除随之带入的 JSZip / JSON5 / Acorn 前端副本。
+## 未发布修订 · 重新接回 tianji-turn-addon 最新版（2026-11-22）
 
 ### 变更
 
-- 「附加包汉化」改回本项目自研离线词库（`src/lang.js` / `src/dict.js`），只处理 `texts/*.lang`
-  与 JSON UI 文案，不处理脚本硬编码文本与世界存档 NBT。
-- 新增嵌套包支持：`.mcaddon` 里的 `.mcpack` 会先解开、逐个汉化，再重新打包写回外层。
-- 文档与第三方声明同步更正，不再声称“不是原样复制”。
+- 「附加包汉化」重新接入上游 `zanesu154-rgb/tianji-turn-addon`，固定 `f2c3165`（2026-11-21，`v2026.11.21-90`），替换此前的自研小词库。
+- 上游本次更新包含：脚本句式 ASCII 化再匹配、单行句式不跨行吞并、JSON 写回保留 `1.0` 这类小数、`property_bag` 变量文字、RawMessage 参数、HUD 标题/动作栏数据、`%键` 引用保护、manifest 末尾多余 `}` 宽松解析、包名以 manifest 为准、物品自定义名同步命令、`.mcfunction` 仅 `\r` 换行修复、下划线词提取等。
+- 完整上游代码放入 `assets/i18n/`；`assets/js/addon-i18n.js` 恢复为 iframe 入口；`index.html` / `assets/index.html` 重新引入该脚本。
+- 离线适配：JSON5 改本地 `vendor/json5.min.js`，移除 CDN 与访问计数；`bridge.js` 接安卓原生保存/父页转发/浏览器下载；`override.css` 适配 iframe 与手机。
+- `assets/sw.js` 缓存清单重新加入 `i18n/` 全部文件，缓存键改为 `mctoolbox-1.0.0-i18n`，匹配时忽略查询参数。
+- `README.md`、`THIRD_PARTY_NOTICES.md`、`docs/VERSION_MATRIX.md` 更正为“内嵌上游、MIT、已署名”，不再写“自研、已移除”。
+- `assets/assets_app.js` 不变（md5 `5cd21621c6a4d358104703682bfc04c1`）；三端安装包需要重新打包以带入 `i18n/`。
 
-### 待办
+### 说明
 
-- Android APK、Windows ZIP、Linux TAR.GZ / DEB 仍是 1.0.0 旧资产，需要用原签名密钥重新打包后替换下载表。
+- 上游为 MIT，允许复制、修改、再发布；本次已附完整 `LICENSE` 与来源说明。
+- 与作者的沟通属于礼貌确认与关系维护，不是 MIT 强制前置条件；在作者回复前，发布物保留完整署名与许可。
 
 ## 1.0.0 · BUILD 1 · 2026-11-22 · 首个公开发布版本
 

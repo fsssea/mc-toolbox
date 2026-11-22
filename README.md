@@ -50,7 +50,7 @@ JAVA 重制版（`com.mctoolbox.java`）与 C++ 重制版（`com.mctoolbox.cpp`�
 
 - 附加包 / 地图 / 皮肤 / 披风 / 结构 / 存档浏览与编辑
 - 基岩版存档互转、Java NBT / region 读写、附加包 ⇄ 模组转换
-- 附加包汉化（自研离线词库：`texts/*.lang` + JSON 文案；不处理脚本硬编码与世界存档）
+- 附加包汉化（内嵌 `tianji-turn-addon` 最新版：`.lang`、JSON UI、脚本硬编码、运行时翻译与世界存档，离线运行）
 - `@minecraft/server` 与 `@minecraft/server-ui` 脚本模拟器
 - 离线 Script API 文档与脚本体检器
 - 英文代码视图：`level.dat` 的 NBT 摊成「类型 路径 = 值」明文，保存自动编码回二进制
@@ -117,12 +117,26 @@ npm run dist  # 生成 dist/ 下的 Windows 包
 
 ## 汉化实现方式
 
-汉化由本项目自行实现，不内嵌第三方汉化子应用：
+「附加包汉化」由上游开源项目 **tianji-turn-addon** 提供，本项目只做嵌入与离线适配，不声称自研：
 
-1. `src/lang.js` 负责解析 `texts/*.lang`、按离线词库逐条替换，并处理 JSON UI 里的 `text` / `label` / `title` 等文案字段。
-2. `src/dict.js` 保存自建术语表；`src/hanhua.js` 在整包范围内按行为包 / 资源包分别生成 `zh_CN.lang`。
-3. 主界面「附加包汉化」按钮直接对当前打开的包执行，不再打开 iframe。
-4. 当前范围不含脚本硬编码文本、世界存档 NBT 文本与 AST 改写；这些能力未引入第三方代码，后续如需支持将另行自研。
+- 上游：https://github.com/zanesu154-rgb/tianji-turn-addon
+- 作者：B 站「天际译栈_栈主」（GitHub `zanesu154-rgb`）
+- 固定版本：`f2c3165`（2026-11-21，页面版本 `v2026.11.21-90`）
+- 许可：MIT，完整文本见 `assets/i18n/LICENSE`
+
+代码位置与入口：
+
+1. `assets/i18n/` 是上游的完整副本，保留其 `README.md`、`CHANGELOG.md`、`LICENSE` 与源码结构。
+2. 主界面「附加包汉化」按钮由 `assets/js/addon-i18n.js` 接管，以全屏 iframe 打开 `assets/i18n/index.html`。
+3. 上游能力原样保留：`.lang` 提取与补全、JSON UI、脚本硬编码、运行时翻译、世界存档 NBT / LevelDB、人工翻译编辑器等。
+
+本项目对上游做的唯一改动（均不改变汉化逻辑）：
+
+- 把 JSON5 从 CDN 改成本地 `vendor/json5.min.js`，去掉访问计数与赞助图联网请求，保证离线可用；
+- 增加 `bridge.js`：安卓 WebView 走 `AndroidBridge.saveBinary`，iframe 内把文件交回父页保存，桌面浏览器仍用 `<a download>`；
+- 增加 `override.css`：隐藏推广/计数元素，适配 iframe 与手机窄屏。
+
+上游更新时，直接用它覆盖 `assets/i18n/`，再把上述三处适配重新打上即可。不要把上游代码说成本项目自研。
 
 ## 回归测试
 
