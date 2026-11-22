@@ -5,30 +5,29 @@
   "founders": [
     {
       "id": "F1",
-      "name": {
-        "zh-Hans": "创始人 A",
-        "zh-Hant": "創始人 A",
-        "en": "Founder A",
-        "ja": "創設者 A",
-        "ko": "창립자 A"
-      },
-      "github": "fsssea",
-      "title": "最高管理员 · 创始人",
-      "since": "2026-11-22"
-    },
-    {
-      "id": "F2",
-      "name": {
-        "zh-Hans": "创始人 B",
-        "zh-Hant": "創始人 B",
-        "en": "Founder B",
-        "ja": "創設者 B",
-        "ko": "창립자 B"
-      },
+      "name": "一只想飞的巨型大嘴花",
       "github": "fsssea",
       "title": "最高管理员 · 创始人",
       "since": "2026-11-22",
-      "shared_account": true
+      "bilibili": {
+        "name": "一只想飞的巨型大嘴花",
+        "url": "https://space.bilibili.com/3546753368329112/",
+        "uid": "3546753368329112",
+        "official": true
+      }
+    },
+    {
+      "id": "F2",
+      "name": "豆包",
+      "github": "fsssea",
+      "title": "最高管理员 · 创始人",
+      "since": "2026-11-22",
+      "shared_account": true,
+      "bilibili": {
+        "name": "",
+        "url": "",
+        "official": false
+      }
     }
   ],
   "admins": [],
@@ -38,6 +37,14 @@
     "每次被创始人驳回记 1 次误判；累计超过 10 次（第 11 次起）永久取消权限，且不可重新申请。",
     "计数公开在本文件，创始人复核后可撤销误判（需在 admin-strike Issue 里写明理由）。",
     "创始人两位为最高管理员，不占管理员席位，负责审核申请、复核定级、执行撤销。",
-    "两位创始人目前共用同一个 GitHub 账号 @fsssea（暂无可用的第二账号）；提交时在 Issue 正文写明 F1 或 F2 以区分身份，名册上仍按两个最高管理员记录。"
-  ]
+    "两位创始人目前共用同一个 GitHub 账号 @fsssea（暂无可用的第二账号）；提交时在 Issue 正文写明 F1 或 F2 以区分身份，名册上仍按两个最高管理员记录。",
+    "官方账号：哔哩哔哩「一只想飞的巨型大嘴花」（space id 3546753368329112）是唯一官方账号与唯一发布渠道，其他同名账号均非官方。"
+  ],
+  "official_channel": {
+    "platform": "bilibili",
+    "name": "一只想飞的巨型大嘴花",
+    "url": "https://space.bilibili.com/3546753368329112/",
+    "uid": "3546753368329112",
+    "note": "唯一官方账号，仅此一个；同名或相似名账号均非官方"
+  }
 }
