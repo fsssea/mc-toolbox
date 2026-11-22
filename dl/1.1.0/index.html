@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MC工具箱 1.1.0 长期下载 · 分卷备份</title>
+<style>
+:root{--bg:#0e1116;--panel:#171c24;--line:#2a3341;--text:#e8edf4;--muted:#9aa7b8;--accent:#ffcc4d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:820px;margin:0 auto;padding:44px 20px 72px}
+a{color:var(--accent)}h1{font-size:30px;line-height:1.25;margin:8px 0 12px}h2{font-size:19px;margin:36px 0 12px}
+p{color:var(--muted)}.tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font:12px ui-monospace,monospace;color:var(--accent)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0}
+.card h3{margin:0 0 4px;font-size:17px}.meta{font:12px ui-monospace,monospace;color:var(--muted);margin-bottom:12px}
+.links{display:flex;flex-wrap:wrap;gap:8px}.links a{display:inline-block;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:7px 11px;background:#11161d}
+.links a:hover{border-color:var(--accent)}code{background:#0b0f14;border:1px solid var(--line);border-radius:6px;padding:2px 6px;font-size:13px}
+.note{border-left:3px solid var(--accent);padding:10px 14px;background:#151a21;color:#c8d1dc;margin:18px 0}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}th{color:var(--muted);font-weight:500}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">LONG-TERM MIRROR / 1.1.0</span>
+  <h1>MC工具箱 1.1.0 长期下载</h1>
+  <p>GitHub Pages 单文件上限 100 MB，所以 Windows / Linux / DEB 改为分卷。Android APK 未超过上限，可直接下载。分卷下载完成后运行合并脚本，校验值对得上再安装。</p>
+  <div class="note">如果你只想最快拿到完整包，回到 <a href="../../">官网下载页</a> 使用豆包 CDN 直链。本页是长期备份，不依赖 CDN 的短期签名。</div>
+
+  <h2>Android · 直接安装</h2>
+  <div class="card">
+    <h3>MC-Toolbox-Classic-1.1.0-android.apk</h3>
+    <div class="meta">96.7 MiB · versionCode 81 · 32/64 位 · SHA-256 002be829…3a001</div>
+    <div class="links"><a href="MC-Toolbox-Classic-1.1.0-android.apk" download>下载 APK</a></div>
+  </div>
+
+  <h2>Windows x64 · 两个分卷</h2>
+  <div class="card">
+    <h3>MC-Toolbox-Windows-1.1.0.zip</h3>
+    <div class="meta">169 MB · 分卷 1/2 + 2/2 · 合并后 SHA-256 9d7ea5e7…6908fd</div>
+    <div class="links">
+      <a href="MC-Toolbox-Windows-1.1.0.zip.part00" download>分卷 1/2</a>
+      <a href="MC-Toolbox-Windows-1.1.0.zip.part01" download>分卷 2/2</a>
+      <a href="合并-Windows.bat" download>合并脚本 .bat</a>
+    </div>
+    <p>把三个文件放在同一目录，双击 <code>合并-Windows.bat</code>，会生成 <code>MC-Toolbox-Windows-1.1.0.zip</code> 并自动算 SHA-256。</p>
+  </div>
+
+  <h2>Linux x64 · TAR.GZ</h2>
+  <div class="card">
+    <h3>MC-Toolbox-Linux-1.1.0.tar.gz</h3>
+    <div class="meta">170 MB · 分卷 1/2 + 2/2 · 合并后 SHA-256 66422abb…932b9</div>
+    <div class="links">
+      <a href="MC-Toolbox-Linux-1.1.0.tar.gz.part00" download>分卷 1/2</a>
+      <a href="MC-Toolbox-Linux-1.1.0.tar.gz.part01" download>分卷 2/2</a>
+      <a href="合并-Linux.sh" download>合并脚本 .sh</a>
+    </div>
+    <p>下载三个文件后执行 <code>sh 合并-Linux.sh</code>，再用 <code>tar xzf</code> 解压。</p>
+  </div>
+
+  <h2>Linux x64 · DEB</h2>
+  <div class="card">
+    <h3>MC-Toolbox-Linux-1.1.0.deb</h3>
+    <div class="meta">133 MB · 分卷 1/2 + 2/2 · 合并后 SHA-256 b3373649…9d268</div>
+    <div class="links">
+      <a href="MC-Toolbox-Linux-1.1.0.deb.part00" download>分卷 1/2</a>
+      <a href="MC-Toolbox-Linux-1.1.0.deb.part01" download>分卷 2/2</a>
+      <a href="合并-Linux-deb.sh" download>合并脚本 .sh</a>
+    </div>
+    <p>下载三个文件后执行 <code>sh 合并-Linux-deb.sh</code>，再 <code>sudo dpkg -i</code> 安装。</p>
+  </div>
+
+  <h2>校验值</h2>
+  <p><a href="SHA256SUMS-parts.txt">分卷 SHA-256 清单</a> · <a href="../SHA256SUMS-1.1.0.txt">完整包 SHA-256 清单</a></p>
+  <table>
+    <thead><tr><th>文件</th><th>SHA-256</th></tr></thead>
+    <tbody>
+      <tr><td>APK</td><td><code>002be829268b818fb0ab7da3890845a76b027fe56a1f91e5cdc0088a1b13a001</code></td></tr>
+      <tr><td>Windows ZIP</td><td><code>9d7ea5e77845ff9d2f0fe1a7758763dfed45e26d25023cd9961f70a54f6908fd</code></td></tr>
+      <tr><td>Linux TAR.GZ</td><td><code>66422abbe3907fc7d38345571c6197d8ea63116507b49fba47d1045fc72932b9</code></td></tr>
+      <tr><td>Linux DEB</td><td><code>b3373649938920855e9b0691d7efd2b397d4895a58b9a058d1445d50f8f9d268</code></td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:28px"><a href="../../">← 返回 MC工具箱官网</a></p>
+</div>
+</body>
+</html>
