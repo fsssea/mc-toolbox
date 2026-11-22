@@ -24,8 +24,7 @@
     'src/world/leveldb.js',
     'src/world/world.js',
     'src/world/editor.js',
-    'app.js',
-    'bridge.js'
+    'app.js'
   ];
 
   var ov = document.createElement('div');
@@ -54,6 +53,35 @@
       });
     });
   }
+
+  // 下载适配：安卓 WebView 走原生桥，iframe 内交给父页保存，桌面浏览器用 <a download>。
+  function b64(u8) {
+    var n = '';
+    for (var i = 0; i < u8.length; i += 32768) n += String.fromCharCode.apply(null, u8.subarray(i, i + 32768));
+    return btoa(n);
+  }
+  window.__mctSave = async function (blob, filename) {
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.saveBinary) {
+        var buf = await blob.arrayBuffer();
+        var path = window.AndroidBridge.saveBinary(filename, b64(new Uint8Array(buf)));
+        if (parent !== window) {
+          if (String(path).indexOf('ERR') === 0) parent.postMessage({ type: 'mc-i18n-error', message: filename + '：' + path }, '*');
+          else parent.postMessage({ type: 'mc-i18n-saved', name: filename, path: path }, '*');
+        }
+        return path;
+      }
+      if (parent !== window) {
+        var fb = await blob.arrayBuffer();
+        parent.postMessage({ type: 'mc-i18n-save-b64', name: filename, b64: b64(new Uint8Array(fb)) }, '*');
+        return;
+      }
+    } catch (e) { /* 继续走浏览器下载 */ }
+    var url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = filename; a.rel = 'noopener';
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { a.remove(); URL.revokeObjectURL(url); }, 1000);
+  };
 
   Promise.all(FILES.map(function (f) { return getOne(f, 0); })).then(function (texts) {
     for (var i = 0; i < FILES.length; i++) {
