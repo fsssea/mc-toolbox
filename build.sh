@@ -18,7 +18,7 @@ ALIAS="${MCBE_KEY_ALIAS:-mcbe}"
 SPASS="${MCBE_STORE_PASS:-mcbe123456}"
 KPASS="${MCBE_KEY_PASS:-$SPASS}"
 
-rm -rf build && mkdir -p build/classes build/dex
+rm -rf build && mkdir -p build/classes build/dex build/assets
 
 echo "[1/6] 编译 Java"
 "$JAVA_HOME/bin/javac" --release 11 -classpath "$AJ" -d build/classes \
@@ -28,12 +28,15 @@ echo "[2/6] d8 转 dex"
 "$BT/d8" --release --lib "$AJ" --min-api 29 --output build/dex \
   $(find build/classes -name "*.class")
 
-echo "[3/6] aapt2 编译资源"
+echo "[3/6] 准备 APK 资源（Web 前端 + Chunker 引擎）"
+cp -a assets/. build/assets/
+mkdir -p build/assets/chunker
+cp -a android/chunker/. build/assets/chunker/
 "$BT/aapt2" compile --dir android/res -o build/res.zip
 
 echo "[4/6] aapt2 链接（含 assets、manifest）"
 "$BT/aapt2" link -o build/base.apk -I "$AJ" \
-  --manifest android/AndroidManifest.xml -A assets \
+  --manifest android/AndroidManifest.xml -A build/assets \
   --min-sdk-version 29 --target-sdk-version 34 build/res.zip
 
 echo "[5/6] 加入 classes.dex"

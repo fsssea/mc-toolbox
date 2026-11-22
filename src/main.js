@@ -2287,7 +2287,7 @@ function openTools() {
     ['披风制作器', '64×32 披风绘制 / 代码生成 / 导出 PNG', () => openSkinStudio('cape')],
     ['Java 存档', '读 .zip/.mca/.nbt，统计、地图、玩家、level.dat', openJavaTools],
     ['Java 模组制作器', '生成 Fabric / Forge / NeoForge 工程（源码+构建脚本）', openJavaModStudio],
-    ['存档转换', '基岩版 ⇄ Java 双方向地形转换，不需要 mod', openConverter],
+    ['存档转换', (window.AndroidBridge && window.AndroidBridge.chunkerStart) || (window.McDesktop && window.McDesktop.chunkerConvert) ? 'Chunker 1.21.0 完整转换：基岩 ⇄ Java，支持 32/64 位 Android' : '基岩版 ⇄ Java 双方向地形转换，不需要 mod', openConverter],
     ['模组转换', '基岩附加包 ⇄ Java 模组工程，贴图/物品/方块/配方', openModConverter],
     ['工具中心', '20 个离线小工具：UUID/清单/贴图/结构/报告', openToolbox],
   ];

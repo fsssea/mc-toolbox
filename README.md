@@ -29,16 +29,16 @@
 
 ![Verify](https://github.com/fsssea/mc-toolbox/actions/workflows/verify.yml/badge.svg)
 
-# MC工具箱 1.0.0（正式版）
+# MC工具箱 1.1.0（测试构建）
 
-## 经典版 × 三端（1.0.0 / BUILD 1）
+## 经典版 × 三端（1.1.0 / BUILD 2）
 
 | 版本 | Android | Windows | Linux | 内核源码 |
 | --- | --- | --- | --- | --- |
-| 经典版 · `com.doubao.mctoolbox` | [APK](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Classic-1.0.0-android.apk) | [ZIP](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Windows-1.0.0.zip) | [TAR.GZ](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Linux-1.0.0.tar.gz) · [DEB](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Linux-1.0.0.deb) | `assets_app.js`（JS） |
+| 经典版 · `com.doubao.mctoolbox` | [APK](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Classic-1.1.0-android.apk) | [ZIP](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Windows-1.1.0.zip) | [TAR.GZ](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Linux-1.1.0.tar.gz) · [DEB](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Linux-1.1.0.deb) | `assets_app.js`（JS） |
 
-1.0.0 是**第一个公开发布的版本**。此前的内部迭代没有对外发布、没有公开测试，仓库历史里保留为内部记录；
-对外公开版本号从 1.0.0 起算，官网、本文档与安装包统一使用 1.0.0。
+1.1.0 是**本周的测试构建**，不对外宣布“正式版”；版本号从 1.0.0 正式向上递增。
+三端新增 Chunker 1.21.0 完整存档转换（基岩 ⇄ Java），Android 同时支持 32 / 64 位。
 
 JAVA 重制版（`com.mctoolbox.java`）与 C++ 重制版（`com.mctoolbox.cpp`）仍在内部开发，
 **暂不对外发布**，因此不在下载表中提供链接。三个 `applicationId` 互不相同，日后正式发布时可同机共存。
@@ -64,7 +64,7 @@ JAVA 重制版（`com.mctoolbox.java`）与 C++ 重制版（`com.mctoolbox.cpp`�
 
 ## 更新日志
 
-见 [CHANGELOG.md](CHANGELOG.md)：1.0.0 是首个公开发布版本，把存档 `level.dat` 的 NBT 摊成「类型 路径 = 值」的英文代码（保存自动编码回二进制）、给英文代码视图加上长字段自动换行（手机上不用横拖）、并让 db 里的非 NBT 文件按 0x 偏移看英文串、按十进制字节就地编辑，改前自动备份整包。2026-11-22 修订在不改版本号的前提下，为 `.mcstructure` 增加原二进制、十进制、十六进制、纯英文代码四种编辑模式。
+见 [CHANGELOG.md](CHANGELOG.md)：1.0.0 是首个公开发布版本，把存档 `level.dat` 的 NBT 摊成「类型 路径 = 值」的英文代码（保存自动编码回二进制）、给英文代码视图加上长字段自动换行（手机上不用横拖）、并让 db 里的非 NBT 文件按 0x 偏移看英文串、按十进制字节就地编辑，改前自动备份整包。2026-11-22 修订为 `.mcstructure` 增加原二进制、十进制、十六进制、纯英文代码四种编辑模式；1.1.0 再接入 Chunker 完整转换。
 
 ## 目录
 

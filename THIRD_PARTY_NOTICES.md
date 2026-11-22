@@ -25,6 +25,29 @@
 - **JSON5** — MIT，`assets/i18n/vendor/json5.min.js`
 - **Acorn** — MIT，`assets/i18n/vendor/acorn.js`，许可见 `vendor/acorn.LICENSE`
 
+
+
+## Chunker（存档转换 CLI）
+
+- 上游：https://github.com/HiveGamesOSS/Chunker
+- 固定版本：`1.21.0`，许可 **MIT**
+- 位置：Android `assets/chunker/cli.jar`；桌面端 `resources/app/chunker/chunker-cli/`
+- 用途：基岩版 ⇄ Java 版完整存档转换；不包含实体/玩家背包转换
+- 许可文本：`chunker/legal/CHUNKER_MIT.txt`
+
+## OpenJDK 17 运行时
+
+- Android 64 位：来自 ChunkoidNG `assets/rootfs.zip` 内的 OpenJDK 17（aarch64）
+- Android 32 位：来自 `ArtRuntime/openjdk-android-hostcraft` release `openjdk-2026.11.01-0456` 的 `jre-17-arm.tar.xz`
+- 许可：GPLv2 + Classpath Exception
+- 位置：Android `assets/chunker/arm64.zip` / `arm32.zip`
+- 许可文本：`chunker/legal/OPENJDK_*.txt`
+
+## ChunkoidNG
+
+- 上游：https://github.com/Dicecan/ChunkoidNG
+- 只参考其 Android 运行时启动方式（`/system/bin/linker(64)` + 内置 CLI）；**未复制其 GPLv3 Kotlin/Compose 源码**
+
 ## 字体与图标
 
 应用图标为本项目自制。界面使用系统字体，不内嵌第三方字体。

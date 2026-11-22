@@ -11,12 +11,12 @@
 
 | 项目 | 值 |
 | --- | --- |
-| 对外版本 | **1.0.0** |
-| BUILD | 1 |
+| 对外版本 | **1.1.0（测试构建，非正式版）** |
+| BUILD | 2 |
 | 发布日期 | 2026-11-22 |
 | Android `applicationId` | `com.doubao.mctoolbox` |
-| Android `versionCode` | 80（沿用既有值，保证覆盖安装可升级） |
-| 三端 `assets/assets_app.js` | 同一份文件，md5 `c586978372c5b37924f905cb0b1e4bcd`（531,677 B，含 `.mcstructure` 四视图） |
+| Android `versionCode` | 81（覆盖安装可升级；versionName 1.1.0） |
+| 三端 `assets/assets_app.js` | 同一份文件，md5 `592e9693cd799abd2ac9c40e4998ecfa`（536,720 B，含 `.mcstructure` 四视图 + Chunker 完整转换入口） |
 | 内嵌汉化子应用 | `tianji-turn-addon` `f2c3165`（2026-11-21，`v2026.11.21-90`），MIT，位于 `assets/i18n/` |
 | 许可 | MIT，全离线运行 |
 | `.mcstructure` 编辑 | 切片可视化 + 原二进制 / 十进制 / 十六进制 / 纯英文代码四视图，4KB 分页 |
@@ -25,7 +25,7 @@
 
 | | Android | Windows | Linux |
 | --- | --- | --- | --- |
-| 经典版 1.0.0 | `MC-Toolbox-Classic-1.0.0-android.apk` | `MC-Toolbox-Windows-1.0.0.zip` | `MC-Toolbox-Linux-1.0.0.tar.gz` / `.deb` |
+| 经典版 1.1.0 | `MC-Toolbox-Classic-1.1.0-android.apk` | `MC-Toolbox-Windows-1.1.0.zip` | `MC-Toolbox-Linux-1.1.0.tar.gz` / `.deb` |
 | JAVA 重制版 | 内部开发中，不发布 | 内部开发中，不发布 | 内部开发中，不发布 |
 | C++ 重制版 | 内部开发中，不发布 | 内部开发中，不发布 | 内部开发中，不发布 |
 
@@ -37,7 +37,13 @@
 
 ## 五、安卓端说明
 
-安卓包的对外文件名与安装器显示的 `versionName` 均为 1.0.0；APK 已用原签名库重建并重签，`versionCode` 80 保持不变。
+安卓包的对外文件名与安装器显示的 `versionName` 均为 1.1.0；APK 已用原签名库重建并重签，`versionCode` 81。
+
+## 六、Chunker 运行时
+
+- Android：`assets/chunker/arm64.zip`（64 位，约 28 MB）与 `assets/chunker/arm32.zip`（32 位，约 41 MB），按 `Build.SUPPORTED_ABIS` 选择；首次转换解压到应用私有目录。
+- Windows / Linux：包内 `resources/app/chunker/chunker-cli/` 为 Chunker 1.21.0 原生 CLI 与运行时，不依赖系统 Java。
+- 许可：Chunker MIT，OpenJDK GPLv2 + Classpath Exception；许可文本见 `chunker/legal/`。
 
 ## 六、未来版本规划
 

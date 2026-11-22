@@ -346,7 +346,7 @@ export function convertJavaToBedrock(zipBytes, onLog = () => {}) {
 
 function $id(id) { return document.getElementById(id); }
 
-export function openConverter() {
+function openTerrainConverter() {
   const body = $id('modalBody');
   body.innerHTML = `<h3>存档转换</h3>
     <p class="muted">双方向地形层转换，不需要安装任何模组/第三方转换器。实体、容器、红石状态不迁移。</p>
@@ -397,4 +397,131 @@ export function openConverter() {
       log('完成：已导出 转换-基岩版.mcworld');
     } catch (e) { log('失败：' + e.message); }
   };
+}
+
+function bytesB64(u8) {
+  let s = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < u8.length; i += chunk) s += String.fromCharCode.apply(null, u8.subarray(i, i + chunk));
+  return btoa(s);
+}
+
+function safePart(name) {
+  const n = String(name || 'world.zip').split(/[\\/]/).pop().replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_').trim();
+  return n || 'world.zip';
+}
+
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+function fullConverterSupported() {
+  return !!(window.AndroidBridge && window.AndroidBridge.chunkerStart) ||
+    !!(window.McDesktop && window.McDesktop.chunkerConvert);
+}
+
+function openFullConverter() {
+  const body = $id('modalBody');
+  const isAndroid = !!(window.AndroidBridge && window.AndroidBridge.chunkerStart);
+  body.innerHTML = `<h3>存档转换 · Chunker 1.21.0</h3>
+    <p class="muted">完整地形/方块/方块实体转换，基岩版 ⇄ Java 双方向；实体、玩家背包不迁移。Android 端自动选择 32/64 位内置运行时。</p>
+    <label>目标格式</label>
+    <select id="cvTarget" style="width:100%;padding:10px;border-radius:10px;background:#141922;color:#e6edf3;border:1px solid #2a3441">
+      <option value="JAVA_1_21_11">Java 1.21.11</option>
+      <option value="JAVA_1_21_4">Java 1.21.4</option>
+      <option value="JAVA_1_20_6">Java 1.20.6</option>
+      <option value="JAVA_1_19_2">Java 1.19.2</option>
+      <option value="JAVA_1_16_5">Java 1.16.5</option>
+      <option value="BEDROCK_1_26_50">基岩版 1.26.50</option>
+      <option value="BEDROCK_1_21_130">基岩版 1.21.130</option>
+      <option value="BEDROCK_1_21_50">基岩版 1.21.50</option>
+    </select>
+    <div class="skbar" style="margin-top:10px">
+      <button id="cvFullB2J" class="primary">基岩版 → Java</button>
+      <button id="cvFullJ2B" class="primary">Java → 基岩版</button>
+      <button id="cvFullClose" class="ghost">关闭</button>
+    </div>
+    <p class="muted">输入：.mcworld / .mctemplate / .zip；输出：Java 世界为 .zip，基岩版为 .mcworld。转换在本地完成，不上传文件。</p>
+    <input type="file" id="cvFile" style="display:none" accept=".mcworld,.mctemplate,.zip,.mcpack">
+    <div id="cvLog" class="logbox" style="max-height:38vh;overflow:auto;white-space:pre-wrap"></div>`;
+  $id('modal').style.display = 'flex';
+  const box = document.querySelector('.modalbox'); if (box) { box.style.maxWidth = '760px'; box.style.width = '96vw'; }
+  const log = (s) => { const el = $id('cvLog'); if (el) { el.textContent += s + '\n'; el.scrollTop = el.scrollHeight; } };
+  const close = () => { if (box) { box.style.maxWidth = ''; box.style.width = ''; } $id('modal').style.display = 'none'; };
+  $id('cvFullClose').onclick = close;
+  const pick = () => new Promise((res, rej) => {
+    const inp = $id('cvFile'); inp.value = '';
+    inp.onchange = () => {
+      const f = inp.files[0]; if (!f) return rej(new Error('未选择文件'));
+      res(f);
+    };
+    inp.click();
+  });
+  const targetOf = (dir) => {
+    const sel = $id('cvTarget');
+    if (dir === 'b2j') sel.value = 'JAVA_1_21_11';
+    else sel.value = 'BEDROCK_1_26_50';
+    return sel.value;
+  };
+  const outNameOf = (target) => target.startsWith('JAVA') ? '转换-Java版.zip' : '转换-基岩版.mcworld';
+
+  const runAndroid = async (file, target) => {
+    const buf = new Uint8Array(await file.arrayBuffer());
+    const rel = 'chunker/in/' + Date.now() + '-' + safePart(file.name);
+    log('写入临时输入：' + (buf.length / 1048576).toFixed(2) + ' MB');
+    const wr = window.AndroidBridge.writeAppFile(rel, bytesB64(buf));
+    if (wr !== 'OK') throw new Error('写入输入失败：' + wr);
+    const st = JSON.parse(window.AndroidBridge.chunkerStart(rel, target, outNameOf(target)));
+    if (!st.ok) throw new Error(st.error || '启动转换失败');
+    log('任务已启动：' + st.id);
+    let lastLog = '';
+    for (let i = 0; i < 100000; i++) {
+      await sleep(700);
+      const s = JSON.parse(window.AndroidBridge.chunkerStatus(st.id));
+      if (s.log && s.log !== lastLog) {
+        lastLog = s.log;
+        $id('cvLog').textContent = s.log;
+        $id('cvLog').scrollTop = $id('cvLog').scrollHeight;
+      }
+      if (s.state === 'success') {
+        log('转换完成，正在导出……');
+        const ex = window.AndroidBridge.exportAppFile(s.output);
+        if (ex !== 'OK') throw new Error('导出失败：' + ex);
+        log('已导出到「下载/MCBE解析/' + outNameOf(target) + '」');
+        return;
+      }
+      if (s.state === 'error' || s.state === 'cancelled') throw new Error(s.error || s.state);
+    }
+    throw new Error('转换超时');
+  };
+
+  const runDesktop = async (file, target) => {
+    const outName = outNameOf(target);
+    const payload = { inputName: file.name, target, outName };
+    // Electron 会暴露 File.path；没有时退回 base64
+    if (file.path) payload.inputPath = file.path;
+    else payload.inputBase64 = bytesB64(new Uint8Array(await file.arrayBuffer()));
+    log('启动内置 Chunker 引擎…');
+    const r = await window.McDesktop.chunkerConvert(payload);
+    if (r && r.log) log(r.log);
+    if (!r || !r.ok) throw new Error((r && r.error) || '转换失败');
+    log('已保存：' + r.path);
+  };
+
+  const go = async (dir) => {
+    try {
+      const target = targetOf(dir);
+      const file = await pick();
+      log('开始：' + file.name + ' → ' + target);
+      if (isAndroid) await runAndroid(file, target);
+      else await runDesktop(file, target);
+    } catch (e) {
+      log('失败：' + (e && e.message || e));
+    }
+  };
+  $id('cvFullB2J').onclick = () => go('b2j');
+  $id('cvFullJ2B').onclick = () => go('j2b');
+}
+
+export function openConverter() {
+  if (fullConverterSupported()) return openFullConverter();
+  return openTerrainConverter();
 }

@@ -27,6 +27,16 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import java.io.OutputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 import android.util.Base64;
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,6 +53,18 @@ public class MainActivity extends Activity {
     private ValueCallback<Uri[]> filePathCallback;
     private long lastBackTime = 0;
     private boolean pageLoaded = false;
+
+    // Chunker 转换任务表放在 Activity 层，Bridge 是内部类不能声明 static 成员
+    private static final Map<String, ChunkerTask> CHUNKER_TASKS = new ConcurrentHashMap<>();
+    private static final AtomicInteger CHUNKER_SEQ = new AtomicInteger();
+
+    private static class ChunkerTask {
+        volatile String state = "queued";
+        volatile String log = "";
+        volatile String output = "";
+        volatile String error = "";
+        volatile Process process;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -406,6 +428,319 @@ public class MainActivity extends Activity {
                 out.close();
                 return "OK";
             } catch (Throwable e) { return "ERR:" + e.getMessage(); }
+        }
+
+        // ===== Chunker 1.21.0 完整存档转换（Android，32/64 位自适应） =====
+        private File chunkerRoot() { return new File(getFilesDir(), "chunker"); }
+
+        private boolean chunkerAbi64() {
+            try {
+                if (android.os.Process.is64Bit()) {
+                    for (String abi : Build.SUPPORTED_64_BIT_ABIS) {
+                        if ("arm64-v8a".equals(abi)) return true;
+                    }
+                }
+                for (String abi : Build.SUPPORTED_ABIS) {
+                    if ("armeabi-v7a".equals(abi) || "armeabi".equals(abi)) return false;
+                    if ("arm64-v8a".equals(abi) && android.os.Process.is64Bit()) return true;
+                }
+            } catch (Throwable e) { }
+            return false;
+        }
+
+        private boolean chunkerIsArm() {
+            try {
+                for (String abi : Build.SUPPORTED_ABIS) {
+                    if ("arm64-v8a".equals(abi) || "armeabi-v7a".equals(abi) || "armeabi".equals(abi)) return true;
+                }
+            } catch (Throwable e) { }
+            return false;
+        }
+
+        @JavascriptInterface
+        public String chunkerInfo() {
+            try {
+                boolean arm = chunkerIsArm();
+                boolean arm64 = arm && chunkerAbi64();
+                File root = chunkerRoot();
+                boolean ready = new File(root, ".ready").isFile();
+                return "{\"supported\":" + (arm ? "true" : "false") +
+                        ",\"abi\":\"" + (arm64 ? "arm64-v8a" : (arm ? "armeabi-v7a" : "unsupported")) + "\"" +
+                        ",\"version\":\"1.21.0\",\"ready\":" + (ready ? "true" : "false") +
+                        ",\"engine\":\"Chunker CLI (MIT)\"}";
+            } catch (Throwable e) {
+                return "{\"supported\":false,\"error\":\"" + escapeJson(String.valueOf(e.getMessage())) + "\"}";
+            }
+        }
+
+        private synchronized void ensureChunkerEngine() throws Exception {
+            File root = chunkerRoot();
+            File ready = new File(root, ".ready");
+            File jar = new File(root, "cli.jar");
+            File jre = new File(root, "jre");
+            if (ready.isFile() && jar.isFile() && new File(jre, "lib/jvm/java-17-openjdk/bin/java").isFile()) return;
+            root.mkdirs();
+            if (ready.exists()) ready.delete();
+            // 清理可能残留的半解压目录
+            if (jre.exists()) deleteRec(jre);
+            copyAsset("chunker/cli.jar", jar);
+            String zipName = chunkerAbi64() ? "chunker/arm64.zip" : "chunker/arm32.zip";
+            unzipAsset(zipName, jre);
+            // 给 java 与 jspawnhelper 等可执行文件补权限
+            chmodTree(jre);
+            java.io.FileWriter w = new java.io.FileWriter(ready);
+            w.write("ok\n");
+            w.close();
+        }
+
+        private void copyAsset(String asset, File dst) throws Exception {
+            File parent = dst.getParentFile();
+            if (parent != null) parent.mkdirs();
+            InputStream in = getAssets().open(asset);
+            FileOutputStream out = new FileOutputStream(dst);
+            byte[] buf = new byte[65536];
+            int n;
+            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+            in.close();
+            out.flush();
+            out.close();
+        }
+
+        private void unzipAsset(String asset, File dest) throws Exception {
+            dest.mkdirs();
+            String destPath = dest.getCanonicalPath();
+            ZipInputStream zin = new ZipInputStream(getAssets().open(asset));
+            ZipEntry ze;
+            byte[] buf = new byte[65536];
+            while ((ze = zin.getNextEntry()) != null) {
+                String name = ze.getName().replace('\\', '/');
+                if (name.startsWith("/") || name.contains("../")) continue;
+                File out = new File(dest, name);
+                String outPath = out.getCanonicalPath();
+                if (!outPath.equals(destPath) && !outPath.startsWith(destPath + File.separator)) continue;
+                if (ze.isDirectory()) {
+                    out.mkdirs();
+                } else {
+                    File parent = out.getParentFile();
+                    if (parent != null) parent.mkdirs();
+                    FileOutputStream fos = new FileOutputStream(out);
+                    int n;
+                    while ((n = zin.read(buf)) > 0) fos.write(buf, 0, n);
+                    fos.flush();
+                    fos.close();
+                }
+                zin.closeEntry();
+            }
+            zin.close();
+        }
+
+        private void chmodTree(File f) {
+            if (f == null) return;
+            if (f.isDirectory()) {
+                File[] fs = f.listFiles();
+                if (fs != null) for (File c : fs) chmodTree(c);
+            } else {
+                String n = f.getName();
+                if (n.equals("java") || n.equals("keytool") || n.equals("jspawnhelper")
+                        || n.equals("jfr") || n.equals("jrunscript") || n.equals("rmiregistry")
+                        || n.endsWith(".so")) {
+                    f.setExecutable(true, false);
+                    f.setReadable(true, false);
+                }
+            }
+        }
+
+        @JavascriptInterface
+        public String chunkerStart(String inputPath, String targetFormat, String outName) {
+            try {
+                if (!chunkerIsArm()) return "{\"ok\":false,\"error\":\"当前设备不是 ARM，Chunker 引擎暂不支持\"}";
+                File in = safeFile(inputPath);
+                if (in == null || !in.isFile()) return "{\"ok\":false,\"error\":\"输入文件不存在\"}";
+                String target = (targetFormat == null || targetFormat.trim().isEmpty()) ? "INPUT" : targetFormat.trim();
+                String id = "c" + System.currentTimeMillis() + "_" + CHUNKER_SEQ.incrementAndGet();
+                ChunkerTask task = new ChunkerTask();
+                CHUNKER_TASKS.put(id, task);
+                final String fid = id, fout = outName == null ? "转换结果.zip" : outName;
+                new Thread(() -> runChunker(fid, task, in, target, fout), "chunker-" + id).start();
+                return "{\"ok\":true,\"id\":\"" + id + "\"}";
+            } catch (Throwable e) {
+                return "{\"ok\":false,\"error\":\"" + escapeJson(String.valueOf(e.getMessage())) + "\"}";
+            }
+        }
+
+        @JavascriptInterface
+        public String chunkerStatus(String id) {
+            ChunkerTask t = CHUNKER_TASKS.get(id);
+            if (t == null) return "{\"state\":\"missing\",\"error\":\"任务不存在\"}";
+            return "{\"state\":\"" + escapeJson(t.state) + "\",\"log\":\"" + escapeJson(t.log) +
+                    "\",\"output\":\"" + escapeJson(t.output) + "\",\"error\":\"" + escapeJson(t.error) + "\"}";
+        }
+
+        @JavascriptInterface
+        public String chunkerCancel(String id) {
+            ChunkerTask t = CHUNKER_TASKS.get(id);
+            if (t != null && t.process != null) {
+                try { t.process.destroy(); } catch (Throwable e) { }
+                t.state = "cancelled";
+                return "OK";
+            }
+            return "ERR:not running";
+        }
+
+        private void runChunker(String id, ChunkerTask task, File input, String target, String outName) {
+            File root = chunkerRoot();
+            File work = new File(root, "work/" + id);
+            try {
+                task.state = "preparing";
+                ensureChunkerEngine();
+                deleteRec(work);
+                File inDir = new File(work, "in");
+                File outDir = new File(work, "out");
+                File tmp = new File(work, "tmp");
+                inDir.mkdirs(); outDir.mkdirs(); tmp.mkdirs();
+                unzipFile(input, inDir);
+                File world = normalizeWorld(inDir);
+                task.log = "输入：" + input.getName() + "\n目标格式：" + target + "\n";
+                File jre = new File(root, "jre");
+                File javaBin = new File(jre, "lib/jvm/java-17-openjdk/bin/java");
+                if (!javaBin.isFile()) throw new Exception("内置 Java 运行时缺失");
+                javaBin.setExecutable(true, false);
+
+                List<String> cmd = new ArrayList<>();
+                // Android 10+ 禁止直接 exec 应用私有目录的可执行文件；用系统 linker 载入，
+                // 这与 ChunkoidNG 的 JavaProcessManager 做法一致。
+                if (Build.VERSION.SDK_INT >= 29) {
+                    cmd.add(chunkerAbi64() ? "/system/bin/linker64" : "/system/bin/linker");
+                }
+                cmd.add(javaBin.getAbsolutePath());
+                cmd.add("-Xmx384m");
+                cmd.add("-Xss1m");
+                cmd.add("-Djava.io.tmpdir=" + tmp.getAbsolutePath());
+                cmd.add("-jar");
+                cmd.add(new File(root, "cli.jar").getAbsolutePath());
+                cmd.add("-i"); cmd.add(world.getAbsolutePath());
+                cmd.add("-o"); cmd.add(outDir.getAbsolutePath());
+                cmd.add("-f"); cmd.add(target);
+
+                ProcessBuilder pb = new ProcessBuilder(cmd);
+                pb.directory(root);
+                pb.redirectErrorStream(true);
+                Map<String, String> env = pb.environment();
+                String lib1 = new File(jre, "lib/jvm/java-17-openjdk/lib").getAbsolutePath();
+                String lib2 = new File(jre, "lib/jvm/java-17-openjdk/lib/server").getAbsolutePath();
+                String lib3 = new File(jre, "lib").getAbsolutePath();
+                env.put("LD_LIBRARY_PATH", lib3 + ":" + lib1 + ":" + lib2);
+                env.put("JAVA_HOME", new File(jre, "lib/jvm/java-17-openjdk").getAbsolutePath());
+                env.put("PATH", new File(jre, "bin").getAbsolutePath() + ":/system/bin:/vendor/bin");
+                env.put("HOME", work.getAbsolutePath());
+                env.put("TMPDIR", tmp.getAbsolutePath());
+                env.put("LANG", "C.UTF-8");
+
+                task.state = "running";
+                Process p = pb.start();
+                task.process = p;
+                BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream(), "UTF-8"));
+                String line;
+                StringBuilder log = new StringBuilder(task.log);
+                while ((line = r.readLine()) != null) {
+                    log.append(line).append('\n');
+                    if (log.length() > 8000) log.delete(0, log.length() - 8000);
+                    task.log = log.toString();
+                }
+                int code = p.waitFor();
+                task.process = null;
+                if (code != 0) throw new Exception("Chunker 退出码 " + code);
+                File zipOut = safeFile("chunker/out/" + id + "-" + safeOutName(outName));
+                if (zipOut == null) throw new Exception("输出路径无效");
+                File parent = zipOut.getParentFile();
+                if (parent != null) parent.mkdirs();
+                zipDir(outDir, zipOut);
+                task.output = "chunker/out/" + zipOut.getName();
+                task.state = "success";
+                task.log = log.append("完成：输出 ").append(zipOut.getName()).toString();
+            } catch (Throwable e) {
+                task.state = "error";
+                task.error = String.valueOf(e.getMessage());
+                task.log = task.log + "\n失败：" + task.error;
+            } finally {
+                try { deleteRec(work); } catch (Throwable e) { }
+            }
+        }
+
+        private String safeOutName(String n) {
+            String s = n == null ? "转换结果.zip" : n.replace('\\', '/');
+            int i = s.lastIndexOf('/');
+            if (i >= 0) s = s.substring(i + 1);
+            s = s.replaceAll("[\\\\/:*?\"<>|\\x00-\\x1f]", "_");
+            return s.isEmpty() ? "转换结果.zip" : s;
+        }
+
+        private void unzipFile(File zip, File dest) throws Exception {
+            String destPath = dest.getCanonicalPath();
+            ZipInputStream zin = new ZipInputStream(new java.io.BufferedInputStream(new FileInputStream(zip)));
+            ZipEntry ze;
+            byte[] buf = new byte[65536];
+            while ((ze = zin.getNextEntry()) != null) {
+                String name = ze.getName().replace('\\', '/');
+                if (name.startsWith("/") || name.contains("../") || name.startsWith("__MACOSX/")) continue;
+                File out = new File(dest, name);
+                String outPath = out.getCanonicalPath();
+                if (!outPath.equals(destPath) && !outPath.startsWith(destPath + File.separator)) continue;
+                if (ze.isDirectory()) out.mkdirs();
+                else {
+                    File parent = out.getParentFile();
+                    if (parent != null) parent.mkdirs();
+                    FileOutputStream fos = new FileOutputStream(out);
+                    int n;
+                    while ((n = zin.read(buf)) > 0) fos.write(buf, 0, n);
+                    fos.flush(); fos.close();
+                }
+                zin.closeEntry();
+            }
+            zin.close();
+        }
+
+        private File normalizeWorld(File dir) {
+            if (new File(dir, "level.dat").isFile() || new File(dir, "db").isDirectory()) return dir;
+            File[] fs = dir.listFiles();
+            if (fs != null) {
+                int dirs = 0;
+                for (File f : fs) if (f.isDirectory()) dirs++;
+                if (dirs == 1) {
+                    for (File f : fs) {
+                        if (f.isDirectory() && (new File(f, "level.dat").isFile() || new File(f, "db").isDirectory())) return f;
+                    }
+                }
+            }
+            return dir;
+        }
+
+        private void zipDir(File dir, File out) throws Exception {
+            ZipOutputStream zos = new ZipOutputStream(new java.io.BufferedOutputStream(new FileOutputStream(out)));
+            zipDirRec(dir, dir, zos);
+            zos.finish();
+            zos.close();
+        }
+
+        private void zipDirRec(File base, File dir, ZipOutputStream zos) throws Exception {
+            File[] fs = dir.listFiles();
+            if (fs == null) return;
+            java.util.Arrays.sort(fs, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+            for (File f : fs) {
+                String rel = base.toURI().relativize(f.toURI()).getPath();
+                if (f.isDirectory()) {
+                    zipDirRec(base, f, zos);
+                } else {
+                    ZipEntry ze = new ZipEntry(rel);
+                    zos.putNextEntry(ze);
+                    FileInputStream in = new FileInputStream(f);
+                    byte[] buf = new byte[65536];
+                    int n;
+                    while ((n = in.read(buf)) > 0) zos.write(buf, 0, n);
+                    in.close();
+                    zos.closeEntry();
+                }
+            }
         }
 
         @JavascriptInterface
