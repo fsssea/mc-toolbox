@@ -40,6 +40,8 @@
 1.1.0 是**本周的测试构建**，不对外宣布“正式版”；版本号从 1.0.0 正式向上递增。
 三端新增 Chunker 1.21.0 完整存档转换（基岩 ⇄ Java），Android 同时支持 32 / 64 位。
 
+CDN 直链失效时，使用 [GitHub Pages 长期分卷镜像](https://fsssea.github.io/mc-toolbox/dl/1.1.0/)；Windows / Linux 需下载两个分卷并运行合并脚本，校验值见该页。
+
 JAVA 重制版（`com.mctoolbox.java`）与 C++ 重制版（`com.mctoolbox.cpp`）仍在内部开发，
 **暂不对外发布**，因此不在下载表中提供链接。三个 `applicationId` 互不相同，日后正式发布时可同机共存。
 
