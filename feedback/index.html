@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>反馈中心 · MC工具箱 1.0.0</title>
+<meta name="description" content="MC工具箱官方反馈中心：报 bug、提建议、反馈兼容性问题。提交后会直接生成 GitHub Issue，方便跟踪修复进度。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23101820'/%3E%3Cpath d='M8 11l8-4 8 4v10l-8 4-8-4z' fill='none' stroke='%23e9eff6' stroke-width='2'/%3E%3Cpath d='M8 11l8 4 8-4M16 15v10' fill='none' stroke='%231859d8' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#e8edf3;--paper2:#dfe6ee;--ink:#101820;--muted:#5b6875;--line:#aeb9c5;
+  --blue:#1859d8;--blue-deep:#0f3f9e;--panel:#111a24;--panel-fg:#e9f0f7;
+  --panel-muted:#9fb0c1;--panel-line:#2b3947;--ok:#3f9d6a;--warn:#c07a1c;--max:1100px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace}
+a{color:inherit}
+::selection{background:var(--blue);color:#fff}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 26px}
+.nav{position:sticky;top:0;z-index:20;background:rgba(232,237,243,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav-in{max-width:var(--max);margin:0 auto;padding:0 26px;height:62px;display:flex;align-items:center;gap:20px}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none;flex:0 0 auto}
+.brand svg{width:25px;height:25px}
+.brand b{font-weight:900;font-size:16px}
+.brand span{font-size:11px;color:var(--muted);border-left:1px solid var(--line);padding-left:8px;letter-spacing:.1em}
+.links{display:flex;gap:18px;margin-left:auto;font-size:14px}
+.links a{text-decoration:none;color:#2c3742;padding:3px 0;border-bottom:2px solid transparent}
+.links a:hover{border-color:var(--ink)}
+.links a[aria-current="page"]{border-color:var(--blue);color:var(--blue)}
+.lang{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.lang select{font:inherit;font-size:12px;padding:5px 8px;border:1px solid var(--line);border-radius:3px;background:#fff;color:var(--ink)}
+@media(max-width:780px){.links{display:none}.brand span{display:none}}
+
+.hero{padding:64px 0 48px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:
+  linear-gradient(rgba(16,24,32,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(16,24,32,.05) 1px,transparent 1px);
+  background-size:28px 28px;mask-image:linear-gradient(90deg,#000 0 55%,transparent 100%)}
+.hero .wrap{position:relative}
+.kicker{display:flex;align-items:center;gap:9px;font-size:12px;letter-spacing:.1em;color:var(--muted);margin-bottom:16px;flex-wrap:wrap}
+.dot{width:7px;height:7px;background:var(--ok);border-radius:50%}
+h1{font-size:clamp(32px,5vw,56px);line-height:1.16;font-weight:900;letter-spacing:-.03em;margin:0 0 16px}
+h1 em{font-style:normal;color:var(--blue)}
+.lead{max-width:44em;color:#31404c;font-size:16px;margin:0 0 26px}
+.chips{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.chip{border:1px solid var(--line);background:#f1f5f9;padding:6px 11px;border-radius:999px}
+
+section{padding:52px 0}
+h2{font-size:clamp(24px,3vw,32px);font-weight:900;letter-spacing:-.02em;margin:0 0 10px}
+.sec-label{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.18em;color:var(--blue);margin-bottom:8px}
+.sec-desc{color:var(--muted);font-size:14px;max-width:44em;margin:0 0 26px}
+
+.form-card{border:1px solid var(--line);background:#f1f5f9;padding:24px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field label{font-size:13px;font-weight:700;color:#22303c}
+.field .hint{font-size:11px;color:var(--muted);font-weight:400}
+input[type=text],textarea,select{font:inherit;font-size:14px;padding:10px 12px;border:1px solid var(--line);border-radius:3px;background:#fff;color:var(--ink);width:100%}
+textarea{resize:vertical;min-height:88px;line-height:1.6}
+input:focus,textarea:focus,select:focus{outline:2px solid rgba(24,89,216,.35);border-color:var(--blue)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid transparent;border-radius:3px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--blue);color:#fff;box-shadow:4px 4px 0 #0b2c63}
+.btn.pri:hover{background:var(--blue-deep)}
+.btn.sec{border-color:var(--ink);background:transparent;color:var(--ink)}
+.btn.sec:hover{background:var(--ink);color:var(--paper)}
+.btn.ghost{border-color:var(--line);background:#fff;color:#22303c;font-weight:500}
+.btn.ghost:hover{border-color:var(--ink)}
+.note{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.8}
+.note strong{color:var(--warn)}
+.warnbox{border-left:3px solid var(--warn);background:#fbf3e4;padding:12px 14px;font-size:13px;color:#4a3a20;margin-top:16px}
+
+.mvcards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mvcard{border:1px solid var(--line);background:#f1f5f9;padding:20px}
+.mvcard .n{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--blue);margin-bottom:8px}
+.mvcard h3{font-size:17px;margin:0 0 8px}
+.mvcard p{font-size:13px;color:#3a4854;margin:0}
+@media(max-width:900px){.grid2,.mvcards{grid-template-columns:1fr}}
+
+.faq details{border:1px solid var(--line);background:#f1f5f9;margin-bottom:10px}
+.faq summary{cursor:pointer;padding:14px 16px;font-weight:700;font-size:14px;list-style:none;display:flex;justify-content:space-between;gap:12px}
+.faq summary::after{content:"+";color:var(--blue);font-family:"IBM Plex Mono",monospace}
+.faq details[open] summary::after{content:"–"}
+.faq p{margin:0;padding:0 16px 14px;font-size:13px;color:#3a4854}
+
+.links-sec{background:var(--panel);color:var(--panel-fg);border-top:1px solid #0a1119}
+.links-sec h2{color:#fff}
+.links-sec .sec-label{color:#8fb8ff}
+.links-sec .sec-desc{color:var(--panel-muted)}
+.linkgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.lcard{border:1px solid var(--panel-line);padding:18px;text-decoration:none;color:var(--panel-fg);background:rgba(255,255,255,.02);transition:.15s}
+.lcard:hover{border-color:#8fb8ff;transform:translateY(-2px)}
+.lcard .mono{font-size:10px;letter-spacing:.14em;color:#8fb8ff}
+.lcard b{display:block;margin:6px 0 4px;font-size:16px}
+.lcard small{color:var(--panel-muted);font-size:12px}
+@media(max-width:900px){.linkgrid{grid-template-columns:1fr 1fr}}
+footer{border-top:1px solid var(--line);padding:22px 0 36px;font-size:12px;color:var(--muted)}
+.foot-in{max-width:var(--max);margin:0 auto;padding:0 26px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:3px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:50}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="../" aria-label="MC工具箱">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 10l10-5 10 5v12l-10 5-10-5z" fill="none" stroke="#101820" stroke-width="2"/><path d="M6 10l10 5 10-5M16 15v12" fill="none" stroke="#1859d8" stroke-width="2"/></svg>
+      <b>MC工具箱</b><span class="mono">v1.0.0</span>
+    </a>
+    <nav class="links">
+      <a href="../" data-i18n="nav.home">官网</a>
+      <a href="../#versions" data-i18n="nav.download">下载</a>
+      <a href="../feedback/" aria-current="page" data-i18n="nav.feedback">反馈</a>
+      <a href="https://github.com/fsssea/mc-toolbox" data-i18n="nav.repo">开源仓库</a>
+    </nav>
+    <div class="lang">
+      <span data-i18n="nav.lang">语言</span>
+      <select id="langSel" aria-label="Language"></select>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="kicker mono"><span class="dot"></span><span data-i18n="hero.kicker">官方反馈入口 · 直达 Issue</span></div>
+      <h1 data-i18n="hero.title">反馈中心，<em>修漏洞从这里开始</em>。</h1>
+      <p class="lead" data-i18n="hero.lead">报 bug、提建议、反馈兼容性问题，都走这里。填完表单会直接生成一条 GitHub Issue，标题、版本、平台、复现步骤都会带进去，方便跟踪、也方便你回来看修没修好。</p>
+      <div class="chips mono">
+        <span class="chip" data-i18n="hero.chip1">免注册浏览 · 提交需 GitHub 账号</span>
+        <span class="chip" data-i18n="hero.chip2">版本 1.0.0 / BUILD 1</span>
+        <span class="chip" data-i18n="hero.chip3">安卓 · Windows · Linux · 网页版</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="form">
+    <div class="wrap">
+      <div class="sec-label mono" data-i18n="form.label">REPORT / 提交反馈</div>
+      <h2 data-i18n="form.h">填好这五项，基本就不会来回问了。</h2>
+      <p class="sec-desc" data-i18n="form.desc">生成的内容会先填进 GitHub 的 Issue 表单，你确认后再点提交；不想用 GitHub，也可以复制全文发到 B 站私信或视频评论区置顶留言。</p>
+
+      <div class="form-card">
+        <div class="grid2">
+          <div class="field">
+            <label for="fType" data-i18n="form.type">反馈类型</label>
+            <select id="fType">
+              <option value="bug" data-i18n="form.type.bug">Bug / 崩溃</option>
+              <option value="regression" data-i18n="form.type.reg">功能异常 / 回退</option>
+              <option value="compat" data-i18n="form.type.compat">兼容性（存档 / 附加包 / 系统）</option>
+              <option value="idea" data-i18n="form.type.idea">功能建议</option>
+              <option value="other" data-i18n="form.type.other">其他</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fPlatform" data-i18n="form.platform">平台</label>
+            <select id="fPlatform">
+              <option value="Android" data-i18n="form.pf.android">Android（APK）</option>
+              <option value="Windows" data-i18n="form.pf.win">Windows（ZIP）</option>
+              <option value="Linux" data-i18n="form.pf.linux">Linux（tar.gz / deb）</option>
+              <option value="Web" data-i18n="form.pf.web">网页版（PWA）</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="field">
+            <label for="fVersion" data-i18n="form.version">版本 <span class="hint" data-i18n="form.version.hint">（官网当前为 1.0.0）</span></label>
+            <select id="fVersion">
+              <option value="1.0.0" selected>1.0.0 / BUILD 1</option>
+              <option value="older" data-i18n="form.version.older">更早的内部版本（不对外）</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fTitle" data-i18n="form.title">一句话标题</label>
+            <input id="fTitle" type="text" data-i18n-ph="form.title.ph" placeholder="例：安卓端打开 db 里 30KB 的 .log 时闪退">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="fDesc" data-i18n="form.descLabel">详细描述</label>
+          <textarea id="fDesc" data-i18n-ph="form.desc.ph" placeholder="做了什么、点了哪个按钮、界面显示什么、期望是什么。截图里的报错原文可以直接贴在这里。"></textarea>
+        </div>
+
+        <div class="grid2">
+          <div class="field">
+            <label for="fSteps" data-i18n="form.steps">复现步骤 <span class="hint" data-i18n="form.steps.hint">（一行一步）</span></label>
+            <textarea id="fSteps" data-i18n-ph="form.steps.ph" placeholder="1. 打开存档文件夹&#10;2. 点 db/000030.log&#10;3. 切到字节编辑&#10;4. 闪退"></textarea>
+          </div>
+          <div class="field">
+            <label for="fExpect" data-i18n="form.expect">期望结果</label>
+            <textarea id="fExpect" data-i18n-ph="form.expect.ph" placeholder="例：正常显示 60 字节，可编辑保存"></textarea>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="field">
+            <label for="fContact" data-i18n="form.contact">联系方式 <span class="hint" data-i18n="form.contact.hint">（可选，公开可见）</span></label>
+            <input id="fContact" type="text" data-i18n-ph="form.contact.ph" placeholder="GitHub 用户名 / 邮箱 / B 站 ID">
+          </div>
+          <div class="field" style="justify-content:flex-end">
+            <label style="display:flex;align-items:center;gap:8px;font-weight:400;font-size:13px">
+              <input id="fPublic" type="checkbox" checked style="width:auto">
+              <span data-i18n="form.public">允许公开这条 Issue（推荐，方便别人搜到同样的问题）</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn pri" id="btnIssue" type="button" data-i18n="form.btn.issue">生成 GitHub Issue</button>
+          <button class="btn sec" id="btnCopy" type="button" data-i18n="form.btn.copy">复制反馈全文</button>
+          <button class="btn ghost" id="btnReset" type="button" data-i18n="form.btn.reset">清空</button>
+        </div>
+        <p class="note" data-i18n="note.before">提交前先搜一下已有 Issue，避免重复；<strong>不要把个人存档、账号、聊天记录贴上去</strong>，需要样本时请脱敏或只描述结构。</p>
+        <div class="warnbox" data-i18n="note.db">db 是存档最重要的数据文件夹。为了排查问题需要你提供样本时，请先「导出存档」备份，再在副本上操作。</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="wrap">
+      <div class="sec-label mono" data-i18n="how.label">HOW TO / 怎么写才有用</div>
+      <h2 data-i18n="how.h">三条就够，别写小作文。</h2>
+      <p class="sec-desc" data-i18n="how.desc">能复现的步骤 + 报错原文 + 版本平台，基本一次就能定位；只写「打不开」「坏了」通常要多来回三轮。</p>
+      <div class="mvcards">
+        <article class="mvcard">
+          <div class="n">01</div>
+          <h3 data-i18n="how.c1.t">能复现</h3>
+          <p data-i18n="how.c1.d">从打开软件到出问题的每一步，按顺序写；能附截图就附，报错弹窗整段复制。</p>
+        </article>
+        <article class="mvcard">
+          <div class="n">02</div>
+          <h3 data-i18n="how.c2.t">说清楚环境</h3>
+          <p data-i18n="how.c2.d">哪个端、什么系统版本、存档多大、是不是从别的版本转过来的包。</p>
+        </article>
+        <article class="mvcard">
+          <div class="n">03</div>
+          <h3 data-i18n="how.c3.t">给样本</h3>
+          <p data-i18n="how.c3.d">能提供最小复现包最好；给不了就描述文件结构，别直接传整份存档。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <div class="sec-label mono" data-i18n="faq.label">FAQ / 常见问题</div>
+      <h2 data-i18n="faq.h">关于反馈这件事。</h2>
+      <div class="faq">
+        <details open>
+          <summary data-i18n="faq.q1">一定要 GitHub 账号吗？</summary>
+          <p data-i18n="faq.a1">提交 Issue 需要；只看不用。没有账号就把表单内容复制下来，发到 B 站私信或视频评论区，我一样会看。</p>
+        </details>
+        <details>
+          <summary data-i18n="faq.q2">多久会修？</summary>
+          <p data-i18n="faq.a2">崩溃、存档写坏这类先修；界面与体验类按批次排。修好后会在对应 Issue 里回一句「已在 1.0.x 修复」，你可以回来查。</p>
+        </details>
+        <details>
+          <summary data-i18n="faq.q3">能提功能建议和汉化问题吗？</summary>
+          <p data-i18n="faq.a3">可以，类型选「功能建议」。汉化缺词、错译请附上原文与截图，方便直接改。</p>
+        </details>
+        <details>
+          <summary data-i18n="faq.q4">会不会把我存档传上去？</summary>
+          <p data-i18n="faq.a4">不会自动上传。软件全离线运行；只有你自己在 Issue 里主动附加的文件才会公开，贴之前请先脱敏。</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="links-sec" id="links">
+    <div class="wrap">
+      <div class="sec-label mono">LINKS / 相关入口</div>
+      <h2 data-i18n="links.h">四个入口，各管一件事。</h2>
+      <p class="sec-desc" data-i18n="links.desc">下载去官网，报问题留在这里，看源码去仓库，更新记录在日志里。</p>
+      <div class="linkgrid">
+        <a class="lcard" href="../">
+          <span class="mono">OFFICIAL SITE</span>
+          <b data-i18n="links.site">官网</b>
+          <small data-i18n="links.site.d">下载 1.0.0 三端与网页版</small>
+        </a>
+        <a class="lcard" href="../feedback/">
+          <span class="mono">FEEDBACK</span>
+          <b data-i18n="links.fb">反馈中心</b>
+          <small data-i18n="links.fb.d">当前页面，报 bug 与建议</small>
+        </a>
+        <a class="lcard" href="https://github.com/fsssea/mc-toolbox">
+          <span class="mono">SOURCE / MIT</span>
+          <b data-i18n="links.repo">开源仓库</b>
+          <small data-i18n="links.repo.d">源码、Issue、版本历史</small>
+        </a>
+        <a class="lcard" href="https://github.com/fsssea/mc-toolbox/blob/main/CHANGELOG.md">
+          <span class="mono">CHANGELOG</span>
+          <b data-i18n="links.log">更新日志</b>
+          <small data-i18n="links.log.d">1.0.0 改了什么</small>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot-in">
+    <span data-i18n="foot.copy">© 2026 MC工具箱 contributors · MIT License</span>
+    <span class="mono">PUBLIC 1.0.0 / BUILD 1 / 2026-11-22</span>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const I18N = {
+  "zh-Hans": {
+    "meta.title":"反馈中心 · MC工具箱 1.0.0",
+    "nav.home":"官网","nav.download":"下载","nav.feedback":"反馈","nav.repo":"开源仓库","nav.lang":"语言",
+    "hero.kicker":"官方反馈入口 · 直达 Issue",
+    "hero.title":"反馈中心，<em>修漏洞从这里开始</em>。",
+    "hero.lead":"报 bug、提建议、反馈兼容性问题，都走这里。填完表单会直接生成一条 GitHub Issue，标题、版本、平台、复现步骤都会带进去，方便跟踪、也方便你回来看修没修好。",
+    "hero.chip1":"免注册浏览 · 提交需 GitHub 账号","hero.chip2":"版本 1.0.0 / BUILD 1","hero.chip3":"安卓 · Windows · Linux · 网页版",
+    "form.h":"填好这五项，基本就不会来回问了。",
+    "form.label":"REPORT / 提交反馈","how.label":"HOW TO / 怎么写才有用","faq.label":"FAQ / 常见问题",
+    "form.desc":"生成的内容会先填进 GitHub 的 Issue 表单，你确认后再点提交；不想用 GitHub，也可以复制全文发到 B 站私信或视频评论区置顶留言。",
+    "form.type":"反馈类型","form.type.bug":"Bug / 崩溃","form.type.reg":"功能异常 / 回退","form.type.compat":"兼容性（存档 / 附加包 / 系统）","form.type.idea":"功能建议","form.type.other":"其他",
+    "form.platform":"平台","form.pf.android":"Android（APK）","form.pf.win":"Windows（ZIP）","form.pf.linux":"Linux（tar.gz / deb）","form.pf.web":"网页版（PWA）",
+    "form.version":"版本","form.version.hint":"（官网当前为 1.0.0）","form.version.older":"更早的内部版本（不对外）",
+    "form.title":"一句话标题","form.title.ph":"例：安卓端打开 db 里 30KB 的 .log 时闪退",
+    "form.descLabel":"详细描述","form.desc.ph":"做了什么、点了哪个按钮、界面显示什么、期望是什么。截图里的报错原文可以直接贴在这里。",
+    "form.steps":"复现步骤","form.steps.hint":"（一行一步）","form.steps.ph":"1. 打开存档文件夹\n2. 点 db/000030.log\n3. 切到字节编辑\n4. 闪退",
+    "form.expect":"期望结果","form.expect.ph":"例：正常显示 60 字节，可编辑保存",
+    "form.contact":"联系方式","form.contact.hint":"（可选，公开可见）","form.contact.ph":"GitHub 用户名 / 邮箱 / B 站 ID",
+    "form.public":"允许公开这条 Issue（推荐，方便别人搜到同样的问题）",
+    "form.btn.issue":"生成 GitHub Issue","form.btn.copy":"复制反馈全文","form.btn.reset":"清空",
+    "note.before":"提交前先搜一下已有 Issue，避免重复；<strong>不要把个人存档、账号、聊天记录贴上去</strong>，需要样本时请脱敏或只描述结构。",
+    "note.db":"db 是存档最重要的数据文件夹。为了排查问题需要你提供样本时，请先「导出存档」备份，再在副本上操作。",
+    "how.h":"三条就够，别写小作文。",
+    "how.desc":"能复现的步骤 + 报错原文 + 版本平台，基本一次就能定位；只写「打不开」「坏了」通常要多来回三轮。",
+    "how.c1.t":"能复现","how.c1.d":"从打开软件到出问题的每一步，按顺序写；能附截图就附，报错弹窗整段复制。",
+    "how.c2.t":"说清楚环境","how.c2.d":"哪个端、什么系统版本、存档多大、是不是从别的版本转过来的包。",
+    "how.c3.t":"给样本","how.c3.d":"能提供最小复现包最好；给不了就描述文件结构，别直接传整份存档。",
+    "faq.h":"关于反馈这件事。","faq.q1":"一定要 GitHub 账号吗？",
+    "faq.a1":"提交 Issue 需要；只看不用。没有账号就把表单内容复制下来，发到 B 站私信或视频评论区，我一样会看。",
+    "faq.q2":"多久会修？","faq.a2":"崩溃、存档写坏这类先修；界面与体验类按批次排。修好后会在对应 Issue 里回一句「已在 1.0.x 修复」，你可以回来查。",
+    "faq.q3":"能提功能建议和汉化问题吗？","faq.a3":"可以，类型选「功能建议」。汉化缺词、错译请附上原文与截图，方便直接改。",
+    "faq.q4":"会不会把我存档传上去？","faq.a4":"不会自动上传。软件全离线运行；只有你自己在 Issue 里主动附加的文件才会公开，贴之前请先脱敏。",
+    "links.h":"四个入口，各管一件事。","links.desc":"下载去官网，报问题留在这里，看源码去仓库，更新记录在日志里。",
+    "links.site":"官网","links.site.d":"下载 1.0.0 三端与网页版",
+    "links.fb":"反馈中心","links.fb.d":"当前页面，报 bug 与建议",
+    "links.repo":"开源仓库","links.repo.d":"源码、Issue、版本历史",
+    "links.log":"更新日志","links.log.d":"1.0.0 改了什么",
+    "foot.copy":"© 2026 MC工具箱 contributors · MIT License",
+    "toast.copied":"已复制，可直接粘贴提交","toast.empty":"先填标题和详细描述","toast.reset":"已清空",
+    "issue.label.bug":"bug","issue.label.reg":"regression","issue.label.compat":"compatibility","issue.label.idea":"enhancement","issue.label.other":"feedback"
+  },
+  "zh-Hant": {
+    "meta.title":"回饋中心 · MC工具箱 1.0.0",
+    "nav.home":"官網","nav.download":"下載","nav.feedback":"回饋","nav.repo":"開源倉庫","nav.lang":"語言",
+    "hero.kicker":"官方回饋入口 · 直達 Issue",
+    "hero.title":"回饋中心，<em>修漏洞從這裡開始</em>。",
+    "hero.lead":"回報 bug、提建議、回饋相容性問題，都走這裡。填完表單會直接產生一條 GitHub Issue，標題、版本、平台、重現步驟都會帶進去，方便追蹤，也方便你回來看修好了沒。",
+    "hero.chip1":"免註冊瀏覽 · 提交需 GitHub 帳號","hero.chip2":"版本 1.0.0 / BUILD 1","hero.chip3":"Android · Windows · Linux · 網頁版",
+    "form.h":"填好這五項，基本上就不用來回問了。",
+    "form.label":"REPORT / 提交回饋","how.label":"HOW TO / 怎麼寫才有用","faq.label":"FAQ / 常見問題",
+    "form.desc":"產生的內容會先填進 GitHub 的 Issue 表單，你確認後再送出；不想用 GitHub，也可以複製全文發到 B 站私訊或影片留言區置頂留言。",
+    "form.type":"回饋類型","form.type.bug":"Bug / 當機","form.type.reg":"功能異常 / 退化","form.type.compat":"相容性（存檔 / 附加包 / 系統）","form.type.idea":"功能建議","form.type.other":"其他",
+    "form.platform":"平台","form.pf.android":"Android（APK）","form.pf.win":"Windows（ZIP）","form.pf.linux":"Linux（tar.gz / deb）","form.pf.web":"網頁版（PWA）",
+    "form.version":"版本","form.version.hint":"（官網目前為 1.0.0）","form.version.older":"更早的內部版本（不對外）",
+    "form.title":"一句話標題","form.title.ph":"例：Android 端開啟 db 裡 30KB 的 .log 時閃退",
+    "form.descLabel":"詳細描述","form.desc.ph":"做了什麼、點了哪個按鈕、介面顯示什麼、期望是什麼。截圖裡的錯誤原文可以直接貼在這裡。",
+    "form.steps":"重現步驟","form.steps.hint":"（一行一步）","form.steps.ph":"1. 開啟存檔資料夾\n2. 點 db/000030.log\n3. 切到位元組編輯\n4. 閃退",
+    "form.expect":"期望結果","form.expect.ph":"例：正常顯示 60 位元組，可編輯儲存",
+    "form.contact":"聯絡方式","form.contact.hint":"（選填，公開可見）","form.contact.ph":"GitHub 使用者名稱 / 電子郵件 / B 站 ID",
+    "form.public":"允許公開這條 Issue（建議，方便別人搜到同樣的問題）",
+    "form.btn.issue":"產生 GitHub Issue","form.btn.copy":"複製回饋全文","form.btn.reset":"清空",
+    "note.before":"送出前先搜一下已有的 Issue，避免重複；<strong>不要把個人存檔、帳號、聊天記錄貼上去</strong>，需要樣本時請去識別化或只描述結構。",
+    "note.db":"db 是存檔最重要的資料資料夾。為了排查問題需要你提供樣本時，請先「匯出存檔」備份，再在副本上操作。",
+    "how.h":"三條就夠，別寫長篇。","how.desc":"可重現的步驟 + 錯誤原文 + 版本平台，通常一次就能定位；只寫「打不開」「壞了」往往要多來回三輪。",
+    "how.c1.t":"可重現","how.c1.d":"從開啟軟體到出問題的每一步，按順序寫；能附截圖就附，錯誤視窗整段複製。",
+    "how.c2.t":"講清楚環境","how.c2.d":"哪個端、什麼系統版本、存檔多大、是不是從別的版本轉過來的包。",
+    "how.c3.t":"給樣本","how.c3.d":"能提供最小重現包最好；給不了就描述檔案結構，別直接傳整份存檔。",
+    "faq.h":"關於回饋這件事。","faq.q1":"一定要 GitHub 帳號嗎？",
+    "faq.a1":"送出 Issue 需要；只看不用。沒有帳號就把表單內容複製下來，發到 B 站私訊或影片留言區，我一樣會看。",
+    "faq.q2":"多久會修？","faq.a2":"當機、存檔寫壞這類先修；介面與體驗類按批次排。修好後會在對應 Issue 回一句「已在 1.0.x 修復」，你可以回來查。",
+    "faq.q3":"能提功能建議和漢化問題嗎？","faq.a3":"可以，類型選「功能建議」。漢化缺詞、錯譯請附上原文與截圖，方便直接改。",
+    "faq.q4":"會不會把我存檔傳上去？","faq.a4":"不會自動上傳。軟體全離線執行；只有你自己在 Issue 裡主動附加的檔案才會公開，貼之前請先去識別化。",
+    "links.h":"四個入口，各管一件事。","links.desc":"下載去官網，回報問題留在這裡，看原始碼去倉庫，更新記錄在日誌裡。",
+    "links.site":"官網","links.site.d":"下載 1.0.0 三端與網頁版",
+    "links.fb":"回饋中心","links.fb.d":"目前頁面，回報 bug 與建議",
+    "links.repo":"開源倉庫","links.repo.d":"原始碼、Issue、版本歷史",
+    "links.log":"更新日誌","links.log.d":"1.0.0 改了什麼",
+    "foot.copy":"© 2026 MC工具箱 contributors · MIT License",
+    "toast.copied":"已複製，可直接貼上送出","toast.empty":"先填標題和詳細描述","toast.reset":"已清空",
+    "issue.label.bug":"bug","issue.label.reg":"regression","issue.label.compat":"compatibility","issue.label.idea":"enhancement","issue.label.other":"feedback"
+  },
+  "en": {
+    "meta.title":"Feedback Center · MC Toolbox 1.0.0",
+    "nav.home":"Home","nav.download":"Download","nav.feedback":"Feedback","nav.repo":"Source","nav.lang":"Language",
+    "hero.kicker":"OFFICIAL FEEDBACK · CREATES AN ISSUE",
+    "hero.title":"Feedback Center — <em>where bugs get fixed</em>.",
+    "hero.lead":"Bugs, suggestions and compatibility problems all go here. The form builds a GitHub Issue with your version, platform and repro steps already filled in, so it can be tracked and you can check back later.",
+    "hero.chip1":"Read without signing in · GitHub account needed to submit","hero.chip2":"Version 1.0.0 / BUILD 1","hero.chip3":"Android · Windows · Linux · Web",
+    "form.h":"Five fields, and we usually won't need to ask again.",
+    "form.label":"REPORT / NEW ISSUE","how.label":"HOW TO / REPORT WELL","faq.label":"FAQ / COMMON QUESTIONS",
+    "form.desc":"The text is filled into GitHub's new-issue form first; you review it, then submit. No GitHub? Copy the text and send it in a Bilibili DM or pinned comment.",
+    "form.type":"Type","form.type.bug":"Bug / crash","form.type.reg":"Regression / broken feature","form.type.compat":"Compatibility (world / add-on / OS)","form.type.idea":"Feature request","form.type.other":"Other",
+    "form.platform":"Platform","form.pf.android":"Android (APK)","form.pf.win":"Windows (ZIP)","form.pf.linux":"Linux (tar.gz / deb)","form.pf.web":"Web (PWA)",
+    "form.version":"Version","form.version.hint":"(currently 1.0.0)","form.version.older":"Earlier internal build (not public)",
+    "form.title":"One-line summary","form.title.ph":"e.g. Android crashes when opening a 30 KB .log in db",
+    "form.descLabel":"What happened","form.desc.ph":"What you did, which button you pressed, what the UI showed, what you expected. Paste the exact error text here.",
+    "form.steps":"Steps to reproduce","form.steps.hint":"(one per line)","form.steps.ph":"1. Open the world folder\n2. Click db/000030.log\n3. Switch to byte editor\n4. Crash",
+    "form.expect":"Expected result","form.expect.ph":"e.g. 60 bytes shown and editable",
+    "form.contact":"Contact","form.contact.hint":"(optional, public)","form.contact.ph":"GitHub username / email / Bilibili ID",
+    "form.public":"Allow this issue to be public (recommended, others can find it)",
+    "form.btn.issue":"Create GitHub Issue","form.btn.copy":"Copy report","form.btn.reset":"Clear",
+    "note.before":"Search existing issues first.<strong> Never paste personal worlds, accounts or chat logs</strong> — redact or describe the structure instead.",
+    "note.db":"db is the most important data folder in a world. If we ask for a sample, export a backup first and work on a copy.",
+    "how.h":"Three things. No essays needed.",
+    "how.desc":"Reproducible steps + exact error + version/platform usually pinpoints it in one round; \"it's broken\" takes three.",
+    "how.c1.t":"Reproducible","how.c1.d":"Every step from launch to failure, in order. Screenshots help; copy the whole error dialog.",
+    "how.c2.t":"Environment","how.c2.d":"Which platform, OS version, world size, and whether the pack came from another version.",
+    "how.c3.t":"A sample","how.c3.d":"A minimal repro pack is ideal; otherwise describe the file layout instead of uploading the whole world.",
+    "faq.h":"About feedback.","faq.q1":"Do I need a GitHub account?",
+    "faq.a1":"To submit, yes; reading needs nothing. Without an account, copy the form and send it via Bilibili DM or comments — it still gets read.",
+    "faq.q2":"How fast is a fix?","faq.a2":"Crashes and world corruption first; UI and polish items in batches. The issue gets a note when fixed (\"fixed in 1.0.x\").",
+    "faq.q3":"Feature requests and translation issues?","faq.a3":"Yes, pick \"Feature request\". For missing or wrong translations, include source text and a screenshot.",
+    "faq.q4":"Will my world be uploaded?","faq.a4":"Not automatically. The app runs fully offline; only files you attach to an issue become public — redact first.",
+    "links.h":"Four doors, one job each.","links.desc":"Downloads on the site, problems here, source in the repo, history in the changelog.",
+    "links.site":"Official site","links.site.d":"Download 1.0.0 for three platforms + web",
+    "links.fb":"Feedback center","links.fb.d":"This page — bugs and suggestions",
+    "links.repo":"Source repo","links.repo.d":"Code, issues, version history",
+    "links.log":"Changelog","links.log.d":"What changed in 1.0.0",
+    "foot.copy":"© 2026 MC Toolbox contributors · MIT License",
+    "toast.copied":"Copied — paste it into the issue","toast.empty":"Add a title and description first","toast.reset":"Cleared",
+    "issue.label.bug":"bug","issue.label.reg":"regression","issue.label.compat":"compatibility","issue.label.idea":"enhancement","issue.label.other":"feedback"
+  },
+  "ja": {
+    "meta.title":"フィードバック · MC工具箱 1.0.0",
+    "nav.home":"公式サイト","nav.download":"ダウンロード","nav.feedback":"フィードバック","nav.repo":"ソース","nav.lang":"言語",
+    "hero.kicker":"公式フィードバック · Issue を直接作成",
+    "hero.title":"フィードバックセンター — <em>不具合はここから直します</em>。",
+    "hero.lead":"不具合・要望・互換性の問題はすべてここへ。フォームからバージョン・環境・再現手順入りの GitHub Issue を作成でき、追跡もしやすいです。",
+    "hero.chip1":"閲覧は登録不要 · 送信には GitHub アカウントが必要","hero.chip2":"バージョン 1.0.0 / BUILD 1","hero.chip3":"Android · Windows · Linux · Web",
+    "form.h":"5 項目埋めれば、ほぼ聞き返しません。",
+    "form.label":"REPORT / 送信","how.label":"HOW TO / 書き方のコツ","faq.label":"FAQ / よくある質問",
+    "form.desc":"入力内容は GitHub の Issue 作成画面に流し込み、確認後に送信します。GitHub を使わない場合は全文をコピーして Bilibili の DM や固定コメントへ。",
+    "form.type":"種類","form.type.bug":"不具合 / クラッシュ","form.type.reg":"機能の異常 / 退行","form.type.compat":"互換性（ワールド / アドオン / OS）","form.type.idea":"機能要望","form.type.other":"その他",
+    "form.platform":"プラットフォーム","form.pf.android":"Android（APK）","form.pf.win":"Windows（ZIP）","form.pf.linux":"Linux（tar.gz / deb）","form.pf.web":"Web（PWA）",
+    "form.version":"バージョン","form.version.hint":"（現在 1.0.0）","form.version.older":"以前の内部ビルド（非公開）",
+    "form.title":"一行タイトル","form.title.ph":"例：Android で db の 30KB .log を開くと落ちる",
+    "form.descLabel":"詳しい内容","form.desc.ph":"何をしたか、どのボタンを押したか、画面表示、期待した結果。エラー文はそのまま貼ってください。",
+    "form.steps":"再現手順","form.steps.hint":"（1 行 1 手順）","form.steps.ph":"1. ワールドフォルダを開く\n2. db/000030.log をクリック\n3. バイト編集に切り替え\n4. クラッシュ",
+    "form.expect":"期待する結果","form.expect.ph":"例：60 バイトが表示され、編集保存できる",
+    "form.contact":"連絡先","form.contact.hint":"（任意・公開）","form.contact.ph":"GitHub ユーザー名 / メール / Bilibili ID",
+    "form.public":"この Issue を公開する（推奨：同じ問題を検索できる）",
+    "form.btn.issue":"GitHub Issue を作成","form.btn.copy":"全文をコピー","form.btn.reset":"クリア",
+    "note.before":"送信前に既存 Issue を検索してください。<strong>個人のワールド・アカウント・チャットログは貼らないでください</strong>。サンプルが必要な場合は伏せ字に。",
+    "note.db":"db はワールドで最も重要なデータフォルダです。サンプル提供を求められたら、まず「ワールドを書き出す」でバックアップし、コピー上で操作してください。",
+    "how.h":"3 つで十分。長文は不要です。",
+    "how.desc":"再現手順 + エラー文 + バージョン/環境で、たいてい一度で特定できます。「開かない」「壊れた」だけだと往復が増えます。",
+    "how.c1.t":"再現できる","how.c1.d":"起動から失敗までを順番に。スクショがあると良い。エラーダイアログは全文コピー。",
+    "how.c2.t":"環境を書く","how.c2.d":"どの端末・OS バージョン・ワールドの大きさ・他バージョンからの変換か。",
+    "how.c3.t":"サンプル","how.c3.d":"最小再現パックが理想。無理なら構成を説明し、ワールド全体は上げないでください。",
+    "faq.h":"フィードバックについて。","faq.q1":"GitHub アカウントは必須ですか？",
+    "faq.a1":"送信には必要、閲覧は不要です。アカウントがない場合はフォームの内容をコピーして Bilibili の DM やコメントへ。同じく確認します。",
+    "faq.q2":"いつ直りますか？","faq.a2":"クラッシュやワールド破損を優先、UI や改善はまとめて。修正後は Issue に「1.0.x で修正済み」と追記します。",
+    "faq.q3":"要望や翻訳の指摘も可？","faq.a3":"可能です。「機能要望」を選んでください。翻訳の欠落・誤訳は原文とスクショを添えてください。",
+    "faq.q4":"ワールドはアップロードされますか？","faq.a4":"自動では送信しません。完全オフライン動作です。Issue に自分で添付したファイルだけが公開されます。",
+    "links.h":"4 つの入口、役割は 1 つずつ。","links.desc":"ダウンロードは公式、不具合はここ、コードはリポジトリ、履歴は更新ログ。",
+    "links.site":"公式サイト","links.site.d":"1.0.0 の 3 端末と Web 版",
+    "links.fb":"フィードバック","links.fb.d":"このページ：不具合と要望",
+    "links.repo":"ソースリポジトリ","links.repo.d":"コード・Issue・履歴",
+    "links.log":"更新ログ","links.log.d":"1.0.0 の変更点",
+    "foot.copy":"© 2026 MC工具箱 contributors · MIT License",
+    "toast.copied":"コピーしました。Issue に貼り付けてください","toast.empty":"タイトルと詳細を入力してください","toast.reset":"クリアしました",
+    "issue.label.bug":"bug","issue.label.reg":"regression","issue.label.compat":"compatibility","issue.label.idea":"enhancement","issue.label.other":"feedback"
+  },
+  "ko": {
+    "meta.title":"피드백 센터 · MC工具箱 1.0.0",
+    "nav.home":"공식 사이트","nav.download":"다운로드","nav.feedback":"피드백","nav.repo":"소스","nav.lang":"언어",
+    "hero.kicker":"공식 피드백 · Issue 로 바로 연결",
+    "hero.title":"피드백 센터 — <em>버그는 여기서 고칩니다</em>.",
+    "hero.lead":"버그, 제안, 호환성 문제 모두 여기로 보내주세요. 양식을 채우면 버전·플랫폼·재현 절차가 포함된 GitHub Issue 초안이 만들어져 추적하기 쉽습니다.",
+    "hero.chip1":"읽기는 로그인 불필요 · 제출은 GitHub 계정 필요","hero.chip2":"버전 1.0.0 / BUILD 1","hero.chip3":"Android · Windows · Linux · 웹",
+    "form.h":"다섯 칸만 채우면 다시 묻지 않습니다.",
+    "form.label":"REPORT / 제출","how.label":"HOW TO / 작성 요령","faq.label":"FAQ / 자주 묻는 질문",
+    "form.desc":"작성 내용은 GitHub Issue 작성 화면에 먼저 채워지고, 확인 후 제출합니다. GitHub 이 없다면 전문을 복사해 Bilibili DM 이나 고정 댓글로 보내주세요.",
+    "form.type":"유형","form.type.bug":"버그 / 크래시","form.type.reg":"기능 이상 / 회귀","form.type.compat":"호환성(월드 / 애드온 / OS)","form.type.idea":"기능 제안","form.type.other":"기타",
+    "form.platform":"플랫폼","form.pf.android":"Android(APK)","form.pf.win":"Windows(ZIP)","form.pf.linux":"Linux(tar.gz / deb)","form.pf.web":"웹(PWA)",
+    "form.version":"버전","form.version.hint":"(현재 1.0.0)","form.version.older":"이전 내부 빌드(비공개)",
+    "form.title":"한 줄 제목","form.title.ph":"예: Android 에서 db 의 30KB .log 를 열면 튕김",
+    "form.descLabel":"상세 설명","form.desc.ph":"무엇을 했는지, 어떤 버튼을 눌렀는지, 화면 표시와 기대 결과. 오류 문구는 그대로 붙여주세요.",
+    "form.steps":"재현 절차","form.steps.hint":"(한 줄에 한 단계)","form.steps.ph":"1. 월드 폴더 열기\n2. db/000030.log 클릭\n3. 바이트 편집으로 전환\n4. 튕김",
+    "form.expect":"기대 결과","form.expect.ph":"예: 60 바이트가 표시되고 편집 저장 가능",
+    "form.contact":"연락처","form.contact.hint":"(선택, 공개)","form.contact.ph":"GitHub 사용자명 / 이메일 / Bilibili ID",
+    "form.public":"이 Issue 공개 허용(권장: 같은 문제를 검색할 수 있음)",
+    "form.btn.issue":"GitHub Issue 만들기","form.btn.copy":"보고 내용 복사","form.btn.reset":"비우기",
+    "note.before":"제출 전에 기존 Issue 를 검색하세요. <strong>개인 월드·계정·채팅 기록은 올리지 마세요</strong>. 샘플이 필요하면 익명화하거나 구조만 설명하세요.",
+    "note.db":"db 는 월드에서 가장 중요한 데이터 폴더입니다. 샘플을 요청받으면 먼저 '월드 내보내기'로 백업하고 사본에서 작업하세요.",
+    "how.h":"세 가지만. 장문은 필요 없습니다.",
+    "how.desc":"재현 절차 + 오류 원문 + 버전/플랫폼이면 보통 한 번에 찾습니다. \"안 열림\" \"깨짐\"만 쓰면 세 번은 왔다 갔다 합니다.",
+    "how.c1.t":"재현 가능","how.c1.d":"실행부터 실패까지 순서대로. 스크린샷이 좋고 오류 창은 전문 복사하세요.",
+    "how.c2.t":"환경 설명","how.c2.d":"어느 플랫폼, OS 버전, 월드 크기, 다른 버전에서 변환한 팩인지.",
+    "how.c3.t":"샘플 제공","how.c3.d":"최소 재현 팩이 최선. 불가능하면 파일 구조를 설명하고 월드 전체는 올리지 마세요.",
+    "faq.h":"피드백에 대해.","faq.q1":"GitHub 계정이 꼭 필요한가요?",
+    "faq.a1":"제출에는 필요하고 열람에는 없습니다. 계정이 없으면 양식 내용을 복사해 Bilibili DM 이나 댓글로 보내세요. 똑같이 확인합니다.",
+    "faq.q2":"얼마나 빨리 고쳐지나요?","faq.a2":"크래시·월드 손상 우선, UI·개선은 묶음 처리. 수정되면 해당 Issue 에 \"1.0.x 에서 수정됨\"을 남깁니다.",
+    "faq.q3":"기능 제안과 번역 문제도 되나요?","faq.a3":"됩니다. '기능 제안'을 선택하세요. 번역 누락·오역은 원문과 스크린샷을 첨부해 주세요.",
+    "faq.q4":"제 월드가 업로드되나요?","faq.a4":"자동 업로드는 없습니다. 완전 오프라인 실행이며, Issue 에 직접 첨부한 파일만 공개됩니다.",
+    "links.h":"네 개의 입구, 역할은 하나씩.","links.desc":"다운로드는 공식 사이트, 문제는 여기, 코드는 저장소, 기록은 변경 로그.",
+    "links.site":"공식 사이트","links.site.d":"1.0.0 세 플랫폼 + 웹",
+    "links.fb":"피드백 센터","links.fb.d":"이 페이지 — 버그와 제안",
+    "links.repo":"소스 저장소","links.repo.d":"코드·Issue·버전 기록",
+    "links.log":"변경 로그","links.log.d":"1.0.0 에서 바뀐 것",
+    "foot.copy":"© 2026 MC工具箱 contributors · MIT License",
+    "toast.copied":"복사했습니다. Issue 에 붙여넣으세요","toast.empty":"제목과 상세 설명을 먼저 입력하세요","toast.reset":"비웠습니다",
+    "issue.label.bug":"bug","issue.label.reg":"regression","issue.label.compat":"compatibility","issue.label.idea":"enhancement","issue.label.other":"feedback"
+  }
+};
+
+const LANG_NAMES = {"zh-Hans":"简体中文","zh-Hant":"繁體中文","en":"English","ja":"日本語","ko":"한국어"};
+const SUPPORTED = Object.keys(I18N);
+
+function detectLang(){
+  const saved = localStorage.getItem('mcbox-lang');
+  if (saved && I18N[saved]) return saved;
+  const list = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'en']);
+  for (const raw of list){
+    const t = String(raw).toLowerCase();
+    if (t.startsWith('zh')) return /hant|tw|hk|mo/.test(t) ? 'zh-Hant' : 'zh-Hans';
+    if (t.startsWith('ja')) return 'ja';
+    if (t.startsWith('ko')) return 'ko';
+    if (t.startsWith('en')) return 'en';
+  }
+  return 'en';
+}
+
+let CUR = 'zh-Hans';
+function t(key){ return (I18N[CUR] && I18N[CUR][key]) || I18N['zh-Hans'][key] || key; }
+
+function apply(lang){
+  CUR = lang;
+  document.documentElement.lang = lang === 'zh-Hant' ? 'zh-Hant' : (lang === 'zh-Hans' ? 'zh-CN' : lang);
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-i18n');
+    if (I18N[lang][k] !== undefined) el.innerHTML = I18N[lang][k];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
+    const k = el.getAttribute('data-i18n-ph');
+    if (I18N[lang][k] !== undefined) el.setAttribute('placeholder', I18N[lang][k]);
+  });
+  document.title = t('meta.title');
+  const desc = document.querySelector('meta[name=description]');
+  if (desc) desc.setAttribute('content', t('hero.lead').replace(/<[^>]+>/g,''));
+  const sel = document.getElementById('langSel');
+  if (sel) sel.value = lang;
+  localStorage.setItem('mcbox-lang', lang);
+}
+
+function buildBody(){
+  const typeLabel = document.querySelector('#fType option:checked').textContent.trim();
+  const plat = document.getElementById('fPlatform').value;
+  const ver = document.getElementById('fVersion').value === 'older' ? 'older internal build' : '1.0.0 / BUILD 1';
+  const title = document.getElementById('fTitle').value.trim();
+  const desc = document.getElementById('fDesc').value.trim();
+  const steps = document.getElementById('fSteps').value.trim();
+  const expect = document.getElementById('fExpect').value.trim();
+  const contact = document.getElementById('fContact').value.trim();
+  const pub = document.getElementById('fPublic').checked;
+  const L = [];
+  L.push('### ' + t('form.type') + ': ' + typeLabel);
+  L.push('');
+  L.push('- Version: ' + ver);
+  L.push('- Platform: ' + plat);
+  L.push('- Public: ' + (pub ? 'yes' : 'no'));
+  L.push('');
+  L.push('### ' + t('form.descLabel'));
+  L.push(desc || '—');
+  if (steps){ L.push(''); L.push('### ' + t('form.steps')); L.push('```'); L.push(steps); L.push('```'); }
+  if (expect){ L.push(''); L.push('### ' + t('form.expect')); L.push(expect); }
+  if (contact){ L.push(''); L.push('### ' + t('form.contact')); L.push(contact); }
+  L.push('');
+  L.push('---');
+  L.push('_Reported via the official feedback center · MC Toolbox 1.0.0_');
+  return L.join('\n');
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  const sel = document.getElementById('langSel');
+  SUPPORTED.forEach(code=>{
+    const o = document.createElement('option');
+    o.value = code; o.textContent = LANG_NAMES[code];
+    sel.appendChild(o);
+  });
+  apply(detectLang());
+  sel.addEventListener('change', ()=>apply(sel.value));
+
+  const toast = (msg)=>{ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'), 2200); };
+
+  document.getElementById('btnIssue').addEventListener('click', ()=>{
+    const title = document.getElementById('fTitle').value.trim();
+    const desc = document.getElementById('fDesc').value.trim();
+    if (!title || !desc){ toast(t('toast.empty')); return; }
+    const label = t('issue.label.' + document.getElementById('fType').value);
+    const url = 'https://github.com/fsssea/mc-toolbox/issues/new?title=' + encodeURIComponent('[1.0.0] ' + title)
+      + '&body=' + encodeURIComponent(buildBody()) + '&labels=' + encodeURIComponent(label);
+    window.open(url, '_blank', 'noopener');
+  });
+
+  document.getElementById('btnCopy').addEventListener('click', async ()=>{
+    const title = document.getElementById('fTitle').value.trim();
+    const desc = document.getElementById('fDesc').value.trim();
+    if (!title || !desc){ toast(t('toast.empty')); return; }
+    const text = '【' + title + '】\n\n' + buildBody();
+    try { await navigator.clipboard.writeText(text); toast(t('toast.copied')); }
+    catch(e){
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+      toast(t('toast.copied'));
+    }
+  });
+
+  document.getElementById('btnReset').addEventListener('click', ()=>{
+    ['fTitle','fDesc','fSteps','fExpect','fContact'].forEach(id=>document.getElementById(id).value='');
+    toast(t('toast.reset'));
+  });
+});
+</script>
+</body>
+</html>

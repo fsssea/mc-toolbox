@@ -146,10 +146,14 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:12px;color
 .foot-in{max-width:var(--max);margin:0 auto;padding:0 28px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .foot-in a{text-decoration:none;color:#3a4854}
 .foot-in a:hover{color:var(--blue)}
+
+.lang{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);margin-left:14px;flex:0 0 auto}
+.lang select{font:inherit;font-size:11px;padding:4px 6px;border:1px solid var(--line);border-radius:2px;background:#fff;color:var(--ink)}
+@media(max-width:760px){.lang{display:none}}
 </style>
 </head>
 <body>
-<a class="skip" href="#main">跳到正文</a>
+<a class="skip" href="#main" data-i18n="skip">跳到正文</a>
 
 <header class="nav">
   <div class="nav-in">
@@ -158,14 +162,16 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:12px;color
       <b>MC工具箱</b><span class="mono">v1.0.0</span>
     </a>
     <nav class="navlinks" aria-label="主导航">
-      <a href="#changes">更新</a>
-      <a href="#versions">下载</a>
-      <a href="./app/">网页版</a>
-      <a href="#numbering">版本号</a>
-      <a href="#faq">说明</a>
-      <a href="#open">开源</a>
+      <a href="#changes" data-i18n="nav.updates">更新</a>
+      <a href="#versions" data-i18n="nav.download">下载</a>
+      <a href="./app/" data-i18n="nav.web">网页版</a>
+      <a href="./feedback/" data-i18n="nav.feedback">反馈</a>
+      <a href="#numbering" data-i18n="nav.numbering">版本号</a>
+      <a href="#faq" data-i18n="nav.faq">说明</a>
+      <a href="#open" data-i18n="nav.open">开源</a>
     </nav>
-    <a class="nav-cta" href="#versions">下载 1.0.0</a>
+    <div class="lang"><span data-i18n="nav.lang">语言</span><select id="langSel" aria-label="Language"></select></div>
+    <a class="nav-cta" href="#versions" data-i18n="nav.cta">下载 1.0.0</a>
   </div>
 </header>
 
@@ -174,17 +180,17 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:12px;color
     <div class="grid-bg" aria-hidden="true"></div>
     <div class="hero-in">
       <div>
-        <p class="kicker mono"><span class="dot"></span><span>今日正式发布</span><span class="sep"></span><span>经典版 · 三端同步</span><span class="sep"></span><span>MIT 开源</span></p>
-        <h1>MC工具箱 <em>1.0.0</em><br>正式版，今天见。</h1>
-        <p class="lead">这是第一个公开发布的版本。经典版覆盖 Android、Windows、Linux 三端，共用同一个解析器与同一份 <span class="mono">assets_app.js</span>。存档里的 <span class="mono">level.dat</span> 不用再对着一串十进制字节看，直接翻成英文代码，改完保存自动编码回二进制。全离线，不联网也能用。</p>
+        <p class="kicker mono"><span class="dot"></span><span data-i18n="hero.k1">今日正式发布</span><span class="sep"></span><span data-i18n="hero.k2">经典版 · 三端同步</span><span class="sep"></span><span data-i18n="hero.k3">网页版同一内核</span><span class="sep"></span><span data-i18n="hero.k4">MIT 开源</span></p>
+        <h1 data-i18n="hero.title">MC工具箱 <em>1.0.0</em><br>正式版，今天见。</h1>
+        <p class="lead" data-i18n="hero.lead">这是第一个公开发布的版本。经典版覆盖 Android、Windows、Linux 三端，共用同一个解析器与同一份 <span class="mono">assets_app.js</span>。存档里的 <span class="mono">level.dat</span> 不用再对着一串十进制字节看，直接翻成英文代码，改完保存自动编码回二进制。全离线，不联网也能用。</p>
         <div class="actions">
-          <a class="btn pri" href="#versions">下载 1.0.0 <span class="mono" style="font-weight:400">· 三端</span></a>
-          <a class="btn sec" href="./app/">打开网页版 1.0.0</a>
+          <a class="btn pri" href="#versions" data-i18n="hero.btn1">下载 1.0.0 <span class="mono" style="font-weight:400">· 三端</span></a>
+          <a class="btn sec" href="./app/" data-i18n="hero.btn2">打开网页版 1.0.0</a>
         </div>
         <div class="hero-meta mono">
-          <span>2026-11-22</span>
-          <span>PUBLIC BUILD 1</span>
-          <span>Android · Windows · Linux</span>
+          <span data-i18n="hero.m1">2026-11-22</span>
+          <span data-i18n="hero.m2">PUBLIC BUILD 1</span>
+          <span data-i18n="hero.m3">Android · Windows · Linux · 网页版</span>
         </div>
       </div>
 
@@ -199,31 +205,31 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:12px;color
         <ul class="m-rows">
           <li class="m-row">
             <div class="m-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8h8v8H8z"/></svg></div>
-            <div style="min-width:0"><div class="m-name">Android · APK</div><div class="m-note">com.doubao.mctoolbox · 覆盖安装即可</div></div>
-            <a class="m-a" href="./dl/MC-Toolbox-Classic-1.0.0-android.apk" download>下载</a>
+            <div style="min-width:0"><div class="m-name" data-i18n="man.apk.n">Android · APK</div><div class="m-note" data-i18n="man.apk.d">com.doubao.mctoolbox · 覆盖安装即可</div></div>
+            <a class="m-a" href="./dl/MC-Toolbox-Classic-1.0.0-android.apk" download data-i18n="man.dl">下载</a>
           </li>
           <li class="m-row">
             <div class="m-ico"><svg viewBox="0 0 24 24"><path d="M3 5h18v11H3zM8 20h8"/><path d="M3 5l2-2h14l2 2"/></svg></div>
-            <div style="min-width:0"><div class="m-name">Windows · ZIP</div><div class="m-note">解压即用 · 无需安装</div></div>
-            <a class="m-a" href="./dl/MC-Toolbox-Windows-1.0.0.zip" download>下载</a>
+            <div style="min-width:0"><div class="m-name" data-i18n="man.win.n">Windows · ZIP</div><div class="m-note" data-i18n="man.win.d">解压即用 · 无需安装</div></div>
+            <a class="m-a" href="./dl/MC-Toolbox-Windows-1.0.0.zip" download data-i18n="man.dl">下载</a>
           </li>
           <li class="m-row">
             <div class="m-ico"><svg viewBox="0 0 24 24"><path d="M4 5h16v10H4zM2 19h20"/><path d="M9 9l-2 2 2 2M15 9l2 2-2 2"/></svg></div>
-            <div style="min-width:0"><div class="m-name">Linux · TAR.GZ / DEB</div><div class="m-note">x64 · 免安装或 dpkg 安装</div></div>
-            <a class="m-a" href="./dl/MC-Toolbox-Linux-1.0.0.tar.gz" download>下载</a>
+            <div style="min-width:0"><div class="m-name" data-i18n="man.lin.n">Linux · TAR.GZ / DEB</div><div class="m-note" data-i18n="man.lin.d">x64 · 免安装或 dpkg 安装</div></div>
+            <a class="m-a" href="./dl/MC-Toolbox-Linux-1.0.0.tar.gz" download data-i18n="man.dl">下载</a>
           </li>
         </ul>
-        <div class="m-foot"><span>经典版三端齐备 · 网页版 1.0.0 可直接用</span><a href="#numbering">为什么是 1.0.0</a></div>
+        <div class="m-foot"><span data-i18n="man.foot">经典版三端齐备 · 网页版 1.0.0 可直接用</span><a href="#numbering" data-i18n="man.how">为什么是 1.0.0</a></div>
       </aside>
     </div>
   </section>
 
   <div class="flow" aria-label="处理流程">
     <div class="flow-in">
-      <span class="flow-step"><i>1</i>选择文件</span><span class="flow-arrow"></span>
-      <span class="flow-step"><i>2</i>识别与编辑</span><span class="flow-arrow"></span>
-      <span class="flow-step"><i>3</i>转换与打包</span><span class="flow-arrow"></span>
-      <span class="flow-step"><i>4</i>保存或导出</span>
+      <span class="flow-step"><i>1</i><span data-i18n="flow.1">选择文件</span></span><span class="flow-arrow"></span>
+      <span class="flow-step"><i>2</i><span data-i18n="flow.2">识别与编辑</span></span><span class="flow-arrow"></span>
+      <span class="flow-step"><i>3</i><span data-i18n="flow.3">转换与打包</span></span><span class="flow-arrow"></span>
+      <span class="flow-step"><i>4</i><span data-i18n="flow.4">保存或导出</span></span>
     </div>
   </div>
 
@@ -231,45 +237,45 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:12px;color
     <div class="wrap">
       <div class="sec-head">
         <div>
-          <div class="sec-label">WHAT'S NEW / 1.0.0</div>
-          <h2>核心变化，只有一件半。</h2>
+          <div class="sec-label" data-i18n="chg.label">WHAT'S NEW / 1.0.0</div>
+          <h2 data-i18n="chg.h">核心变化，只有一件半。</h2>
         </div>
-        <p class="sec-desc">不是把按钮堆满首页。1.0.0 只做三件事：把存档核心数据翻成人能读的代码、让长字段在手机上自己折行、让 db 里的文件也能按字节改。</p>
+        <p class="sec-desc" data-i18n="chg.d">不是把按钮堆满首页。1.0.0 只做三件事：把存档核心数据翻成人能读的代码、让长字段在手机上自己折行、让 db 里的文件也能按字节改。</p>
       </div>
 
       <div class="cards">
         <article class="card">
-          <span class="tag">CODEX / 英文代码</span>
-          <h3>level.dat，直接翻成英文代码</h3>
-          <p>一行一个字段：<span class="mono">类型 路径 = 值</span>。世界名、随机种子、难度、生成器类型、游戏规则、实验开关，全部明文呈现。</p>
+          <span class="tag" data-i18n="c1.tag">CODEX / 英文代码</span>
+          <h3 data-i18n="c1.h">level.dat，直接翻成英文代码</h3>
+          <p data-i18n="c1.p">一行一个字段：<span class="mono">类型 路径 = 值</span>。世界名、随机种子、难度、生成器类型、游戏规则、实验开关，全部明文呈现。</p>
           <ul>
-            <li>改完点「保存到存档」，自动编码回二进制 NBT</li>
-            <li>写回前先自动备份，改错可回退</li>
-            <li>手机端与桌面端同一套逻辑</li>
+            <li data-i18n="c1.b1">改完点「保存到存档」，自动编码回二进制 NBT</li>
+            <li data-i18n="c1.b2">写回前先自动备份，改错可回退</li>
+            <li data-i18n="c1.b3">手机端与桌面端同一套逻辑</li>
           </ul>
           <img class="shot" src="./code.png" alt="level.dat 英文代码视图截图" loading="lazy">
         </article>
 
         <article class="card">
-          <span class="tag">WRAP / 自动换行</span>
-          <h3>长字段自己折行，手机不用横拖</h3>
-          <p>很长的世界名、成串的 byte 数组，按窗口宽度自动折行；横向滚动关掉，打开就是第一行。</p>
+          <span class="tag" data-i18n="c2.tag">WRAP / 自动换行</span>
+          <h3 data-i18n="c2.h">长字段自己折行，手机不用横拖</h3>
+          <p data-i18n="c2.p">很长的世界名、成串的 byte 数组，按窗口宽度自动折行；横向滚动关掉，打开就是第一行。</p>
           <ul>
-            <li>折行只影响显示，不动保存逻辑</li>
-            <li>渲染完滚动条归零，不用找开头</li>
-            <li>手机竖屏也能整段读完</li>
+            <li data-i18n="c2.b1">折行只影响显示，不动保存逻辑</li>
+            <li data-i18n="c2.b2">渲染完滚动条归零，不用找开头</li>
+            <li data-i18n="c2.b3">手机竖屏也能整段读完</li>
           </ul>
           <img class="shot" src="./wrap.png" alt="长字段自动换行截图" loading="lazy">
         </article>
 
         <article class="card">
-          <span class="tag">DB / 文件级编辑</span>
-          <h3>db 里的文件，也能逐个改</h3>
-          <p>不是 NBT 的文件按 0x 偏移列出英文串，引号里的内容可就地替换；也能按十进制字节编辑，大文件 4KB 分页。</p>
+          <span class="tag" data-i18n="c3.tag">DB / 文件级编辑</span>
+          <h3 data-i18n="c3.h">db 里的文件，也能逐个改</h3>
+          <p data-i18n="c3.p">不是 NBT 的文件按 0x 偏移列出英文串，引号里的内容可就地替换；也能按十进制字节编辑，大文件 4KB 分页。</p>
           <ul>
-            <li>保存前自动备份整包</li>
-            <li>界面常驻提示：db 是存档最重要的数据文件夹</li>
-            <li>随便修改可能导致存档报废，先导出再改</li>
+            <li data-i18n="c3.b1">保存前自动备份整包</li>
+            <li data-i18n="c3.b2">界面常驻提示：db 是存档最重要的数据文件夹</li>
+            <li data-i18n="c3.b3">随便修改可能导致存档报废，先导出再改</li>
           </ul>
           <img class="shot" src="./dbtext.png" alt="db 文件英文串视图截图" loading="lazy">
         </article>
@@ -283,52 +289,52 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:12px;color
     <div class="wrap">
       <div class="sec-head">
         <div>
-          <div class="sec-label">DOWNLOAD / 三端同步</div>
-          <h2>一份内核，三个安装包。</h2>
+          <div class="sec-label" data-i18n="ver.label">DOWNLOAD / 三端同步</div>
+          <h2 data-i18n="ver.h">一份内核，三个安装包。</h2>
         </div>
-        <p class="sec-desc">三端包里的 <span class="mono">assets/assets_app.js</span> 是同一份文件，md5 一致；装哪个端，行为都一样。</p>
+        <p class="sec-desc" data-i18n="ver.d">三端包里的 <span class="mono">assets/assets_app.js</span> 是同一份文件，md5 一致；装哪个端，行为都一样。</p>
       </div>
 
       <div class="vgrid">
         <div class="vbox">
-          <div class="mono">PUBLIC RELEASE</div>
+          <div class="mono" data-i18n="ver.b1.tag">PUBLIC RELEASE</div>
           <div class="big">1.0.0</div>
-          <small>2026-11-22 · BUILD 1</small>
-          <p style="margin-top:14px">第一个公开发布版本。此前所有内部迭代都没有对外测试，公开版本号从 1.0.0 开始，不再沿用内部编号。</p>
+          <small data-i18n="ver.b1.small">2026-11-22 · BUILD 1</small>
+          <p style="margin-top:14px" data-i18n="ver.b1.p">第一个公开发布版本。此前所有内部迭代都没有对外测试，公开版本号从 1.0.0 开始，不再沿用内部编号。</p>
         </div>
         <div class="vbox">
-          <div class="mono">PACKAGES</div>
-          <div class="big">3<span style="font-size:22px"> 端 + 网页</span></div>
-          <small>Android · Windows · Linux · 网页版</small>
-          <p style="margin-top:14px">网页版（PWA）同样只提供经典版 1.0.0，与三个安装包共用同一份内核；不需要注册，打开即用。</p>
+          <div class="mono" data-i18n="ver.b2.tag">PACKAGES</div>
+          <div class="big" data-i18n="ver.b2.big">3<span style="font-size:22px"> 端 + 网页</span></div>
+          <small data-i18n="ver.b2.small">Android · Windows · Linux · 网页版</small>
+          <p style="margin-top:14px" data-i18n="ver.b2.p">网页版（PWA）同样只提供经典版 1.0.0，与三个安装包共用同一份内核；不需要注册，打开即用。</p>
         </div>
       </div>
 
       <div class="table">
         <div class="trow">
           <span class="os">Android</span>
-          <span class="f">MC-Toolbox-Classic-1.0.0-android.apk · 972 KB · com.doubao.mctoolbox</span>
-          <a href="./dl/MC-Toolbox-Classic-1.0.0-android.apk" download>下载 APK</a>
+          <span class="f" data-i18n="ver.f.android">MC-Toolbox-Classic-1.0.0-android.apk · 972 KB · com.doubao.mctoolbox</span>
+          <a href="./dl/MC-Toolbox-Classic-1.0.0-android.apk" download data-i18n="ver.t.android">下载 APK</a>
         </div>
         <div class="trow">
           <span class="os">Windows</span>
-          <span class="f">MC-Toolbox-Windows-1.0.0.zip · 95 MB · x64 · 解压即用</span>
-          <a href="./dl/MC-Toolbox-Windows-1.0.0.zip" download>下载 ZIP</a>
+          <span class="f" data-i18n="ver.f.win">MC-Toolbox-Windows-1.0.0.zip · 95 MB · x64 · 解压即用</span>
+          <a href="./dl/MC-Toolbox-Windows-1.0.0.zip" download data-i18n="ver.t.win">下载 ZIP</a>
         </div>
         <div class="trow">
           <span class="os">Linux</span>
-          <span class="f">MC-Toolbox-Linux-1.0.0.tar.gz · 93 MB · x64 · 免安装</span>
-          <a href="./dl/MC-Toolbox-Linux-1.0.0.tar.gz" download>下载 TAR.GZ</a>
+          <span class="f" data-i18n="ver.f.lin">MC-Toolbox-Linux-1.0.0.tar.gz · 93 MB · x64 · 免安装</span>
+          <a href="./dl/MC-Toolbox-Linux-1.0.0.tar.gz" download data-i18n="ver.t.lin">下载 TAR.GZ</a>
         </div>
         <div class="trow">
           <span class="os">Linux · deb</span>
-          <span class="f">MC-Toolbox-Linux-1.0.0.deb · 73 MB · Debian / Ubuntu</span>
-          <a href="./dl/MC-Toolbox-Linux-1.0.0.deb" download>下载 DEB</a>
+          <span class="f" data-i18n="ver.f.deb">MC-Toolbox-Linux-1.0.0.deb · 73 MB · Debian / Ubuntu</span>
+          <a href="./dl/MC-Toolbox-Linux-1.0.0.deb" download data-i18n="ver.t.deb">下载 DEB</a>
         </div>
         <div class="trow">
-          <span class="os">网页版</span>
-          <span class="f">app/ · PWA · 1.0.0 · 与安装包同一份 assets_app.js · 可安装到桌面离线用</span>
-          <a href="./app/">打开网页版</a>
+          <span class="os" data-i18n="ver.os.web">网页版</span>
+          <span class="f" data-i18n="ver.f.web">app/ · PWA · 1.0.0 · 与安装包同一份 assets_app.js · 可安装到桌面离线用</span>
+          <a href="./app/" data-i18n="ver.t.web">打开网页版</a>
         </div>
       </div>
     </div>
@@ -338,22 +344,22 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:12px;color
     <div class="wrap">
       <div class="sec-head">
         <div>
-          <div class="sec-label">WHY 1.0.0 / 版本号说明</div>
-          <h2>为什么是 1.0.0，而不是继续往下排。</h2>
+          <div class="sec-label" data-i18n="num.label">WHY 1.0.0 / 版本号说明</div>
+          <h2 data-i18n="num.h">为什么是 1.0.0，而不是继续往下排。</h2>
         </div>
-        <p class="sec-desc">因为在此之前，没有任何一个版本对外发布过。内部调试用的编号留在仓库历史里，公开版本从 1.0.0 起算。</p>
+        <p class="sec-desc" data-i18n="num.d">因为在此之前，没有任何一个版本对外发布过。内部调试用的编号留在仓库历史里，公开版本从 1.0.0 起算。</p>
       </div>
 
       <div class="cards" style="grid-template-columns:1fr 1fr">
         <article class="card">
-          <span class="tag">BEFORE / 内部迭代</span>
-          <h3>没公开过，就不算版本</h3>
-          <p>早期那些编号只用于内部自测，没有公开下载、没有对外测试、也没有对外承诺。对外沿用这些编号会让人误以为中间漏掉了好几个版本。</p>
+          <span class="tag" data-i18n="n1.tag">BEFORE / 内部迭代</span>
+          <h3 data-i18n="n1.h">没公开过，就不算版本</h3>
+          <p data-i18n="n1.p">早期那些编号只用于内部自测，没有公开下载、没有对外测试、也没有对外承诺。对外沿用这些编号会让人误以为中间漏掉了好几个版本。</p>
         </article>
         <article class="card">
-          <span class="tag">NOW / 公开口径</span>
-          <h3>仓库、官网、安装包，统一 1.0.0</h3>
-          <p>README、CHANGELOG、版本矩阵、官网文案与三端安装包，全部改成 1.0.0；历史内部编号只在仓库的归档记录里出现，不再作为下载版本。</p>
+          <span class="tag" data-i18n="n2.tag">NOW / 公开口径</span>
+          <h3 data-i18n="n2.h">仓库、官网、安装包，统一 1.0.0</h3>
+          <p data-i18n="n2.p">README、CHANGELOG、版本矩阵、官网文案与三端安装包，全部改成 1.0.0；历史内部编号只在仓库的归档记录里出现，不再作为下载版本。</p>
         </article>
       </div>
     </div>
@@ -363,27 +369,27 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:12px;color
     <div class="wrap">
       <div class="sec-head">
         <div>
-          <div class="sec-label">README / 使用说明</div>
-          <h2>装之前，先看这四条。</h2>
+          <div class="sec-label" data-i18n="faq.label">README / 使用说明</div>
+          <h2 data-i18n="faq.h">装之前，先看这四条。</h2>
         </div>
-        <p class="sec-desc">尤其是第三条。db 是存档里最要紧的地方，改之前请先导出备份。</p>
+        <p class="sec-desc" data-i18n="faq.d">尤其是第三条。db 是存档里最要紧的地方，改之前请先导出备份。</p>
       </div>
       <div class="faq">
         <details open>
-          <summary>三端装哪个？能一起装吗？</summary>
-          <p>按设备选：手机装 APK，Windows 解压 ZIP 直接用，Linux 用 tar.gz 或 deb，不想装东西就开网页版（同样只有经典版 1.0.0）。三端是不同设备上的同一款软件，包名与桌面端不冲突；同一台手机重复覆盖安装即可升级。</p>
+          <summary data-i18n="faq.q1">三端装哪个？能一起装吗？</summary>
+          <p data-i18n="faq.a1">按设备选：手机装 APK，Windows 解压 ZIP 直接用，Linux 用 tar.gz 或 deb，不想装东西就开网页版（同样只有经典版 1.0.0）。三端是不同设备上的同一款软件，包名与桌面端不冲突；同一台手机重复覆盖安装即可升级。</p>
         </details>
         <details>
-          <summary>英文代码改完，存档会不会坏？</summary>
-          <p>只改等号右边的值，左边的类型与路径不要动。点「保存到存档」时会先自动备份整包，再重新编码成二进制 NBT 写回；写坏了可以用备份回退。</p>
+          <summary data-i18n="faq.q2">英文代码改完，存档会不会坏？</summary>
+          <p data-i18n="faq.a2">只改等号右边的值，左边的类型与路径不要动。点「保存到存档」时会先自动备份整包，再重新编码成二进制 NBT 写回；写坏了可以用备份回退。</p>
         </details>
         <details>
-          <summary>db 文件夹能随便改吗？</summary>
-          <p>不能。db 是存档最重要的数据文件夹，随便修改可能导致存档报废。界面会一直提示这一点；动手前请先用「导出存档」备份一份，只改你确定要改的字段。</p>
+          <summary data-i18n="faq.q3">db 文件夹能随便改吗？</summary>
+          <p data-i18n="faq.a3">不能。db 是存档最重要的数据文件夹，随便修改可能导致存档报废。界面会一直提示这一点；动手前请先用「导出存档」备份一份，只改你确定要改的字段。</p>
         </details>
         <details>
-          <summary>需要联网吗？开源吗？</summary>
-          <p>全离线运行，不联网也能用，不上传任何存档数据。代码 MIT 开源，仓库地址 github.com/fsssea/mc-toolbox。</p>
+          <summary data-i18n="faq.q4">需要联网吗？开源吗？</summary>
+          <p data-i18n="faq.a4">全离线运行，不联网也能用，不上传任何存档数据。代码 MIT 开源，仓库地址 github.com/fsssea/mc-toolbox。</p>
         </details>
       </div>
     </div>
@@ -393,19 +399,72 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:12px;color
     <div class="wrap">
       <div>
         <div class="sec-label mono">OPEN SOURCE / MIT</div>
-        <h2>源码在仓库，包在官网。</h2>
-        <p>MIT 许可，可自行编译、二次分发；唯一官方发布渠道是哔哩哔哩的发布视频与本站下载页。</p>
+        <h2 data-i18n="open.h">源码在仓库，包在官网。</h2>
+        <p data-i18n="open.p">MIT 许可，可自行编译、二次分发；唯一官方发布渠道是哔哩哔哩的发布视频与本站下载页，遇到问题请走官方反馈站。</p>
       </div>
-      <a class="btn sec" href="https://github.com/fsssea/mc-toolbox">打开仓库</a>
+      <div style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn sec" href="https://github.com/fsssea/mc-toolbox" data-i18n="open.b1">打开仓库</a><a class="btn sec" href="./feedback/" data-i18n="open.b2">反馈站</a></div>
     </div>
   </section>
 </main>
 
 <footer>
   <div class="foot-in">
-    <span>© 2026 MC工具箱 contributors · MIT License</span>
+    <span data-i18n="foot.copy">© 2026 MC工具箱 contributors · MIT License</span>
     <span class="mono">PUBLIC 1.0.0 / BUILD 1 / 2026-11-22</span>
   </div>
 </footer>
+<script src="./i18n-site.js"></script>
+<script>
+(function(){
+  var D = window.SITE_I18N || {};
+  var SUPPORTED = ['zh-Hans','zh-Hant','en','ja','ko'];
+  var NAMES = {'zh-Hans':'简体中文','zh-Hant':'繁體中文','en':'English','ja':'日本語','ko':'한국어'};
+  var cur = 'zh-Hans';
+  function detect(){
+    try {
+      var q = new URLSearchParams(location.search).get('lang');
+      if (q && D[q]) return q;
+    } catch(e){}
+    var saved = localStorage.getItem('mcbox-lang');
+    if (saved && D[saved]) return saved;
+    var list = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'en'];
+    for (var i=0;i<list.length;i++){
+      var t = String(list[i]).toLowerCase();
+      if (t.indexOf('zh') === 0) return /hant|tw|hk|mo/.test(t) ? 'zh-Hant' : 'zh-Hans';
+      if (t.indexOf('ja') === 0) return 'ja';
+      if (t.indexOf('ko') === 0) return 'ko';
+      if (t.indexOf('en') === 0) return 'en';
+    }
+    return 'en';
+  }
+  function apply(lang){
+    if (!D[lang]) lang = 'zh-Hans';
+    cur = lang;
+    document.documentElement.lang = (lang === 'zh-Hans') ? 'zh-CN' : lang;
+    document.querySelectorAll('[data-i18n]').forEach(function(el){
+      var k = el.getAttribute('data-i18n');
+      if (D[lang][k] !== undefined) el.innerHTML = D[lang][k];
+    });
+    if (D[lang]['page.title']) document.title = D[lang]['page.title'];
+    var md = document.querySelector('meta[name=description]');
+    if (md && D[lang]['page.desc']) md.setAttribute('content', D[lang]['page.desc']);
+    var sel = document.getElementById('langSel');
+    if (sel) sel.value = lang;
+    localStorage.setItem('mcbox-lang', lang);
+  }
+  window.mcSetLang = apply;
+  document.addEventListener('DOMContentLoaded', function(){
+    var sel = document.getElementById('langSel');
+    if (sel){
+      SUPPORTED.forEach(function(c){
+        var o = document.createElement('option');
+        o.value = c; o.textContent = NAMES[c]; sel.appendChild(o);
+      });
+      sel.addEventListener('change', function(){ apply(sel.value); });
+    }
+    apply(detect());
+  });
+})();
+</script>
 </body>
 </html>
