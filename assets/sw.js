@@ -1,5 +1,5 @@
 /* MC工具箱 PWA 离线缓存（构建时生成） */
-const CACHE = 'mctoolbox-1.0.0-i18n';
+const CACHE = 'mctoolbox-1.0.0-i18n3';
 const FILES = [
   "./icon-512.png",
   "./icon-192.png",
@@ -18,8 +18,8 @@ const FILES = [
   "./i18n/README.md",
   "./i18n/README_en.md",
   "./i18n/app.js",
-  "./i18n/bridge.js",
   "./i18n/index.html",
+  "./i18n/loader.js",
   "./i18n/override.css",
   "./i18n/src/commands.js",
   "./i18n/src/context.js",

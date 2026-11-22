@@ -10,7 +10,7 @@
 - 「附加包汉化」重新接入上游 `zanesu154-rgb/tianji-turn-addon`，固定 `f2c3165`（2026-11-21，`v2026.11.21-90`），替换此前的自研小词库。
 - 上游本次更新包含：脚本句式 ASCII 化再匹配、单行句式不跨行吞并、JSON 写回保留 `1.0` 这类小数、`property_bag` 变量文字、RawMessage 参数、HUD 标题/动作栏数据、`%键` 引用保护、manifest 末尾多余 `}` 宽松解析、包名以 manifest 为准、物品自定义名同步命令、`.mcfunction` 仅 `\r` 换行修复、下划线词提取等。
 - 完整上游代码放入 `assets/i18n/`；`assets/js/addon-i18n.js` 恢复为 iframe 入口；`index.html` / `assets/index.html` 重新引入该脚本。
-- 离线适配：JSON5 改本地 `vendor/json5.min.js`，移除 CDN 与访问计数；`bridge.js` 接安卓原生保存/父页转发/浏览器下载；`override.css` 适配 iframe 与手机。
+- 离线适配：JSON5 改本地 `vendor/json5.min.js`，移除 CDN 与访问计数；`loader.js` 顺序加载并重试上游脚本，内置安卓原生保存/父页转发/浏览器下载；`override.css` 适配 iframe 与手机。
 - `assets/sw.js` 缓存清单重新加入 `i18n/` 全部文件，缓存键改为 `mctoolbox-1.0.0-i18n`，匹配时忽略查询参数。
 - `README.md`、`THIRD_PARTY_NOTICES.md`、`docs/VERSION_MATRIX.md` 更正为“内嵌上游、MIT、已署名”，不再写“自研、已移除”。
 - `assets/assets_app.js` 不变（md5 `5cd21621c6a4d358104703682bfc04c1`）；三端安装包需要重新打包以带入 `i18n/`。

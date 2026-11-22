@@ -13,7 +13,7 @@
 本项目对上游的改动仅限运行环境适配：
 
 - `vendor/json5.min.js` 本地化，移除 CDN 的 JSON5 与访问计数脚本，保证纯离线；
-- `bridge.js`：安卓 WebView 原生保存、iframe 父页转发、桌面浏览器下载兜底；
+- `loader.js`：按上游顺序加载脚本并自动重试（应对静态托管偶发 503），内置安卓 WebView 原生保存、iframe 父页转发、桌面浏览器下载兜底；
 - `override.css`：隐藏推广/计数元素，适配 iframe 与移动端；
 - `app.js` 的 `downloadBlob` 增加 `window.__mctSave` 分支，用于接入上述下载桥。
 

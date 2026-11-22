@@ -130,13 +130,14 @@ npm run dist  # 生成 dist/ 下的 Windows 包
 2. 主界面「附加包汉化」按钮由 `assets/js/addon-i18n.js` 接管，以全屏 iframe 打开 `assets/i18n/index.html`。
 3. 上游能力原样保留：`.lang` 提取与补全、JSON UI、脚本硬编码、运行时翻译、世界存档 NBT / LevelDB、人工翻译编辑器等。
 
-本项目对上游做的唯一改动（均不改变汉化逻辑）：
+本项目对上游做的运行环境适配（均不改变汉化逻辑）：
 
 - 把 JSON5 从 CDN 改成本地 `vendor/json5.min.js`，去掉访问计数与赞助图联网请求，保证离线可用；
-- 增加 `bridge.js`：安卓 WebView 走 `AndroidBridge.saveBinary`，iframe 内把文件交回父页保存，桌面浏览器仍用 `<a download>`；
-- 增加 `override.css`：隐藏推广/计数元素，适配 iframe 与手机窄屏。
+- 增加 `loader.js`：按上游顺序并发取回并重试脚本（躲开 GitHub Pages 偶发 503），内置安卓 `AndroidBridge.saveBinary` / iframe 父页转发 / 浏览器 `<a download>` 下载适配；
+- 增加 `override.css`：隐藏推广/计数元素，适配 iframe 与手机窄屏；
+- `app.js` 的 `downloadBlob` 增加 `window.__mctSave` 分支，接入上面的下载适配。
 
-上游更新时，直接用它覆盖 `assets/i18n/`，再把上述三处适配重新打上即可。不要把上游代码说成本项目自研。
+上游更新时，直接用它覆盖 `assets/i18n/`，再把上述四处适配重新打上即可。不要把上游代码说成本项目自研。
 
 ## 回归测试
 
