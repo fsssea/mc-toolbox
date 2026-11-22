@@ -5,7 +5,7 @@
 - 网页版：https://fsssea.github.io/mc-toolbox/app/
 - **反馈中心（报 bug / 提建议的唯一官方入口）**：https://fsssea.github.io/mc-toolbox/feedback/
 - 漏洞看板：https://fsssea.github.io/mc-toolbox/feedback/#board
-- 漏洞档案：`https://fsssea.github.io/mc-toolbox/feedback/bug-N/`（第一条反馈为 BUG-1，编号固定不变；每条记录标注「重要 · 待修 / 正在修复 / 已修复」与受影响版本区间）
+- 漏洞档案：`https://fsssea.github.io/mc-toolbox/feedback/bug-N/`（第一条反馈为 BUG-1，编号固定不变；每条记录标注六种状态之一 ——「重要 · 待修 / 病又复发了 / 正在修复 / 已修复 / 设计的特性 / 不存在的漏洞」——以及受影响版本区间与修复版本）
 
 漏洞数据在 `feedback/bugs.json`，页面由 `feedback/tools/gen_bugs.py` 生成：登记一条新漏洞 → 改 JSON → 跑脚本 → 提交 `feedback/bug-N/index.html`。
 - 下载：https://github.com/fsssea/mc-toolbox/releases
