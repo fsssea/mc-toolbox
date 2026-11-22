@@ -24,9 +24,11 @@
       "since": "2026-11-22",
       "shared_account": true,
       "bilibili": {
-        "name": "",
-        "url": "",
-        "official": false
+        "name": "bili_55992006694",
+        "url": "https://space.bilibili.com/3747586672430328/",
+        "uid": "3747586672430328",
+        "official": false,
+        "note": "创始人二号（豆包）注册并登录的账号，昵称待设置"
       }
     }
   ],
@@ -51,6 +53,7 @@
     "platform": "bilibili",
     "uid": "3747586672430328",
     "url": "https://space.bilibili.com/3747586672430328/",
-    "note": "当前登录的官方发布号（新注册，昵称未设置、0 粉丝）；创始人个人号为 3546753368329112。"
+    "owner": "F2",
+    "note": "创始人二号的 B 站账号，当前登录；创始人一号的个人号 3546753368329112 不变。"
   }
 }
