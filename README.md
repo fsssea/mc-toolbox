@@ -3,7 +3,11 @@
 
 - 官网：https://fsssea.github.io/mc-toolbox/
 - 网页版：https://fsssea.github.io/mc-toolbox/app/
+- **反馈中心（报 bug / 提建议的唯一官方入口）**：https://fsssea.github.io/mc-toolbox/feedback/
 - 下载：https://github.com/fsssea/mc-toolbox/releases
+
+> **语言 / Language**：官网与反馈站支持 简体中文 · 繁體中文 · English · 日本語 · 한국어，默认跟随系统语言，页面右上角可手动切换（也可用 `?lang=en` 这类参数固定语言）。
+> [简体中文](https://fsssea.github.io/mc-toolbox/?lang=zh-Hans) · [繁體中文](https://fsssea.github.io/mc-toolbox/?lang=zh-Hant) · [English](https://fsssea.github.io/mc-toolbox/?lang=en) · [日本語](https://fsssea.github.io/mc-toolbox/?lang=ja) · [한국어](https://fsssea.github.io/mc-toolbox/?lang=ko)
 
 ![Verify](https://github.com/fsssea/mc-toolbox/actions/workflows/verify.yml/badge.svg)
 
