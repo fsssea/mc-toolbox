@@ -1,7 +1,7 @@
 /* MC工具箱 漏洞档案页 i18n（bug-N 模板共用，六种状态） */
 window.BUG_I18N = {
   "zh-Hans": {
-    "nav.home":"官网","nav.download":"下载","nav.feedback":"反馈","nav.board":"漏洞看板","nav.repo":"开源仓库","nav.lang":"语言",
+    "nav.home":"官网","nav.download":"下载","nav.feedback":"反馈","nav.board":"漏洞看板","nav.admin":"管理台","nav.repo":"开源仓库","nav.lang":"语言",
     "back":"← 返回漏洞看板",
     "kicker":"BUG / 官方漏洞档案",
     "label.id":"漏洞编号","label.status":"状态","label.area":"模块","label.platforms":"平台",
@@ -23,7 +23,7 @@ window.BUG_I18N = {
     "copy.link":"复制本页链接","toast.copied":"链接已复制"
   },
   "zh-Hant": {
-    "nav.home":"官網","nav.download":"下載","nav.feedback":"回饋","nav.board":"漏洞看板","nav.repo":"開源倉庫","nav.lang":"語言",
+    "nav.home":"官網","nav.download":"下載","nav.feedback":"回饋","nav.board":"漏洞看板","nav.admin":"管理台","nav.repo":"開源倉庫","nav.lang":"語言",
     "back":"← 返回漏洞看板",
     "kicker":"BUG / 官方漏洞檔案",
     "label.id":"漏洞編號","label.status":"狀態","label.area":"模組","label.platforms":"平台",
@@ -45,7 +45,7 @@ window.BUG_I18N = {
     "copy.link":"複製本頁連結","toast.copied":"連結已複製"
   },
   "en": {
-    "nav.home":"Home","nav.download":"Download","nav.feedback":"Feedback","nav.board":"Bug board","nav.repo":"Source","nav.lang":"Language",
+    "nav.home":"Home","nav.download":"Download","nav.feedback":"Feedback","nav.board":"Bug board","nav.admin":"Admin console","nav.repo":"Source","nav.lang":"Language",
     "back":"← Back to the bug board",
     "kicker":"BUG / OFFICIAL RECORD",
     "label.id":"Bug ID","label.status":"Status","label.area":"Area","label.platforms":"Platforms",
@@ -67,7 +67,7 @@ window.BUG_I18N = {
     "copy.link":"Copy this link","toast.copied":"Link copied"
   },
   "ja": {
-    "nav.home":"公式サイト","nav.download":"ダウンロード","nav.feedback":"フィードバック","nav.board":"不具合一覧","nav.repo":"ソース","nav.lang":"言語",
+    "nav.home":"公式サイト","nav.download":"ダウンロード","nav.feedback":"フィードバック","nav.board":"不具合一覧","nav.admin":"管理コンソール","nav.repo":"ソース","nav.lang":"言語",
     "back":"← 不具合一覧に戻る",
     "kicker":"BUG / 公式記録",
     "label.id":"不具合 ID","label.status":"状態","label.area":"モジュール","label.platforms":"プラットフォーム",
@@ -89,7 +89,7 @@ window.BUG_I18N = {
     "copy.link":"このページの URL をコピー","toast.copied":"コピーしました"
   },
   "ko": {
-    "nav.home":"공식 사이트","nav.download":"다운로드","nav.feedback":"피드백","nav.board":"버그 보드","nav.repo":"소스","nav.lang":"언어",
+    "nav.home":"공식 사이트","nav.download":"다운로드","nav.feedback":"피드백","nav.board":"버그 보드","nav.admin":"관리 콘솔","nav.repo":"소스","nav.lang":"언어",
     "back":"← 버그 보드로",
     "kicker":"BUG / 공식 기록",
     "label.id":"버그 ID","label.status":"상태","label.area":"모듈","label.platforms":"플랫폼",
