@@ -34,12 +34,12 @@
         '<button class="mci-btn" id="mciReload">重新载入</button>' +
         '<button class="mci-btn mci-close" id="mciClose">关闭</button>' +
       '</div>' +
-      '<div class="mci-body"><iframe id="mciFrame" title="附加包汉化工具" src="i18n/index.html?v=2026.11.21-90&r=1"></iframe></div>';
+      '<div class="mci-body"><iframe id="mciFrame" title="附加包汉化工具" src="i18n/index.html?v=2026.11.22-1"></iframe></div>';
     document.body.appendChild(overlay);
     frame = overlay.querySelector('#mciFrame');
     overlay.querySelector('#mciClose').onclick = close;
     overlay.querySelector('#mciReload').onclick = function () {
-      frame.src = 'i18n/index.html?v=2026.11.21-90&r=1&t=' + Date.now();
+      frame.src = 'i18n/index.html?v=2026.11.22-1&t=' + Date.now();
       toast('已重新载入汉化工具');
     };
     return overlay;
@@ -50,7 +50,7 @@
     overlay.style.display = 'flex';
     if (!inited) {
       inited = true;
-      frame.src = 'i18n/index.html?v=2026.11.21-90&r=1';
+      frame.src = 'i18n/index.html?v=2026.11.22-1';
     }
     document.body.classList.add('mci-lock');
   }
