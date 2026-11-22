@@ -35,7 +35,7 @@
 
 | 版本 | Android | Windows | Linux | 内核源码 |
 | --- | --- | --- | --- | --- |
-| 经典版 · `com.doubao.mctoolbox` | [APK](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Classic-1.1.0-android.apk) | [ZIP](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Windows-1.1.0.zip) | [TAR.GZ](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Linux-1.1.0.tar.gz) · [DEB](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Linux-1.1.0.deb) | `assets_app.js`（JS） |
+| 经典版 · `com.doubao.mctoolbox` | [APK](https://aka.doubaocdn.com/s/u7M8FHhv6p) | [ZIP](https://aka.doubaocdn.com/s/GABLGwit3r) | [TAR.GZ](https://aka.doubaocdn.com/s/SylSCWfppc) · [DEB](https://aka.doubaocdn.com/s/EHjZY8JEms) | `assets_app.js`（JS） |
 
 1.1.0 是**本周的测试构建**，不对外宣布“正式版”；版本号从 1.0.0 正式向上递增。
 三端新增 Chunker 1.21.0 完整存档转换（基岩 ⇄ Java），Android 同时支持 32 / 64 位。
