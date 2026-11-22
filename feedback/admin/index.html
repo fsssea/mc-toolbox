@@ -115,6 +115,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:12px;color
       <p class="sec-desc" data-i18n="roster.d">名册来自仓库里的公开文件，谁在任、谁被撤销、谁记了几次误判，都写在这里，没有隐藏名单。</p>
       <div class="founders" id="founders"></div>
       <div class="seats" id="seats"></div>
+      <p class="note" data-i18n="roster.shared">两位创始人共用同一个 GitHub 账号 @fsssea（暂无可用的第二个账号），提交时在 Issue 正文写明 F1 或 F2 以示署名；账号相同不代表同一个人。</p>
       <p class="note" data-i18n="roster.note">误判计数由创始人在驳回 Issue 里登记；申诉成立的，创始人可撤销该次记录，撤销理由必须写在同一条 Issue 里。</p>
     </div>
   </section>
@@ -219,6 +220,13 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:12px;color
           </div>
         </div>
         <div class="field">
+          <label for="fSigner" data-i18n="founder.signer">以此身份署名</label>
+          <select id="fSigner">
+            <option value="F1">F1 · 创始人 A · @fsssea</option>
+            <option value="F2">F2 · 创始人 B · @fsssea</option>
+          </select>
+        </div>
+        <div class="field">
           <label for="fWhy" data-i18n="founder.why">理由</label>
           <textarea id="fWhy" data-i18n-ph="founder.why.ph" placeholder="例：把存档兼容问题定成「不存在的漏洞」，与复现步骤矛盾。"></textarea>
         </div>
@@ -252,6 +260,7 @@ const I18N = {
     "roster.h":"管理员名册","roster.d":"名册来自仓库里的公开文件，谁在任、谁被撤销、谁记了几次误判，都写在这里，没有隐藏名单。",
     "roster.note":"误判计数由创始人在驳回 Issue 里登记；申诉成立的，创始人可撤销该次记录，撤销理由必须写在同一条 Issue 里。",
     "roster.founder":"最高管理员 · 创始人","roster.seat":"席位 {n}","roster.empty":"空位 · 等你申请","roster.wrong":"误判 {n} / 10","roster.revoked":"已永久取消","roster.vacant":"未填 GitHub",
+    "roster.shared":"两位创始人共用同一个 GitHub 账号 @fsssea（暂无可用的第二个账号），提交时在 Issue 正文写明 F1 或 F2 以示署名；账号相同不代表同一个人。",
     "apply.h":"申请成为管理员","apply.d":"填 GitHub 用户名和一句申请理由，会生成一条申请 Issue；创始人按 Issue 提交顺序审核，前十位通过者入册。",
     "apply.github":"GitHub 用户名","apply.reason":"申请理由","apply.reason.h":"（一句话）","apply.reason.ph":"例：经常看存档报错，能稳定判断是 bug 还是用法问题",
     "apply.agree":"我接受规则：只能定级、不能下架；误判累计超过 10 次永久取消，且不可重新申请。",
@@ -274,6 +283,7 @@ const I18N = {
     "rules.6":"两位创始人是最高管理员，不占席位，负责审核申请、复核定级、执行撤销；他们之间互相复核，不给自己记分。",
     "founder.h":"创始人复核区","founder.d":"最高管理员用下面两条快捷入口登记误判与撤销，全部留痕在 GitHub Issue 里，公开可查。",
     "founder.admin":"管理员 GitHub 用户名","founder.bug":"相关漏洞编号","founder.why":"理由",
+    "founder.signer":"以此身份署名",
     "founder.why.ph":"例：把存档兼容问题定成「不存在的漏洞」，与复现步骤矛盾。",
     "founder.strike":"登记 1 次误判","founder.revoke":"撤销管理员权限",
     "founder.note":"登记后由创始人改 admins.json 的计数；满 11 次把 revoked 置为 true 并重生成页面。",
@@ -291,6 +301,7 @@ const I18N = {
     "roster.h":"管理員名冊","roster.d":"名冊來自倉庫裡的公開檔案，誰在任、誰被撤銷、誰記了幾次誤判，都寫在這裡，沒有隱藏名單。",
     "roster.note":"誤判計數由創始人在駁回 Issue 裡登記；申訴成立的，創始人可撤銷該次紀錄，理由必須寫在同一條 Issue 裡。",
     "roster.founder":"最高管理員 · 創始人","roster.seat":"席位 {n}","roster.empty":"空位 · 等你申請","roster.wrong":"誤判 {n} / 10","roster.revoked":"已永久取消","roster.vacant":"未填 GitHub",
+    "roster.shared":"兩位創始人共用同一個 GitHub 帳號 @fsssea（暫無可用的第二個帳號），提交時在 Issue 正文寫明 F1 或 F2 以示署名；帳號相同不代表同一個人。",
     "apply.h":"申請成為管理員","apply.d":"填 GitHub 使用者名稱和一句申請理由，會產生一條申請 Issue；創始人依 Issue 提交順序審核，前十位通過者入冊。",
     "apply.github":"GitHub 使用者名稱","apply.reason":"申請理由","apply.reason.h":"（一句話）","apply.reason.ph":"例：常看存檔報錯，能穩定判斷是 bug 還是用法問題",
     "apply.agree":"我接受規則：只能定級、不能下架；誤判累計超過 10 次永久取消，且不可重新申請。",
@@ -313,6 +324,7 @@ const I18N = {
     "rules.6":"兩位創始人是最高管理員，不佔席位，負責審核申請、覆核定級、執行撤銷；他們之間互相覆核，不給自己記分。",
     "founder.h":"創始人覆核區","founder.d":"最高管理員用下面兩條快捷入口登記誤判與撤銷，全部留痕在 GitHub Issue 裡，公開可查。",
     "founder.admin":"管理員 GitHub 使用者名稱","founder.bug":"相關漏洞編號","founder.why":"理由",
+    "founder.signer":"以此身分署名",
     "founder.why.ph":"例：把存檔相容問題定成「不存在的漏洞」，與重現步驟矛盾。",
     "founder.strike":"登記 1 次誤判","founder.revoke":"撤銷管理員權限",
     "founder.note":"登記後由創始人改 admins.json 的計數；滿 11 次把 revoked 置為 true 並重新產生頁面。",
@@ -330,6 +342,7 @@ const I18N = {
     "roster.h":"Admin roster","roster.d":"The roster comes from a public file in the repo. Who serves, who was revoked, how many wrong calls — no hidden list.",
     "roster.note":"Wrong calls are logged by a founder in the rejection issue; if an appeal holds, the founder removes that entry and writes why in the same issue.",
     "roster.founder":"Supreme admin · founder","roster.seat":"Seat {n}","roster.empty":"Open seat — apply","roster.wrong":"wrong calls {n} / 10","roster.revoked":"Permanently removed","roster.vacant":"GitHub not set",
+    "roster.shared":"Both founders currently share one GitHub account, @fsssea (no second account is available). Every proposal states F1 or F2 in the issue body as the signer; a shared login does not mean one person.",
     "apply.h":"Apply to be an admin",
     "apply.d":"Enter your GitHub handle and one-line reason; an application issue is created. Founders review in submission order — the first ten approved are seated.",
     "apply.github":"GitHub username","apply.reason":"Why you","apply.reason.h":"(one line)","apply.reason.ph":"e.g. I read crash logs often and can tell a bug from a usage mistake",
@@ -354,6 +367,7 @@ const I18N = {
     "founder.h":"Founder review",
     "founder.d":"Supreme admins use these two shortcuts to log a wrong call or a removal; everything stays in GitHub issues, publicly readable.",
     "founder.admin":"Admin GitHub username","founder.bug":"Related bug ID","founder.why":"Reason",
+    "founder.signer":"Sign as",
     "founder.why.ph":"e.g. Graded a save-compat issue as \"not a bug\" despite clear repro steps.",
     "founder.strike":"Log 1 wrong call","founder.revoke":"Remove admin rights",
     "founder.note":"A founder then edits admins.json counters; at 11, set revoked to true and regenerate the pages.",
@@ -371,6 +385,7 @@ const I18N = {
     "roster.h":"管理者名簿","roster.d":"名簿はリポジトリの公開ファイル。誰が在任、誰が解除、誤判定が何回か、すべてここに載ります。",
     "roster.note":"誤判定は却下 Issue で創設者が記録。異議が認められた場合は同じ Issue に理由を書いて取り消します。",
     "roster.founder":"最高管理者 · 創設者","roster.seat":"席 {n}","roster.empty":"空席 · 申請できます","roster.wrong":"誤判定 {n} / 10","roster.revoked":"永久解除済み","roster.vacant":"GitHub 未登録",
+    "roster.shared":"2 人の創設者は現在、同じ GitHub アカウント @fsssea を共用しています（2 つ目のアカウントがありません）。Issue 本文に F1 / F2 を明記して署名します。同一アカウントは同一人物という意味ではありません。",
     "apply.h":"管理者に応募する",
     "apply.d":"GitHub ユーザー名と一言の理由を入力すると応募 Issue が作られます。創設者が提出順に審査し、先着 10 名が就任。",
     "apply.github":"GitHub ユーザー名","apply.reason":"応募理由","apply.reason.h":"（一言）","apply.reason.ph":"例：クラッシュログをよく見ており、不具合か使い方の問題かを判断できる",
@@ -395,6 +410,7 @@ const I18N = {
     "founder.h":"創設者レビュー",
     "founder.d":"最高管理者は下の 2 つの入口で誤判定と解除を記録。すべて GitHub Issue に残り、公開で確認できます。",
     "founder.admin":"管理者の GitHub ユーザー名","founder.bug":"関連する不具合 ID","founder.why":"理由",
+    "founder.signer":"署名する立場",
     "founder.why.ph":"例：再現手順が明確なセーブ互換問題を「不具合ではない」と格付けした。",
     "founder.strike":"誤判定を 1 回記録","founder.revoke":"管理者権限を解除",
     "founder.note":"記録後、創設者が admins.json の回数を更新。11 回で revoked を true にし、ページを再生成します。",
@@ -412,6 +428,7 @@ const I18N = {
     "roster.h":"관리자 명부","roster.d":"명부는 저장소의 공개 파일입니다. 누가 재임, 누가 해제, 오판 몇 회인지 모두 여기 적힙니다.",
     "roster.note":"오판은 창립자가 반려 Issue 에 기록합니다. 이의가 인정되면 같은 Issue 에 이유를 남기고 그 기록을 취소합니다.",
     "roster.founder":"최고 관리자 · 창립자","roster.seat":"좌석 {n}","roster.empty":"빈 좌석 · 신청 가능","roster.wrong":"오판 {n} / 10","roster.revoked":"영구 해제됨","roster.vacant":"GitHub 미등록",
+    "roster.shared":"두 창립자는 현재 같은 GitHub 계정 @fsssea 를 함께 사용합니다(두 번째 계정이 없음). Issue 본문에 F1 또는 F2 를 적어 서명하며, 같은 계정이라고 해서 같은 사람은 아닙니다.",
     "apply.h":"관리자 신청",
     "apply.d":"GitHub 사용자명과 한 줄 이유를 적으면 신청 Issue 가 만들어집니다. 창립자가 제출 순으로 심사해 선착순 10명이 취임합니다.",
     "apply.github":"GitHub 사용자명","apply.reason":"신청 이유","apply.reason.h":"(한 줄)","apply.reason.ph":"예: 크래시 로그를 자주 보며 버그와 사용법 문제를 구분할 수 있음",
@@ -436,6 +453,7 @@ const I18N = {
     "founder.h":"창립자 검토",
     "founder.d":"최고 관리자는 아래 두 입구로 오판과 해제를 기록합니다. 모두 GitHub Issue 에 남아 공개로 확인됩니다.",
     "founder.admin":"관리자 GitHub 사용자명","founder.bug":"관련 버그 ID","founder.why":"이유",
+    "founder.signer":"서명 주체",
     "founder.why.ph":"예: 재현 절차가 명확한 세이브 호환 문제를 '버그 아님'으로 판정.",
     "founder.strike":"오판 1회 기록","founder.revoke":"관리자 권한 해제",
     "founder.note":"기록 후 창립자가 admins.json 의 횟수를 수정. 11회면 revoked 를 true 로 바꾸고 페이지를 재생성합니다.",
@@ -470,7 +488,7 @@ function detect(){
 function renderFounders(){
   const box = document.getElementById('founders');
   box.innerHTML = (STATE.founders || []).map(f =>
-    '<div class="fcard"><div class="t mono">SUPREME ADMIN</div><div class="n">'+esc(typeof f.name === 'object' ? (f.name[CUR] || f.name['en'] || '') : (f.name || ''))+'</div><div class="g mono">'+(f.github ? '@'+esc(f.github) : esc(t('roster.vacant')))+'</div></div>'
+    '<div class="fcard"><div class="t mono">SUPREME ADMIN</div><div class="n">'+esc(typeof f.name === 'object' ? (f.name[CUR] || f.name['en'] || '') : (f.name || ''))+'</div><div class="g mono">'+(f.github ? '@'+esc(f.github) : esc(t('roster.vacant')))+(f.id ? ' · '+esc(f.id) : '')+'</div></div>'
   ).join('');
 }
 
@@ -573,6 +591,7 @@ function voteBody(admin, bugId, status, why){
     '- Bug: BUG-' + bugId,
     '- 提案 / Proposed status: **' + status + '** (`' + status + '`)',
     '- 管理员 / Admin: @' + admin,
+    '- 署名 / Signed: ' + (signer || 'F1') + '（共用 @fsssea 账号 / shared login）',
     '',
     '### 判断依据 / Reasoning',
     why,
@@ -583,7 +602,7 @@ function voteBody(admin, bugId, status, why){
   ].join('\n');
 }
 
-function founderBody(kind, admin, bug, why){
+function founderBody(kind, admin, bug, why, signer){
   return [
     '### ' + (kind === 'strike' ? '误判记录 / Wrong call' : '撤销权限 / Revoke admin'),
     '',
@@ -653,15 +672,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const admin = document.getElementById('fAdmin').value.trim().replace(/^@/, '');
     const bug = document.getElementById('fBug').value.trim();
     const why = document.getElementById('fWhy').value.trim();
+    const signer = document.getElementById('fSigner').value;
     if (!admin || !why){ toast(t('vote.need')); return; }
-    openIssue('[误判记录] @' + admin + (bug ? ' · ' + bug : ''), founderBody('strike', admin, bug, why), 'admin-strike');
+    openIssue('[误判记录] @' + admin + (bug ? ' · ' + bug : ''), founderBody('strike', admin, bug, why, signer), 'admin-strike');
   });
   document.getElementById('btnRevoke').addEventListener('click', () => {
     const admin = document.getElementById('fAdmin').value.trim().replace(/^@/, '');
     const bug = document.getElementById('fBug').value.trim();
     const why = document.getElementById('fWhy').value.trim();
+    const signer = document.getElementById('fSigner').value;
     if (!admin || !why){ toast(t('vote.need')); return; }
-    openIssue('[撤销管理员] @' + admin, founderBody('revoke', admin, bug, why), 'admin-revoke');
+    openIssue('[撤销管理员] @' + admin, founderBody('revoke', admin, bug, why, signer), 'admin-revoke');
   });
 });
 </script>
