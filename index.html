@@ -3,314 +3,149 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MC工具箱 6.3.3 · 三个版本，三端同步</title>
-<meta name="description" content="MC工具箱 6.3.3：经典版、JAVA 重制版、C++ 重制版三版本并行，包名不同可共存；Android、Windows、Linux 三端全覆盖；brarchive 解析器完成换代，全离线，MIT 开源。">
+<title>MC工具箱 1.0.0 正式版 · 经典版三端同步</title>
+<meta name="description" content="MC工具箱 1.0.0 正式版，第一个公开发布的版本。经典版 Android / Windows / Linux 三端同步，存档 level.dat 直接翻成英文代码，长字段自动换行，db 文件级编辑；全离线，MIT 开源。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23101820'/%3E%3Cpath d='M8 11l8-4 8 4v10l-8 4-8-4z' fill='none' stroke='%23e9eff6' stroke-width='2'/%3E%3Cpath d='M8 11l8 4 8-4M16 15v10' fill='none' stroke='%231859d8' stroke-width='2'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://miaoda.feishu.cn">
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
 :root{
-  --paper:#e8edf3;
-  --paper-2:#dfe6ee;
-  --ink:#101820;
-  --muted:#5b6875;
-  --line:#aeb9c5;
-  --blue:#1859d8;
-  --blue-deep:#0f3f9e;
-  --amber:#c07a1c;
-  --panel:#111a24;
-  --panel-2:#0b131b;
-  --panel-fg:#e9f0f7;
-  --panel-muted:#9fb0c1;
-  --panel-line:#2b3947;
-  --ok:#3f9d6a;
-  --max:1180px;
+  --paper:#e8edf3;--ink:#101820;--muted:#5b6875;--line:#aeb9c5;
+  --blue:#1859d8;--blue-deep:#0f3f9e;--panel:#111a24;--panel-fg:#e9f0f7;
+  --panel-muted:#9fb0c1;--panel-line:#2b3947;--ok:#3f9d6a;--max:1180px;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{
-  margin:0;background:var(--paper);color:var(--ink);
-  font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
-  font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;
-}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
 .mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace}
 a{color:inherit}
-button{font:inherit;color:inherit}
 img{max-width:100%;height:auto;display:block}
-.wrap{max-width:var(--max);margin:0 auto;padding:0 28px}
-.skip{position:absolute;left:-999px;top:0;background:var(--ink);color:#fff;padding:10px 16px;z-index:100}
-.skip:focus{left:12px}
 ::selection{background:var(--blue);color:#fff}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 28px}
+.skip{position:absolute;left:-999px;background:var(--ink);color:#fff;padding:10px 16px;z-index:100}
+.skip:focus{left:12px}
 
-/* ===== 顶部导航 ===== */
 .nav{position:sticky;top:0;z-index:20;background:rgba(232,237,243,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .nav-in{max-width:var(--max);margin:0 auto;padding:0 28px;height:64px;display:flex;align-items:center;gap:28px}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex:0 0 auto}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
 .brand svg{width:27px;height:27px}
-.brand b{font-weight:900;letter-spacing:.3px;font-size:17px}
+.brand b{font-weight:900;font-size:17px}
 .brand span{font-size:11px;color:var(--muted);border-left:1px solid var(--line);padding-left:9px;letter-spacing:.12em}
 .navlinks{display:flex;gap:22px;margin-left:auto;font-size:14px}
 .navlinks a{text-decoration:none;color:#2c3742;padding:4px 0;border-bottom:2px solid transparent}
 .navlinks a:hover{border-color:var(--ink)}
-.nav-cta{flex:0 0 auto;text-decoration:none;background:var(--ink);color:var(--paper);font-size:13px;font-weight:700;padding:9px 16px;border-radius:3px}
+.nav-cta{text-decoration:none;background:var(--ink);color:var(--paper);font-size:13px;font-weight:700;padding:9px 16px;border-radius:3px}
 .nav-cta:hover{background:var(--blue)}
-.mobile-only{display:none}
-@media (max-width:860px){
-  .navlinks{display:none}
-  .brand span{display:none}
-  .mobile-only{display:inline-flex;align-items:center;text-decoration:none;font-size:13px;padding:8px 12px;
-    border:1px solid var(--line);border-radius:3px;color:var(--ink)}
-  .mobile-only + .mobile-only{background:var(--ink);color:var(--paper);border-color:var(--ink);font-weight:700}
-}
+@media(max-width:860px){.navlinks{display:none}.brand span{display:none}}
 
-/* ===== HERO ===== */
 .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
-.grid-bg{
-  position:absolute;inset:0;pointer-events:none;
-  background-image:
-    linear-gradient(rgba(16,24,32,.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(16,24,32,.055) 1px, transparent 1px),
-    linear-gradient(rgba(16,24,32,.09) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(16,24,32,.09) 1px, transparent 1px);
+.grid-bg{position:absolute;inset:0;pointer-events:none;background-image:
+  linear-gradient(rgba(16,24,32,.055) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(16,24,32,.055) 1px,transparent 1px),
+  linear-gradient(rgba(16,24,32,.09) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(16,24,32,.09) 1px,transparent 1px);
   background-size:24px 24px,24px 24px,120px 120px,120px 120px;
-  mask-image:linear-gradient(90deg,#000 0%,#000 62%,transparent 100%);
-}
-.hero-in{position:relative;max-width:var(--max);margin:0 auto;padding:74px 28px 64px;display:grid;grid-template-columns:minmax(0,1.18fr) minmax(360px,.82fr);gap:56px;align-items:center}
-.kicker{display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.1em;color:var(--muted);margin:0 0 22px}
+  mask-image:linear-gradient(90deg,#000 0%,#000 62%,transparent 100%)}
+.hero-in{position:relative;max-width:var(--max);margin:0 auto;padding:72px 28px 62px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(340px,.85fr);gap:52px;align-items:center}
+.kicker{display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.1em;color:var(--muted);margin:0 0 22px;flex-wrap:wrap}
 .kicker .dot{width:7px;height:7px;background:var(--ok);border-radius:50%}
 .kicker .sep{width:1px;height:14px;background:var(--line)}
-h1{font-size:clamp(40px,5.4vw,68px);line-height:1.14;font-weight:900;letter-spacing:-.035em;margin:0 0 22px;max-width:13em}
+h1{font-size:clamp(38px,5vw,64px);line-height:1.14;font-weight:900;letter-spacing:-.035em;margin:0 0 22px}
 h1 em{font-style:normal;color:var(--blue);white-space:nowrap}
-.lead{font-size:17px;line-height:1.9;color:#31404c;max-width:34em;margin:0 0 30px}
-.actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;text-decoration:none;border:1px solid transparent;border-radius:3px;padding:13px 22px;font-size:14px;font-weight:700;cursor:pointer}
+.lead{font-size:17px;line-height:1.9;color:#31404c;max-width:34em;margin:0 0 28px}
+.actions{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:9px;text-decoration:none;border:1px solid transparent;border-radius:3px;padding:13px 22px;font-size:14px;font-weight:700}
 .btn.pri{background:var(--blue);color:#fff;box-shadow:4px 4px 0 #0b2c63}
-.btn.pri:hover{background:var(--blue-deep);transform:translate(-1px,-1px);box-shadow:5px 5px 0 #0b2c63}
-.btn.sec{background:transparent;border-color:var(--ink);color:var(--ink)}
+.btn.pri:hover{background:var(--blue-deep)}
+.btn.sec{border-color:var(--ink);color:var(--ink)}
 .btn.sec:hover{background:var(--ink);color:var(--paper)}
-.btn.small{padding:8px 13px;font-size:12px;font-weight:600}
-.btn[disabled]{opacity:.55;cursor:not-allowed;box-shadow:none}
 .hero-meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:22px;font-size:12px;color:var(--muted)}
 .hero-meta span{display:flex;align-items:center;gap:6px}
 .hero-meta svg{width:14px;height:14px;stroke:var(--muted)}
 
-/* 发布清单 */
 .manifest{background:var(--panel);color:var(--panel-fg);border:1px solid #0a1119;box-shadow:10px 10px 0 rgba(16,24,32,.13);position:relative}
 .manifest::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:var(--blue)}
 .m-head{padding:18px 20px 15px;border-bottom:1px solid var(--panel-line);display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-.m-title{font-size:11px;letter-spacing:.14em;color:var(--panel-muted)}
-.m-ver{font-family:"IBM Plex Mono",monospace;font-size:24px;font-weight:600;line-height:1.2;margin-top:4px}
-.m-build{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--panel-muted);line-height:1.7}
-.m-build b{display:block;color:var(--panel-fg);font-size:12px;font-weight:500}
-.m-rows{list-style:none;margin:0;padding:4px 0}
-.m-row{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:11px;align-items:center;padding:13px 20px;border-bottom:1px solid var(--panel-line)}
+.m-title{font-size:10px;letter-spacing:.18em;color:var(--panel-muted)}
+.m-ver{font-size:34px;font-weight:900;letter-spacing:-.02em;line-height:1.2}
+.m-build{font-size:10px;color:var(--panel-muted);text-align:right;line-height:1.9}
+.m-build b{display:block;font-size:22px;color:#fff}
+.m-rows{list-style:none;margin:0;padding:6px 0}
+.m-row{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:12px;align-items:center;padding:11px 20px;border-bottom:1px solid rgba(43,57,71,.55)}
 .m-row:last-child{border-bottom:0}
-.m-ico{width:34px;height:34px;border:1px solid var(--panel-line);display:flex;align-items:center;justify-content:center;color:#cfe0f1}
-.m-ico svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8}
-.m-name{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;min-width:0}
-.m-note{font-size:11px;color:var(--panel-muted);font-family:"IBM Plex Mono",monospace;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.m-a{color:#fff;text-decoration:none;font-size:11px;font-weight:700;border:1px solid #425567;padding:6px 11px;border-radius:2px;white-space:nowrap}
-.m-a:hover{border-color:#fff;background:#1b2a38}
-.m-foot{padding:12px 20px;border-top:1px solid var(--panel-line);font-size:11px;color:var(--panel-muted);display:flex;justify-content:space-between;gap:10px}
-.m-foot a{color:#bfd8ff}
+.m-ico{color:#8fb8ff}
+.m-ico svg{width:22px;height:22px;stroke:#8fb8ff;fill:none;stroke-width:1.6}
+.m-name{font-size:13px;font-weight:700}
+.m-note{font-size:11px;color:var(--panel-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-a{font-size:11px;text-decoration:none;color:#8fb8ff;border:1px solid var(--panel-line);padding:4px 9px;border-radius:2px;white-space:nowrap}
+.m-a:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.m-foot{padding:11px 20px;border-top:1px solid var(--panel-line);font-size:11px;color:var(--panel-muted);display:flex;justify-content:space-between;gap:10px}
+.m-foot a{color:#8fb8ff;text-decoration:none}
+@media(max-width:900px){.hero-in{grid-template-columns:1fr;padding-top:48px}}
 
-/* ===== 章节 ===== */
-section{padding:78px 0}
-.sec-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr);gap:36px;align-items:end;margin-bottom:38px}
-.sec-label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;color:var(--blue);margin-bottom:12px}
-h2{font-size:clamp(30px,3.6vw,46px);line-height:1.24;font-weight:900;letter-spacing:-.025em;margin:0}
-.sec-desc{color:var(--muted);font-size:15px;line-height:1.9;margin:0;padding-bottom:4px}
+.flow{border-bottom:1px solid var(--line);background:var(--paper-2,#dfe6ee)}
+.flow-in{max-width:var(--max);margin:0 auto;padding:14px 28px;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);overflow-x:auto}
+.flow-step{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.flow-step i{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:10px;color:#fff;background:var(--ink);width:18px;height:18px;display:grid;place-items:center;border-radius:50%}
+.flow-arrow{flex:0 0 26px;height:1px;background:var(--line);position:relative}
+.flow-arrow::after{content:"";position:absolute;right:0;top:-2px;border:3px solid transparent;border-left-color:var(--line)}
 
-/* 能力网格 */
-.features{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px}
-.feat{border:1px solid var(--line);background:rgba(255,255,255,.26);padding:26px 26px 24px;position:relative;min-width:0}
-.feat.dark{background:var(--panel);color:var(--panel-fg);border-color:#0a1119}
-.feat.blue{background:var(--blue);color:#fff;border-color:var(--blue-deep)}
-.feat .tag{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.08em;padding:3px 7px;border:1px solid currentColor;opacity:.72;margin-bottom:18px}
-.feat h3{font-size:22px;line-height:1.35;margin:0 0 10px;font-weight:700;letter-spacing:-.01em}
-.feat p{margin:0;font-size:14px;line-height:1.85;color:#3e4c58}
-.feat.dark p{color:var(--panel-muted)}
-.feat.blue p{color:#dbe7ff}
-.feat .more{display:inline-flex;align-items:center;gap:7px;margin-top:18px;font-size:12px;font-weight:600;text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:2px}
-.feat svg.art{width:100%;height:auto;margin-top:20px;display:block}
-.f1{grid-column:span 7}
-.f2{grid-column:span 5}
-.f3,.f4,.f5{grid-column:span 4}
-.f6{grid-column:span 8}
-.f7{grid-column:span 4}
-.big-num{font-family:"IBM Plex Mono",monospace;font-size:52px;line-height:1;font-weight:600;margin:8px 0 0;letter-spacing:-.04em}
-.big-num span{font-size:13px;letter-spacing:0;font-weight:400;color:var(--panel-muted);display:block;margin-top:8px;font-family:"Noto Sans SC",sans-serif}
+section{padding:64px 0}
+.sec-head{display:flex;justify-content:space-between;gap:40px;align-items:flex-end;margin-bottom:32px;flex-wrap:wrap}
+.sec-label{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.18em;color:var(--blue);margin-bottom:10px}
+h2{font-size:clamp(26px,3.4vw,40px);line-height:1.3;font-weight:900;letter-spacing:-.02em;margin:0}
+.sec-desc{font-size:14px;color:var(--muted);max-width:30em;margin:0}
 
-/* 流程条 */
-.flow{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--paper-2)}
-.flow-in{max-width:var(--max);margin:0 auto;padding:22px 28px;display:grid;grid-template-columns:auto 1fr auto 1fr auto 1fr auto;gap:14px;align-items:center;font-size:13px}
-.flow-step{display:flex;align-items:center;gap:9px;font-weight:600;white-space:nowrap}
-.flow-step i{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:10px;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--ink);border-radius:50%}
-.flow-arrow{height:1px;background:var(--line);position:relative}
-.flow-arrow::after{content:"";position:absolute;right:0;top:-3px;border:3.5px solid transparent;border-left-color:var(--line)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{border:1px solid var(--line);background:#f1f5f9;padding:22px}
+.card .tag{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;color:var(--blue);margin-bottom:12px;display:block}
+.card h3{font-size:19px;margin:0 0 10px;font-weight:900}
+.card p{font-size:13px;color:#3a4854;margin:0}
+.card ul{margin:12px 0 0;padding-left:18px;font-size:13px;color:var(--muted)}
+.card li{margin-bottom:4px}
+.card .shot{border:1px solid var(--line);margin-top:16px;background:#fff}
+@media(max-width:960px){.cards{grid-template-columns:1fr}}
 
-/* 平台 */
-.platform{background:var(--panel);color:var(--panel-fg);position:relative;overflow:hidden}
-.platform .grid-bg{mask-image:linear-gradient(90deg,transparent,#000 30%,#000 70%,transparent);background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:32px 32px}
-.platform .wrap{position:relative}
-.platform .sec-label{color:#8fb8ff}
-.platform .sec-desc{color:#a9b8c6}
-.plat-table{border:1px solid var(--panel-line);border-bottom:0}
-.plat-row{display:grid;grid-template-columns:minmax(180px,1.1fr) minmax(170px,.9fr) minmax(200px,1fr) auto;gap:20px;align-items:center;padding:18px 22px;border-bottom:1px solid var(--panel-line)}
-.plat-row.head{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;color:#8ea0b2;padding:11px 22px;background:rgba(255,255,255,.03)}
-.plat-name{display:flex;align-items:center;gap:12px;font-weight:700;font-size:16px;min-width:0}
-.plat-name svg{width:24px;height:24px;stroke:#cfe0f1;fill:none;stroke-width:1.7;flex:0 0 auto}
-.plat-name small{display:block;font-size:11px;color:var(--panel-muted);font-weight:400;margin-top:1px}
-.plat-spec{font-family:"IBM Plex Mono",monospace;font-size:12px;color:#c4d2df;line-height:1.7;min-width:0}
-.plat-req{font-size:12px;color:var(--panel-muted);line-height:1.65;min-width:0}
-.plat-act{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
-.p-btn{text-decoration:none;font-size:11px;font-weight:700;padding:7px 11px;border:1px solid #425567;border-radius:2px;white-space:nowrap}
-.p-btn:hover{background:#1b2a38;border-color:#fff}
-.p-btn.main{background:var(--blue);border-color:var(--blue);color:#fff}
-.p-btn.main:hover{background:var(--blue-deep);border-color:var(--blue-deep)}
-.plat-note{margin-top:14px;font-size:11px;color:#8ea0b2;line-height:1.8}
+.shotfig{margin:0;border:1px solid var(--line);background:#fff;box-shadow:8px 8px 0 rgba(16,24,32,.08)}
+.shotfig img{width:100%}
+.shotfig figcaption{font-size:12px;color:var(--muted);padding:10px 14px;border-top:1px solid var(--line);background:var(--paper)}
 
-/* 网页版 */
-.web{background:var(--paper)}
-.web-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:52px;align-items:center}
-.browser{border:1px solid var(--ink);background:#f7f9fb;box-shadow:8px 8px 0 rgba(16,24,32,.12)}
-.b-bar{height:38px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:6px;padding:0 12px;background:var(--paper-2)}
-.b-dot{width:8px;height:8px;border-radius:50%;background:#9aa8b5}
-.b-url{margin-left:10px;flex:1;font-family:"IBM Plex Mono",monospace;font-size:10px;color:#5b6875;background:#fff;border:1px solid var(--line);padding:3px 9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.browser img{width:100%;aspect-ratio:1200/500;object-fit:cover;object-position:top left;border:0}
-.web-copy h3{font-size:26px;margin:0 0 12px;font-weight:700}
-.web-copy p{color:#3e4c58;font-size:14px;line-height:1.9;margin:0 0 12px}
-.web-list{margin:18px 0 24px;padding:0;list-style:none;font-size:13px;color:#34424e}
-.web-list li{padding:6px 0 6px 22px;position:relative}
-.web-list li::before{content:"";position:absolute;left:2px;top:14px;width:8px;height:8px;border:1px solid var(--blue);transform:rotate(45deg)}
-.web-note{font-size:11px;color:var(--muted);border-left:2px solid var(--amber);padding-left:10px;line-height:1.8;margin-top:14px}
+.versions{background:var(--panel);color:var(--panel-fg);border-top:1px solid #0a1119;border-bottom:1px solid #0a1119}
+.versions .sec-label{color:#8fb8ff}
+.versions h2{color:#fff}
+.versions .sec-desc{color:var(--panel-muted)}
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px}
+.vbox{border:1px solid var(--panel-line);padding:26px;background:rgba(255,255,255,.02)}
+.vbox .mono{font-size:10px;letter-spacing:.16em;color:#8fb8ff}
+.vbox h3{margin:8px 0 10px;font-size:24px;color:#fff}
+.vbox p{font-size:13px;color:var(--panel-muted);margin:0}
+.vbox .big{font-size:56px;font-weight:900;line-height:1.1;letter-spacing:-.03em;margin:6px 0 4px;color:#fff}
+.vbox small{display:block;font-size:12px;color:var(--panel-muted)}
+.table{margin-top:26px;border:1px solid var(--panel-line)}
+.trow{display:grid;grid-template-columns:110px 1fr auto;gap:14px;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(43,57,71,.6);font-size:13px}
+.trow:last-child{border-bottom:0}
+.trow .os{font-weight:700;color:#fff}
+.trow .f{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--panel-muted);word-break:break-all}
+.trow a{color:#8fb8ff;text-decoration:none;border:1px solid var(--panel-line);padding:6px 12px;border-radius:2px;font-size:12px;white-space:nowrap}
+.trow a:hover{background:var(--blue);border-color:var(--blue);color:#fff}
+@media(max-width:860px){.vgrid{grid-template-columns:1fr}.trow{grid-template-columns:1fr;gap:6px}}
 
-/* FAQ */
-.faq{background:var(--paper-2);border-top:1px solid var(--line)}
-.faq-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:52px;align-items:start}
-.faq-list{border-top:1px solid var(--line)}
-.faq-list details{border-bottom:1px solid var(--line);padding:16px 0}
-.faq-list summary{cursor:pointer;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between;gap:20px}
-.faq-list summary::-webkit-details-marker{display:none}
-.faq-list summary::after{content:"+";font-family:"IBM Plex Mono",monospace;font-weight:400;color:var(--muted)}
-.faq-list details[open] summary::after{content:"−"}
-.faq-list p{margin:10px 0 0;font-size:13px;line-height:1.9;color:#4a5865;max-width:44em}
-.faq-side{border:1px solid var(--line);background:rgba(255,255,255,.34);padding:26px}
-.faq-side h3{font-size:19px;margin:0 0 10px}
-.faq-side p{font-size:13px;line-height:1.9;color:#42505c;margin:0 0 18px}
-.faq-side .btn{width:100%}
+.faq{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.faq details{border:1px solid var(--line);background:#f1f5f9;padding:0}
+.faq summary{cursor:pointer;padding:16px 18px;font-weight:700;font-size:14px;list-style:none;display:flex;justify-content:space-between;gap:12px}
+.faq summary::after{content:"+";color:var(--blue);font-family:"IBM Plex Mono",monospace}
+.faq details[open] summary::after{content:"–"}
+.faq details p{margin:0;padding:0 18px 16px;font-size:13px;color:#3a4854}
+@media(max-width:860px){.faq{grid-template-columns:1fr}}
 
-/* 页脚 */
-footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
-.foot-in{max-width:var(--max);margin:0 auto;padding:0 28px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr) minmax(0,.7fr);gap:28px}
-.foot-brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:17px;color:#fff}
-.foot-brand svg{width:26px;height:26px}
-.foot-note{font-size:12px;color:#94a6b7;line-height:1.9;margin-top:8px;max-width:30em}
-.foot-col b{display:block;font-size:11px;letter-spacing:.12em;color:#7f93a6;margin-bottom:9px;font-family:"IBM Plex Mono",monospace}
-.foot-col a{display:block;font-size:12px;color:#c5d4e1;text-decoration:none;padding:3px 0}
-.foot-col a:hover{color:#fff}
-.foot-base{max-width:var(--max);margin:28px auto 0;padding:16px 28px 0;border-top:1px solid #263442;display:flex;justify-content:space-between;gap:16px;font-size:11px;color:#7f93a6;flex-wrap:wrap}
+.open{background:var(--paper-2,#dfe6ee);border-top:1px solid var(--line)}
+.open .wrap{display:flex;justify-content:space-between;gap:32px;align-items:center;flex-wrap:wrap}
+.open h2{font-size:26px;margin-bottom:6px}
+.open p{margin:0;font-size:13px;color:var(--muted)}
 
-/* 响应式 */
-@media (max-width:980px){
-  .hero-in{grid-template-columns:1fr;gap:34px;padding-top:52px}
-  .grid-bg{mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 100%)}
-  .manifest{max-width:560px}
-  .sec-head{grid-template-columns:1fr;gap:12px}
-  .features{grid-template-columns:repeat(6,minmax(0,1fr))}
-  .f1,.f2,.f6{grid-column:span 6}
-  .f3,.f4,.f5,.f7{grid-column:span 3}
-  .web-grid,.faq-grid{grid-template-columns:1fr;gap:30px}
-  .plat-row{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:10px 18px}
-  .plat-row.head{display:none}
-  .plat-req{grid-column:1}
-  .plat-act{grid-column:2;grid-row:2;justify-content:flex-start}
-}
-@media (max-width:680px){
-  .wrap,.nav-in,.hero-in,.flow-in,.foot-in,.foot-base{padding-left:18px;padding-right:18px}
-  .navlinks,.nav-cta{display:none}
-  .mobile-only{display:block;margin-left:auto;font-size:12px;text-decoration:none;border:1px solid var(--ink);padding:7px 11px}
-  h1{font-size:37px;line-height:1.2}
-  .lead{font-size:15px}
-  .hero-in{padding-top:40px;padding-bottom:44px}
-  .manifest{max-width:none}
-  .m-row{padding:11px 14px;grid-template-columns:34px minmax(0,1fr) auto}
-  .features{grid-template-columns:1fr}
-  .f1,.f2,.f3,.f4,.f5,.f6,.f7{grid-column:span 1}
-  .feat{padding:22px 20px}
-  section{padding:56px 0}
-  .flow-in{display:none}
-  .plat-row{padding:16px 14px}
-  .plat-row{grid-template-columns:1fr}
-  .plat-act{grid-column:1;grid-row:auto;justify-content:flex-start;margin-top:4px}
-  .plat-req{grid-column:1}
-  .foot-in{grid-template-columns:1fr;gap:20px}
-  .browser img{aspect-ratio:auto}
-}
-@media (prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  *{transition:none!important;animation:none!important}
-}
-
-/* ===== 三版本矩阵（位于深色平台区） ===== */
-.vm-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
-.vm-card{position:relative;background:rgba(255,255,255,.045);border:1px solid var(--panel-line);padding:24px 22px 18px;display:flex;flex-direction:column;color:var(--panel-fg)}
-.vm-card::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:#2b3947}
-.vm-card.emph{background:#0b131b;border-color:#3a5473;box-shadow:8px 8px 0 rgba(0,0,0,.3)}
-.vm-card.emph::before{background:var(--blue)}
-.vm-tag{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;color:#8fb8ff;border:1px solid #3a5473;padding:3px 6px;margin-bottom:12px}
-.vm-head h3{font-size:23px;margin:0 0 8px;font-weight:900;letter-spacing:-.01em;color:var(--panel-fg)}
-.vm-head p{font-size:13px;line-height:1.8;color:var(--panel-muted);margin:0 0 16px;min-height:4.2em}
-.vm-rows{margin:0;padding:0;border-top:1px solid var(--panel-line);flex:1}
-.vm-rows>div{display:flex;flex-direction:column;gap:7px;padding:12px 0;border-bottom:1px solid var(--panel-line)}
-.vm-rows>div:last-child{border-bottom:0}
-.vm-rows dt{font-size:12px;font-weight:700;letter-spacing:.06em;color:#cfe0f1}
-.vm-rows dd{margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.vm-rows dd .mono{font-size:11px;color:var(--panel-muted);flex:1;min-width:110px}
-.vm-rows dd .p-btn{padding:5px 10px;font-size:11px}
-@media (max-width:900px){.vm-grid{grid-template-columns:1fr}}
-
-/* ===== 更新日志 ===== */
-.log{border-left:2px solid var(--line);margin:0;padding:0 0 0 22px;list-style:none}
-.log li{position:relative;padding:0 0 22px}
-.log li::before{content:"";position:absolute;left:-28px;top:6px;width:9px;height:9px;border:2px solid var(--blue);background:var(--paper);border-radius:50%}
-.log .when{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);letter-spacing:.08em}
-.log .what{font-size:16px;font-weight:700;margin:3px 0 6px;color:var(--ink)}
-.log p{margin:0;font-size:13.5px;line-height:1.85;color:var(--muted)}
-.badge-brk{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;color:#fff;background:var(--amber);padding:2px 6px;margin-left:8px;vertical-align:2px}
-.callout{border:1px solid var(--line);border-left:4px solid var(--blue);background:rgba(255,255,255,.4);padding:18px 20px;margin-top:26px}
-.callout b{display:block;font-size:13px;letter-spacing:.06em;margin-bottom:6px}
-.callout p{margin:0;font-size:13.5px;line-height:1.85;color:#31404c}
-.promise{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:26px}
-.promise div{border:1px solid var(--line);padding:16px 18px;background:rgba(255,255,255,.3)}
-.promise b{display:block;font-size:14px;margin-bottom:4px}
-.promise span{font-size:12.5px;color:var(--muted);line-height:1.8}
-@media (max-width:900px){.vm-grid{grid-template-columns:1fr}}
-.p-btn.disabled{opacity:.45;cursor:not-allowed;border-color:#3a5473!important;color:#8ea0b2!important;background:transparent!important}
-
-/* ===== 版本快跳（手机端一眼看到三个版本） ===== */
-.vjump{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:14px 0 0}
-.vjump .lead-txt{font-size:12px;color:var(--muted);margin-right:2px}
-.vjump a{display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:12.5px;font-weight:700;
-  border:1px solid var(--line);background:#fff;color:var(--ink);padding:8px 12px;border-radius:3px}
-.vjump a:hover{border-color:var(--blue);color:var(--blue)}
-.vjump a i{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--blue)}
-.vjump a.jv i,.vjump a.cp i{color:var(--amber)}
-.vjump a small{font-weight:400;font-size:11px;color:var(--muted)}
-.vm-card{scroll-margin-top:80px}
-@media (max-width:640px){
-  .vjump{padding-top:10px}
-  .vjump .lead-txt{width:100%;margin-bottom:2px}
-  .vjump a{flex:1 1 30%;justify-content:center;padding:10px 8px;font-size:12px}
-  .vjump a small{display:none}
-}
-.kicker .k-grp{white-space:nowrap}
-@media (max-width:640px){
-  .kicker{font-size:11px;gap:8px;line-height:1.9;flex-wrap:wrap}
-  .kicker .sep{display:none}
-  .kicker .dot{margin-right:2px}
-}
-:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:12px;color:var(--muted)}
+.foot-in{max-width:var(--max);margin:0 auto;padding:0 28px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.foot-in a{text-decoration:none;color:#3a4854}
+.foot-in a:hover{color:var(--blue)}
 </style>
 </head>
 <body>
@@ -320,19 +155,16 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
   <div class="nav-in">
     <a class="brand" href="#top" aria-label="MC工具箱首页">
       <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 10l10-5 10 5v12l-10 5-10-5z" fill="none" stroke="#101820" stroke-width="2"/><path d="M6 10l10 5 10-5M16 15v12" fill="none" stroke="#1859d8" stroke-width="2"/></svg>
-      <b>MC工具箱</b><span class="mono">v6.3.3</span>
+      <b>MC工具箱</b><span class="mono">v1.0.0</span>
     </a>
     <nav class="navlinks" aria-label="主导航">
-      <a href="#features">功能</a>
-      <a href="#versions">版本</a>
-      <a href="#platforms">平台</a>
-      <a href="#web">网页版</a>
+      <a href="#changes">更新</a>
+      <a href="#versions">下载</a>
+      <a href="#numbering">版本号</a>
       <a href="#faq">说明</a>
-      <a href="#open-source">开源</a>
+      <a href="#open">开源</a>
     </nav>
-    <a class="nav-cta" href="#platforms">下载</a>
-    <a class="mobile-only" href="#versions">版本</a>
-    <a class="mobile-only" href="#platforms">下载</a>
+    <a class="nav-cta" href="#versions">下载 1.0.0</a>
   </div>
 </header>
 
@@ -341,46 +173,46 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
     <div class="grid-bg" aria-hidden="true"></div>
     <div class="hero-in">
       <div>
-        <p class="kicker mono"><span class="dot"></span><span class="k-grp">6.3.3 已发布</span><span class="sep"></span><span class="k-grp">三版本并行</span><span class="sep"></span><span class="k-grp">解析器换代</span><span class="sep"></span><span class="k-grp">MIT 开源</span></p>
-        <h1>三个版本，<br>打通<em>基岩</em>与 <em>Java</em>。</h1>
-        <p class="lead">经典版、JAVA 重制版、C++ 重制版——包名不同，可以同时装在一台机器上；三版共用同一个 brarchive 内核，产出的包互相都能解开。存档互转、附加包与模组互转、脚本模拟、汉化、皮肤与披风制作，全部在本地完成。</p>
+        <p class="kicker mono"><span class="dot"></span><span>今日正式发布</span><span class="sep"></span><span>经典版 · 三端同步</span><span class="sep"></span><span>MIT 开源</span></p>
+        <h1>MC工具箱 <em>1.0.0</em><br>正式版，今天见。</h1>
+        <p class="lead">这是第一个公开发布的版本。经典版覆盖 Android、Windows、Linux 三端，共用同一个解析器与同一份 <span class="mono">assets_app.js</span>。存档里的 <span class="mono">level.dat</span> 不用再对着一串十进制字节看，直接翻成英文代码，改完保存自动编码回二进制。全离线，不联网也能用。</p>
         <div class="actions">
-          <a class="btn pri" href="#platforms">选择版本下载 <span class="mono" style="font-weight:400">· 三版 × 三端</span></a>
-          <a class="btn sec" id="open-web" data-web href="./app/index.html">打开网页版</a>
+          <a class="btn pri" href="#versions">下载 1.0.0 <span class="mono" style="font-weight:400">· 三端</span></a>
+          <a class="btn sec" href="#changes">看这次改了什么</a>
         </div>
         <div class="hero-meta mono">
-          <span><svg viewBox="0 0 24 24"><path d="M12 3l8 4v6c0 4.5-3.5 7.5-8 8-4.5-.5-8-3.5-8-8V7z" fill="none" stroke-width="1.8"/></svg>安装包已签名</span>
-          <span><svg viewBox="0 0 24 24"><path d="M4 7h16v13H4zM4 7l3-4h10l3 4M9 12h6" fill="none" stroke-width="1.8"/></svg>离线可用</span>
-          <span><svg viewBox="0 0 24 24"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5" fill="none" stroke-width="1.8"/></svg>Android · Windows · Linux，三版全覆盖</span>
+          <span>2026-11-22</span>
+          <span>PUBLIC BUILD 1</span>
+          <span>Android · Windows · Linux</span>
         </div>
       </div>
 
-      <aside class="manifest" aria-label="6.3.0 发布清单">
+      <aside class="manifest" aria-label="1.0.0 发布清单">
         <div class="m-head">
           <div>
             <div class="m-title mono">RELEASE MANIFEST</div>
-            <div class="m-ver">6.3.3</div>
+            <div class="m-ver">1.0.0</div>
           </div>
-          <div class="m-build">BUILD<b>80</b>2026-11-22</div>
+          <div class="m-build">BUILD<b>1</b>2026-11-22</div>
         </div>
         <ul class="m-rows">
           <li class="m-row">
             <div class="m-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8h8v8H8z"/></svg></div>
-            <div style="min-width:0"><div class="m-name">经典版 <span class="mono" style="font-size:10px;color:#8fb8ff">CLASSIC</span></div><div class="m-note">com.mctoolbox.classic · 网页套壳 · 体积最小</div></div>
-            <a class="m-a" data-dl="apk" href="#">下载</a>
+            <div style="min-width:0"><div class="m-name">Android · APK</div><div class="m-note">com.doubao.mctoolbox · 覆盖安装即可</div></div>
+            <a class="m-a" href="./dl/MC-Toolbox-Classic-1.0.0-android.apk" download>下载</a>
           </li>
           <li class="m-row">
-            <div class="m-ico"><svg viewBox="0 0 24 24"><path d="M6 4h9l3 3v13H6z"/><path d="M15 4v3h3"/></svg></div>
-            <div style="min-width:0"><div class="m-name">JAVA 重制版 <span class="mono" style="font-size:10px;color:#8fb8ff">REMADE</span></div><div class="m-note">com.mctoolbox.java · Swing 界面 · 与经典版共存</div></div>
-            <a class="m-a" data-dl="javaWin" href="#">下载</a>
+            <div class="m-ico"><svg viewBox="0 0 24 24"><path d="M3 5h18v11H3zM8 20h8"/><path d="M3 5l2-2h14l2 2"/></svg></div>
+            <div style="min-width:0"><div class="m-name">Windows · ZIP</div><div class="m-note">解压即用 · 无需安装</div></div>
+            <a class="m-a" href="./dl/MC-Toolbox-Windows-1.0.0.zip" download>下载</a>
           </li>
           <li class="m-row">
-            <div class="m-ico"><svg viewBox="0 0 24 24"><path d="M8 6l-4 6 4 6M16 6l4 6-4 6"/></svg></div>
-            <div style="min-width:0"><div class="m-name">C++ 重制版 <span class="mono" style="font-size:10px;color:#8fb8ff">POWERED</span></div><div class="m-note">com.mctoolbox.cpp · 原生 GTK · 批量并行</div></div>
-            <a class="m-a" data-dl="cppWin" href="#">下载</a>
+            <div class="m-ico"><svg viewBox="0 0 24 24"><path d="M4 5h16v10H4zM2 19h20"/><path d="M9 9l-2 2 2 2M15 9l2 2-2 2"/></svg></div>
+            <div style="min-width:0"><div class="m-name">Linux · TAR.GZ / DEB</div><div class="m-note">x64 · 免安装或 dpkg 安装</div></div>
+            <a class="m-a" href="./dl/MC-Toolbox-Linux-1.0.0.tar.gz" download>下载</a>
           </li>
         </ul>
-        <div class="m-foot"><span>经典版三端齐备 · JAVA / C++ 桌面端已发布</span><a href="#open-source">查看源码</a></div>
+        <div class="m-foot"><span>经典版三端齐备 · JAVA / C++ 重制版内部开发中</span><a href="#numbering">为什么是 1.0.0</a></div>
       </aside>
     </div>
   </section>
@@ -394,432 +226,179 @@ footer{background:var(--ink);color:#dbe4ec;padding:42px 0 30px}
     </div>
   </div>
 
-  <div class="wrap">
-    <nav class="vjump" aria-label="版本快跳">
-      <span class="lead-txt">三个版本都在这里：</span>
-      <a class="cl" href="#v-classic"><i>CLASSIC</i>经典版<small>已发布</small></a>
-      <a class="jv" href="#v-java"><i>JAVA</i>JAVA 重制版<small>包名独立</small></a>
-      <a class="cp" href="#v-cpp"><i>C++</i>C++ 重制版<small>功能最全</small></a>
-    </nav>
-  </div>
-
-  <section id="features">
+  <section id="changes">
     <div class="wrap">
       <div class="sec-head">
         <div>
-          <div class="sec-label">TOOLBOX / 功能</div>
-          <h2>从打开一个包，<br>到改完、转完、再打包。</h2>
+          <div class="sec-label">WHAT'S NEW / 1.0.0</div>
+          <h2>核心变化，只有一件半。</h2>
         </div>
-        <p class="sec-desc">不是把二十多个按钮堆在首页。文件树、编辑器、转换器、日志和导出围绕同一次任务展开，处理结果能追溯到具体文件。</p>
+        <p class="sec-desc">不是把按钮堆满首页。1.0.0 只做三件事：把存档核心数据翻成人能读的代码、让长字段在手机上自己折行、让 db 里的文件也能按字节改。</p>
       </div>
 
-      <div class="features">
-        <article class="feat f1">
-          <span class="tag">SAVE / 存档</span>
-          <h3>基岩版 ⇄ Java 版，不装模组</h3>
-          <p>直接读写 <span class="mono">level.dat</span>、NBT、region 与 LevelDB。转换后的存档两端都能进入，不依赖任何第三方模组或在线接口。</p>
-          <svg class="art" viewBox="0 0 560 150" role="img" aria-label="基岩版存档与 Java 版存档双向转换示意图">
-            <g fill="none" stroke="#1859d8" stroke-width="1.5">
-              <rect x="8" y="34" width="120" height="78"/>
-              <path d="M8 34l22-16h120l-22 16M130 34l22-16M130 112l22-16M8 112l22-16h120"/>
-              <path d="M32 58h64M32 74h48M32 90h70" stroke="#7d8b98"/>
-              <rect x="432" y="34" width="120" height="78"/>
-              <path d="M432 34h120v78H432zM452 34v78M512 34v78M432 60h120M432 86h120" stroke="#7d8b98"/>
-              <path d="M206 66h120M294 66l-11-6M294 66l-11 6" stroke="#101820"/>
-              <path d="M354 88H234M266 88l11-6M266 88l-11 6" stroke="#101820"/>
-              <text x="250" y="52" font-family="IBM Plex Mono,monospace" font-size="11" fill="#5b6875" stroke="none">convert</text>
-              <text x="28" y="132" font-family="IBM Plex Mono,monospace" font-size="10" fill="#5b6875" stroke="none">BEDROCK / LevelDB</text>
-              <text x="398" y="132" font-family="IBM Plex Mono,monospace" font-size="10" fill="#5b6875" stroke="none">JAVA / region + NBT</text>
-            </g>
-          </svg>
+      <div class="cards">
+        <article class="card">
+          <span class="tag">CODEX / 英文代码</span>
+          <h3>level.dat，直接翻成英文代码</h3>
+          <p>一行一个字段：<span class="mono">类型 路径 = 值</span>。世界名、随机种子、难度、生成器类型、游戏规则、实验开关，全部明文呈现。</p>
+          <ul>
+            <li>改完点「保存到存档」，自动编码回二进制 NBT</li>
+            <li>写回前先自动备份，改错可回退</li>
+            <li>手机端与桌面端同一套逻辑</li>
+          </ul>
+          <img class="shot" src="./code.png" alt="level.dat 英文代码视图截图" loading="lazy">
         </article>
 
-        <article class="feat dark f2">
-          <span class="tag">OFFLINE / 离线</span>
-          <h3>运行时不请求 CDN</h3>
-          <p>JSZip、JSON5、acorn 全部本地打包。断网、弱网、没有账号，功能照常。</p>
-          <div class="big-num">0<span>个在线依赖</span></div>
-          <a class="more" href="#faq">数据去了哪里</a>
+        <article class="card">
+          <span class="tag">WRAP / 自动换行</span>
+          <h3>长字段自己折行，手机不用横拖</h3>
+          <p>很长的世界名、成串的 byte 数组，按窗口宽度自动折行；横向滚动关掉，打开就是第一行。</p>
+          <ul>
+            <li>折行只影响显示，不动保存逻辑</li>
+            <li>渲染完滚动条归零，不用找开头</li>
+            <li>手机竖屏也能整段读完</li>
+          </ul>
+          <img class="shot" src="./wrap.png" alt="长字段自动换行截图" loading="lazy">
         </article>
 
-        <article class="feat f3">
-          <span class="tag">ADDON / 转换</span>
-          <h3>附加包 ⇄ 模组</h3>
-          <p>双向转换方块、物品、实体与配方，尽可能还原。无法映射的字段写进报告，不静默丢弃。</p>
-        </article>
-
-        <article class="feat f4">
-          <span class="tag">SCRIPT / 脚本</span>
-          <h3>脚本工作台</h3>
-          <p>行号、当前行、行列状态；<span class="mono">@minecraft/server</span> 与 <span class="mono">server-ui</span> 模拟器，73 条离线 API 文档，静态体检打分。</p>
-        </article>
-
-        <article class="feat f5">
-          <span class="tag">I18N / 汉化</span>
-          <h3>附加包汉化</h3>
-          <p>内置 tianji-turn-addon（MIT）离线内核。识别 JSON、lang 与脚本硬编码文本，结果直接写回包内。</p>
-        </article>
-
-        <article class="feat blue f6">
-          <span class="tag">MAKER / 制作</span>
-          <h3>皮肤、披风、结构和指令，都能自己做</h3>
-          <p>表单手搓，或按参数批量生成。结构可以预览、替换方块、导出为 <span class="mono">.mcstructure</span>；指令工厂内置约 35 条原创指令的链式组合。</p>
-          <a class="more" href="#platforms">查看各端支持</a>
-        </article>
-
-        <article class="feat f7">
-          <span class="tag">SYNC / 多端</span>
-          <h3>一套前端，四端同步</h3>
-          <p>安卓、Windows、Linux、网页共用同一套界面与数据格式，版本号一起走。</p>
+        <article class="card">
+          <span class="tag">DB / 文件级编辑</span>
+          <h3>db 里的文件，也能逐个改</h3>
+          <p>不是 NBT 的文件按 0x 偏移列出英文串，引号里的内容可就地替换；也能按十进制字节编辑，大文件 4KB 分页。</p>
+          <ul>
+            <li>保存前自动备份整包</li>
+            <li>界面常驻提示：db 是存档最重要的数据文件夹</li>
+            <li>随便修改可能导致存档报废，先导出再改</li>
+          </ul>
         </article>
       </div>
+
+
     </div>
   </section>
 
-  <section class="platform" id="platforms">
-    <div class="grid-bg" aria-hidden="true"></div>
+  <section class="versions" id="versions">
     <div class="wrap">
       <div class="sec-head">
         <div>
-          <div class="sec-label">PLATFORMS / 平台</div>
-          <h2>先选版本，<br>再选设备。</h2>
+          <div class="sec-label">DOWNLOAD / 三端同步</div>
+          <h2>一份内核，三个安装包。</h2>
         </div>
-        <p class="sec-desc">先选版本，再选设备。三个版本都覆盖 Android / Windows / Linux，都支持不停更；不想装东西，网页版直接用。</p>
+        <p class="sec-desc">三端包里的 <span class="mono">assets/assets_app.js</span> 是同一份文件，md5 一致；装哪个端，行为都一样。</p>
       </div>
 
-      <div class="vm-grid" aria-label="三版本 × 三端下载矩阵">
-        <div class="vm-card" id="v-classic">
-          <div class="vm-head"><span class="vm-tag mono">CLASSIC</span><h3>经典版</h3><p>沿用网页套壳形态，体积最小、启动最快。老用户的默认选择。</p></div>
-          <dl class="vm-rows">
-            <div><dt>Android</dt><dd><span class="mono">APK · 6.3.3 / BUILD 80 · 英文代码（自动换行）+ db 编辑</span><a class="p-btn main" data-dl="apk" href="#">下载</a></dd></div>
-            <div><dt>Windows</dt><dd><span class="mono">ZIP · BUILD 80 · 英文代码（自动换行）</span><a class="p-btn main" data-dl="win" href="#">下载</a></dd></div>
-            <div><dt>Linux</dt><dd><span class="mono">TAR.GZ / DEB · BUILD 80 · x64</span><a class="p-btn main" data-dl="linux" href="#">下载</a><a class="p-btn" data-dl="linuxdeb" href="#">deb</a></dd></div>
-          </dl>
+      <div class="vgrid">
+        <div class="vbox">
+          <div class="mono">PUBLIC RELEASE</div>
+          <div class="big">1.0.0</div>
+          <small>2026-11-22 · BUILD 1</small>
+          <p style="margin-top:14px">第一个公开发布版本。此前所有内部迭代都没有对外测试，公开版本号从 1.0.0 开始，不再沿用内部编号。</p>
         </div>
-        <div class="vm-card" id="v-java">
-          <div class="vm-head"><span class="vm-tag mono">JAVA</span><h3>JAVA 重制版</h3><p>纯 JDK 标准库实现，自带 Swing 图形界面，逻辑与另两版逐条对齐。包名独立，可与经典版同机共存。</p></div>
-          <dl class="vm-rows">
-            <div><dt>Android</dt><dd><span class="mono">APK · com.mctoolbox.java · 26+</span><a class="p-btn main" data-dl="javaApk" href="#">下载 APK</a></dd></div>
-            <div><dt>Windows</dt><dd><span class="mono">ZIP · jar + 启动.bat · 需 JRE 17+</span><a class="p-btn" data-dl="javaWin" href="#">下载 ZIP</a></dd></div>
-            <div><dt>Linux</dt><dd><span class="mono">TAR.GZ · jar + start.sh · 用系统 JRE</span><a class="p-btn" data-dl="javaLinux" href="#">下载 TAR.GZ</a><a class="p-btn" data-dl="javaJar" href="#">单拿 JAR</a></dd></div>
-          </dl>
-        </div>
-        <div class="vm-card emph" id="v-cpp">
-          <div class="vm-head"><span class="vm-tag mono">C++</span><h3>C++ 重制版</h3><p>自写 inflate / deflate，不链接 zlib；Linux 版是原生 GTK 图形界面，批量队列 + 多线程并行 + 逐包报表，不加载网页、不依赖 JVM。安卓端同样带批量队列与并行。</p></div>
-          <dl class="vm-rows">
-            <div><dt>Android</dt><dd><span class="mono">APK · com.mctoolbox.cpp · 批量并行</span><a class="p-btn main" data-dl="cppApk" href="#">下载 APK</a></dd></div>
-            <div><dt>Windows</dt><dd><span class="mono">ZIP · 原生深色界面 + 静态 CLI</span><a class="p-btn" data-dl="cppWin" href="#">下载 ZIP</a></dd></div>
-            <div><dt>Linux</dt><dd><span class="mono">TAR.GZ · 原生 GTK 界面 + 静态 CLI</span><a class="p-btn" data-dl="cppLinux" href="#">下载 TAR.GZ</a></dd></div>
-          </dl>
+        <div class="vbox">
+          <div class="mono">PACKAGES</div>
+          <div class="big">3<span style="font-size:22px"> 端</span></div>
+          <small>Android · Windows · Linux</small>
+          <p style="margin-top:14px">JAVA 重制版与 C++ 重制版仍在内部开发，暂不对外发布；今天只发经典版三端。</p>
         </div>
       </div>
-      <p class="plat-note">三版三端全部齐了。经典版：Android / Windows / Linux；JAVA 重制版：Android APK（<span class="mono">com.mctoolbox.java</span>，Swing 内核跑在系统自带的 Android 运行时上）、Windows（jar + 启动.bat，需 JRE 17+）、Linux；C++ 重制版：Android APK（<span class="mono">com.mctoolbox.cpp</span>，自写内核编成 <span class="mono">libmct.so</span>，arm64 / armv7 / x86_64 三个 ABI 全带）、Windows 原生深色界面（<span class="mono">mctool-gui.exe</span>，可拖拽/批量/并行）与静态 CLI，Linux 原生 GTK 界面。三版包名互不相同，可以装在同一台手机上共存；都用同一套新 brarchive 解析器，产出的容器逐字节一致，一台设备上打的包另一台能解。</p>
+
+      <div class="table">
+        <div class="trow">
+          <span class="os">Android</span>
+          <span class="f">MC-Toolbox-Classic-1.0.0-android.apk · 972 KB · com.doubao.mctoolbox</span>
+          <a href="./dl/MC-Toolbox-Classic-1.0.0-android.apk" download>下载 APK</a>
+        </div>
+        <div class="trow">
+          <span class="os">Windows</span>
+          <span class="f">MC-Toolbox-Windows-1.0.0.zip · 95 MB · x64 · 解压即用</span>
+          <a href="./dl/MC-Toolbox-Windows-1.0.0.zip" download>下载 ZIP</a>
+        </div>
+        <div class="trow">
+          <span class="os">Linux</span>
+          <span class="f">MC-Toolbox-Linux-1.0.0.tar.gz · 93 MB · x64 · 免安装</span>
+          <a href="./dl/MC-Toolbox-Linux-1.0.0.tar.gz" download>下载 TAR.GZ</a>
+        </div>
+        <div class="trow">
+          <span class="os">Linux · deb</span>
+          <span class="f">MC-Toolbox-Linux-1.0.0.deb · 73 MB · Debian / Ubuntu</span>
+          <a href="./dl/MC-Toolbox-Linux-1.0.0.deb" download>下载 DEB</a>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section id="versions" style="border-top:1px solid var(--line)">
+  <section id="numbering">
     <div class="wrap">
       <div class="sec-head">
         <div>
-          <div class="sec-label">MATRIX / 三个版本</div>
-          <h2>三套实现，<br>同一个内核。</h2>
+          <div class="sec-label">WHY 1.0.0 / 版本号说明</div>
+          <h2>为什么是 1.0.0，而不是继续往下排。</h2>
         </div>
-        <p class="sec-desc">经典版、JAVA 重制版、C++ 重制版并行维护。包名不同，所以可以同一台设备共存；共用同一套 brarchive 规范，所以谁产出的包谁都解得开。</p>
+        <p class="sec-desc">因为在此之前，没有任何一个版本对外发布过。内部调试用的编号留在仓库历史里，公开版本从 1.0.0 起算。</p>
       </div>
 
-      <div class="promise">
-        <div><b>三版都不停更</b><span>不会因为新版本上线就把老版本弃掉。内核级修复（格式、规则、安全）三版同日同步发布。</span></div>
-        <div><b>三版都覆盖三端</b><span>Android、Windows、Linux 都是正式发布目标，每个版本都给齐，不是“附带编译”。</span></div>
-        <div><b>同一个解析器</b><span>三版都用 6.3.0 起的新 brarchive 内核，产出的容器逐字节一致，可互相打开。</span></div>
-      </div>
-
-      <div class="callout">
-        <b>解析器换代 · BREAKING</b>
-        <p>旧版 brarchive 解析器正式废弃。新内核按 brarchive-flutter（Apache-2.0）公开的容器格式规范<b>独立重写</b>：
-        对方交付的是独立 Flutter APP，而我们是“界面套壳 + 自研内核”的形态，代码不能照搬，所以只对齐格式与规则，
-        源码由我们用 C++ / Java / JavaScript 各写一遍，并互相做字节级交叉验证。归属声明见仓库 <span class="mono">NOTICE.md</span>。</p>
+      <div class="cards" style="grid-template-columns:1fr 1fr">
+        <article class="card">
+          <span class="tag">BEFORE / 内部迭代</span>
+          <h3>没公开过，就不算版本</h3>
+          <p>早期那些编号只用于内部自测，没有公开下载、没有对外测试、也没有对外承诺。对外沿用这些编号会让人误以为中间漏掉了好几个版本。</p>
+        </article>
+        <article class="card">
+          <span class="tag">NOW / 公开口径</span>
+          <h3>仓库、官网、安装包，统一 1.0.0</h3>
+          <p>README、CHANGELOG、版本矩阵、官网文案与三端安装包，全部改成 1.0.0；历史内部编号只在仓库的归档记录里出现，不再作为下载版本。</p>
+        </article>
       </div>
     </div>
   </section>
 
-  <section id="changelog" style="background:var(--paper-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <section id="faq">
     <div class="wrap">
       <div class="sec-head">
         <div>
-          <div class="sec-label">CHANGELOG / 6.3.3 · BUILD 80</div>
-          <h2>这次改了什么。</h2>
+          <div class="sec-label">README / 使用说明</div>
+          <h2>装之前，先看这四条。</h2>
         </div>
-        <p class="sec-desc">2026-11-22。英文代码视图补上自动换行：长字符串、长数组在手机上也一行到底不再横着拖。</p>
+        <p class="sec-desc">尤其是第三条。db 是存档里最要紧的地方，改之前请先导出备份。</p>
       </div>
-      <ul class="log">
-        <li>
-          <div class="when">2026-11-22 · ANDROID / WINDOWS / LINUX</div>
-          <div class="what">英文代码视图加自动换行：长字符串、长数组不再横着拖</div>
-          <p>上一版英文代码是「一行一字段、不换行」，世界名长一点、byte 数组长一点，手机上就得左右划着看，看着像一屏空白。
-             现在改成自动换行（<span class="mono">pre-wrap</span>），按窗口宽度折行、超长单词和数字也能断开，
-             打开就直接从第一行看起、不再停在横向滚动的位置。</p>
-          <p>保存逻辑不变：仍按「类型 路径 = 值」解析，折行只影响显示，保存时按原文本重新编码成二进制 NBT 写回。
-             三端同步 <span class="mono">6.3.3 / BUILD 80</span>。</p>
-        </li>
-        <li>
-          <div class="when">2026-11-22 · ANDROID / WINDOWS / LINUX</div>
-          <div class="what">英文代码视图：存档核心数据不再对着十进制字节看，改英文、保存自动变回二进制</div>
-          <p>以前打开 <span class="mono">level.dat</span> 只能看到一串十进制字节，想改一个字段得先自己解码。现在多了一个「英文代码」视图：
-             解析出来的 NBT 直接摊成一行行 <span class="mono">类型 路径 = 值</span>，比如 <span class="mono">int GameType = 1</span>、
-             <span class="mono">byte CenterMapsToOrigin = 1</span>、<span class="mono">compound lastOpenedWithVersion</span>，
-             世界名、种子、时间、难度、生成器类型、平台锁定标记这些字段都是明文。</p>
-          <p>改的时候只动等号右边：数字直接改、英文串带双引号、数组写成 <span class="mono">[1, 2, 3]</span>。点「保存到存档」，
-             程序把文本重新编码成二进制 NBT（保留 <span class="mono">level.dat</span> 原有的 8 字节头与长度字段）写回包内，再「导出存档」生成新包；
-             桌面端保存前还会自动备份整包。写得不对（超范围、串没关引号、路径被改了）会直接报第几行、错在哪，不会闷头写坏文件。</p>
-          <p>db 下的 <span class="mono">.ldb / .log</span> 不是 NBT，英文视图改成按 <span class="mono">0x</span> 偏移列出文件里的英文串，
-             引号内的文字可改，保存时按偏移拼回字节。字节编辑器仍然保留，两种视图可以随时来回切。</p>
-          <p>三端同步：安卓 <span class="mono">6.3.2 / BUILD 79</span>，Windows / Linux 同为 <b>79</b>，三份包里的
-             <span class="mono">assets_app.js</span> 是同一个文件（md5 一致）。</p>
-        </li>
-        <li>
-          <div class="when">2026-11-21 · KERNEL</div>
-          <div class="what">brarchive 解析器换代<span class="badge-brk">BREAKING</span></div>
-          <p>废弃旧解析器，改用新规范：内容偏移改为相对内容区起点，条目按文件名 UTF-8 字节序写入，版本号严格校验。
-             旧包仍可读，新包建议用 6.3.0 之后的版本处理。</p>
-        </li>
-        <li>
-          <div class="when">2026-11-21 · PLATFORM</div>
-          <div class="what">Android / Windows / Linux 正式纳入发布矩阵</div>
-          <p>三端从“顺手编一下”升级为正式产物：一次脚本出齐，缺工具链会明确报错而不是静默跳过；CI 里五条流水线各自出工件。</p>
-        </li>
-        <li>
-          <div class="when">2026-11-21 · JAVA</div>
-          <div class="what">JAVA 重制版上线</div>
-          <p>只用 JDK 标准库，零第三方依赖；包名与经典版隔离，可同机共存；命令行提供 pack / unpack / info / selftest。</p>
-        </li>
-        <li>
-          <div class="when">2026-11-22 · WINDOWS / LINUX</div>
-          <div class="what">经典版桌面端：db 一路同源的 bug，外加一个更严重的「导出说成功、文件没落盘」</div>
-          <p>db 文件夹点哪个文件都只显示 .log 的内容 —— Windows 与 Linux 包里的 <span class="mono">assets_app.js</span>
-             跟安卓修之前是同一个文件（md5 一致），所以毛病一模一样：全部 db 文件被合并成一个库来读。现在改成按文件自身字节打开。</p>
-          <p>桌面端还有一个更坑的：点「导出 / 下载」会提示“已导出”，但文件根本没落盘。Electron 既没接 <span class="mono">will-download</span>，
-             页面的 blob 下载也被直接丢掉。现在改成 preload + 主进程异步 IPC，走系统「另存为」对话框写盘，成功报真实路径，
-             取消或失败都明确说原因，并给所有下载加了兜底。</p>
-          <p>顺带补齐桌面端：db / level.dat 十进制字节查看与编辑（4KB 分页）、保存前自动备份整包（保留 12 份）、
-             把存档直接拖进窗口就能打开。db 的谨慎提示也一并加上。</p>
-        </li>
-        <li>
-          <div class="when">2026-11-22 · ANDROID</div>
-          <div class="what">db 文件夹点哪个文件都只显示 .log 的内容 —— 已修，并加了十进制字节编辑</div>
-          <p>根因：文件打开的分发里，只要路径命中 <span class="mono">db/CURRENT</span>、<span class="mono">MANIFEST-*</span>、
-             <span class="mono">*.ldb / *.log / *.sst</span>，就一律丢给「LevelDB 查看器」——那是把所有 db 文件合并成一份库来读，
-             所以点哪个文件看到的都是同一团内容，看着就像永远只有 .log。现在改成按文件自己的字节打开。</p>
-          <p>新增：db 里所有文件（含 <span class="mono">level.dat</span>）都能看原始字节——按十进制逐字节列出、可直接改（认 0–255 和 0x 十六进制），
-             点「保存到存档」写回包内，「导出存档」后才生成新包；大文件按 4KB 分页，逐页改完合并写回。入口还留着 LevelDB 查看器，需要合并视角时用。</p>
-          <p>谨慎提示放在 db 文件夹和字节编辑器两处：db 是存档最重要的数据文件夹，别随便改，改之前先导出备份。</p>
-        </li>
-        <li>
-          <div class="when">2026-11-21 · WEB</div>
-          <div class="what">网页版的「下载」也一起修好了，安卓那次的锅在网页端同样存在</div>
-          <p>网页版汉化页是在 iframe 里打开的，所以上一轮安卓的修复没有覆盖到它：站点上根本没有 <span class="mono">bridge.js</span>，
-             那行写坏的 <span class="mono">&lt;script&gt;</span> 标签也原封不动，点了同样没反应。现在桥补进站点、父页面收到 base64 后在顶层文档真正落盘，
-             安卓 <span class="mono">versionCode</span> 跟着同步到 <b>76</b>。桌面 Chromium、Android（Pixel 5）、iPhone 三种模拟实测，
-             点「Download converted file」都拿到了 <span class="mono">_i18n.mcaddon</span>（55 个条目，含 <span class="mono">zh_CN.lang</span>）。</p>
-        </li>
-        <li>
-          <div class="when">2026-11-21 · C++</div>
-          <div class="what">C++ 重制版上线，功能最全</div>
-          <p>自写 inflate（stored / fixed / dynamic Huffman）与 deflate（固定 Huffman + 贪心 LZ77），不链接 zlib；
-             产出单文件静态可执行，Windows 端一个 exe 就能跑。</p>
-        </li>
-        <li>
-          <div class="when">2026-11-21 · C++</div>
-          <div class="what">Windows 也有原生界面了，不再只是命令行</div>
-          <p>用纯 Win32 自绘了一套深色界面：左边批量队列，右边进度条 + 中文日志，六个勾选项、2/4/8 线程并行，
-             还能「右键 → 用 MC工具箱 打开」直接带包启动。Wine 里用三个真实包实测：371 / 208 / 2 个条目，
-             3 个包 253 ms 跑完，解包再打包回去的成品与原包 <span class="mono">sha256</span> 完全一致。</p>
-        </li>
-        <li>
-          <div class="when">2026-11-21 · FIX</div>
-          <div class="what">汉化工具「下载」点了没反应（安卓）</div>
-          <p>根因是 <span class="mono">assets/i18n/index.html</span> 里一行 <span class="mono">&lt;script&gt;</span> 标签被写坏，
-             负责把文件写进手机的 <span class="mono">bridge.js</span> 根本没加载，于是只剩网页自己的 <span class="mono">blob:</span> 下载动作——
-             WebView 不认这个，看着就是「点了没反应」。现在标签修正、桥补了自愈逻辑，并改成写进系统「下载/MC工具箱」并弹提示；
-             http(s) 链接另配了系统下载器兜底。</p>
-        </li>
-        <li>
-          <div class="when">2026-11-21 · ANDROID</div>
-          <div class="what">经典版 APK 重打，补上自动换行</div>
-          <p>经典版 APK 一直是旧壳，这轮用同一套构建脚本重打：versionCode 74（这轮修复顺手升到 75），换行开关跟网页版那套同源，
-             代码区屏幕装不下就折行显示，保存出去仍是一行。注意签名换了密钥，装过旧版的设备要先卸载再装（应用内数据会被清）。</p>
-        </li>
-        <li>
-          <div class="when">2026-11-21 · ANDROID</div>
-          <div class="what">补上 JAVA / C++ 两版的安卓端</div>
-          <p>经典版一直有 APK，两版重制版之前只有桌面端。现在两份 APK 都出了：JAVA 版把内核直接编进 dex，
-             C++ 版把自写内核编成 libmct.so 走 JNI；包名分别是 <span class="mono">com.mctoolbox.java</span> 与
-             <span class="mono">com.mctoolbox.cpp</span>，和经典版同机共存，互不覆盖。C++ 安卓端还多一层批量队列：
-             一次多选几个包，按 CPU 核数开线程并行跑，结果统一导出到「下载/MC工具箱」。</p>
-        </li>
-        <li>
-          <div class="when">2026-11-21 · WEB</div>
-          <div class="what">网页版换成新内核</div>
-          <p>单文件页面，内核内联，零网络请求；支持拖拽与粘贴、PWA 离线安装；整个流程在浏览器里算完，文件不上传。</p>
-        </li>
-        <li>
-          <div class="when">2026-11-21 · FIX</div>
-          <div class="what">四个老问题</div>
-          <p>解包丢父路径（<span class="mono">New Energy BP/blocks</span> 被塌成 <span class="mono">blocks</span>）、目录条目被写成 0 字节文件、
-             <span class="mono">.mcaddon</span> 被输出成 <span class="mono">.zip</span>、ZIP 中央目录字段错位导致自写包读不回。</p>
-        </li>
-      </ul>
-      <div class="callout" style="border-left-color:var(--ok)">
-        <b>验证基线</b>
-        <p>真实样本 2,018,437 字节 / 371 个文件 / 18 个 brarchive：pack → unpack 往返 371 进 371 出，0 缺失、0 多出、0 内容差异；
-           C++、Java、JS 三套内核产出的 18 个归档逐字节一致；浏览器实测全程 0 报错。</p>
+      <div class="faq">
+        <details open>
+          <summary>三端装哪个？能一起装吗？</summary>
+          <p>按设备选：手机装 APK，Windows 解压 ZIP 直接用，Linux 用 tar.gz 或 deb。三端是不同设备上的同一款软件，包名与桌面端不冲突；同一台手机重复覆盖安装即可升级。</p>
+        </details>
+        <details>
+          <summary>英文代码改完，存档会不会坏？</summary>
+          <p>只改等号右边的值，左边的类型与路径不要动。点「保存到存档」时会先自动备份整包，再重新编码成二进制 NBT 写回；写坏了可以用备份回退。</p>
+        </details>
+        <details>
+          <summary>db 文件夹能随便改吗？</summary>
+          <p>不能。db 是存档最重要的数据文件夹，随便修改可能导致存档报废。界面会一直提示这一点；动手前请先用「导出存档」备份一份，只改你确定要改的字段。</p>
+        </details>
+        <details>
+          <summary>需要联网吗？开源吗？</summary>
+          <p>全离线运行，不联网也能用，不上传任何存档数据。代码 MIT 开源，仓库地址 github.com/fsssea/mc-toolbox。</p>
+        </details>
       </div>
     </div>
   </section>
 
-  <section class="web" id="web">
-    <div class="wrap web-grid">
-      <div class="browser">
-        <div class="b-bar" aria-hidden="true"><span class="b-dot"></span><span class="b-dot"></span><span class="b-dot"></span><span class="b-url">mc toolbox / web / 6.3.0</span></div>
-        <img src="data:image/jpeg;base64,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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//Z" alt="MC工具箱网页版主界面截图" width="1200" height="500">
-      </div>
-      <div class="web-copy">
-        <div class="sec-label">WEB / 免安装</div>
-        <h3>不装包，浏览器里直接开工。</h3>
-        <p>网页版已换成 6.3.0 的新内核：把 <span class="mono">.mcpack / .mcaddon</span> 拖进去，就能做 brarchive 打包与解包，处理完直接下载。支持“安装到桌面”，装完后从桌面启动，断网也能开。</p>
-        <ul class="web-list">
-          <li>打包、解包、压缩全部在本机浏览器内完成，文件不会上传到服务器</li>
-          <li>支持离线缓存，弱网环境不用重新下载界面</li>
-          <li>项目、日志与导出文件仍然由你手动选择保存位置</li>
-        </ul>
-        <a class="btn pri" data-dl="webapp" href="./app/index.html">打开网页版</a>
-        <p class="web-note">浏览器出于安全限制，不能像安卓版一样直接写入应用专属目录；需要“应用存储”能力时请用 APK。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="faq" id="faq">
-    <div class="wrap faq-grid">
+  <section class="open" id="open">
+    <div class="wrap">
       <div>
-        <div class="sec-label">NOTES / 说明</div>
-        <h2>几个需要先说清楚的事。</h2>
-        <p class="sec-desc" style="margin-top:16px">官网只负责分发和介绍。工具箱本身不提供云同步、账号系统或在线转换服务。</p>
+        <div class="sec-label mono">OPEN SOURCE / MIT</div>
+        <h2>源码在仓库，包在官网。</h2>
+        <p>MIT 许可，可自行编译、二次分发；唯一官方发布渠道是哔哩哔哩的发布视频与本站下载页。</p>
       </div>
-      <div>
-        <div class="faq-list">
-          <details open>
-            <summary>转换会动我的原文件吗？</summary>
-            <p>不会。打开包后先在内存里处理，只有你点保存或下载时才写出新文件。安卓版的导出结果写入应用专属目录，原包保持原样。</p>
-          </details>
-          <details>
-            <summary>为什么有的内容显示“无法映射”？</summary>
-            <p>基岩版与 Java 版的数据结构并非一一对应，比如部分实体组件、战利品表写法和脚本接口。转换器会把无法映射的条目列进报告，而不是悄悄删掉。</p>
-          </details>
-          <details>
-            <summary>网页版能把文件存在哪？</summary>
-            <p>由浏览器决定。通常下载到系统“下载”目录，或弹窗让你选择位置；网页无法直接访问安卓的 <span class="mono">Android/data</span> 目录。</p>
-          </details>
-          <details>
-            <summary>三个版本有什么区别，要都装吗？</summary>
-            <p>不用都装，按需要挑。经典版沿用网页套壳形态，体积最小；JAVA 重制版逻辑最统一，适合想要一致行为的人；
-               C++ 重制版性能最好、功能最全，适合大批量处理。三者包名不同，真想都装也不会互相覆盖。</p>
-          </details>
-          <details>
-            <summary>老版本会不会停更？</summary>
-            <p>不会。三个版本并行维护，内核级修复（格式、规则、安全、校验）三版同日发布；界面级更新按各自定位推进。
-               任何一个版本都不会因为新版本上线被弃掉。</p>
-          </details>
-          <details>
-            <summary>换了新解析器，我以前做的包还能用吗？</summary>
-            <p>能读。容器格式没有变，只是修正了偏移语义与写入顺序，并补齐了旧实现的路径拼接缺陷。
-               但用 6.3.0 写出的包，建议用 6.3.0 及以后版本打开，避免旧解析器的已知问题。</p>
-          </details>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="open-source" style="padding-top:64px;padding-bottom:64px">
-    <div class="wrap">
-      <div class="sec-head" style="margin-bottom:26px">
-        <div>
-          <div class="sec-label">SOURCE / 开源</div>
-          <h2>代码是公开的。</h2>
-        </div>
-        <p class="sec-desc">MIT 许可。内核（C++ / Java / JS 三套）、三端构建脚本、CI 流水线、汉化子应用与第三方许可说明都在源码包里；签名密钥不在仓库中。解析器归属见 <span class="mono">NOTICE.md</span>。</p>
-      </div>
-      <div class="actions">
-        <a class="btn sec" data-dl="source" href="#">下载 6.3.0 源码</a>
-        <a class="btn sec" href="https://github.com/fsssea/mc-toolbox" target="_blank" rel="noopener">GitHub 仓库</a>
-        <a class="btn sec" href="#platforms">先下载安装包</a>
-      </div>
+      <a class="btn sec" href="https://github.com/fsssea/mc-toolbox">打开仓库</a>
     </div>
   </section>
 </main>
 
 <footer>
   <div class="foot-in">
-    <div>
-      <div class="foot-brand">
-        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 10l10-5 10 5v12l-10 5-10-5z" fill="none" stroke="#e9f0f7" stroke-width="2"/><path d="M6 10l10 5 10-5M16 15v12" fill="none" stroke="#8fb8ff" stroke-width="2"/></svg>
-        MC工具箱
-      </div>
-      <p class="foot-note">基岩与 Java 的离线工具箱。经典版 / JAVA 重制版 / C++ 重制版三版本并行，Android · Windows · Linux 三端全覆盖。非 Mojang 官方产品，与 Mojang / Microsoft 无隶属关系。</p>
-    </div>
-    <div class="foot-col"><b>平台</b><a data-dl="apk" href="#">Android</a><a data-dl="win" href="#">Windows</a><a data-dl="linux" href="#">Linux</a><a data-dl="webapp" href="./app/index.html">网页版</a></div>
-    <div class="foot-col"><b>资源</b><a data-dl="source" href="#">源码（MIT）</a><a data-dl="web" href="#">网页离线包</a><a href="#faq">使用说明</a><a href="#changelog">版本 6.3.0</a></div>
+    <span>© 2026 MC工具箱 contributors · MIT License</span>
+    <span class="mono">PUBLIC 1.0.0 / BUILD 1 / 2026-11-22</span>
   </div>
-  <div class="foot-base"><span>© 2026 MC工具箱 contributors · MIT License</span><span class="mono">BUILD 80 / 2026-11-22</span></div>
 </footer>
-
-<script>
-/* ==========================================================================
-   下载配置：部署到自己的官网时，把下面 6 个地址换成你的对象存储或 Releases 地址。
-   webapp 指向站点里的 app/ 目录；把「网页版离线包」解压到 app/ 后即可直接打开。
-   ========================================================================== */
-var BASE = 'https://github.com/fsssea/mc-toolbox/releases/download/v6.3.0/';
-var LINKS = {
-  // 经典版三端 6.3.3（BUILD 80）直接放本站 dl/；其余仍是 v6.3.0 Release 资产
-  apk:        './dl/MC-Toolbox-Classic-6.3.3-android.apk',
-  win:        './dl/MC-Toolbox-Windows-6.3.3.zip',
-  linux:      './dl/MC-Toolbox-Linux-6.3.3.tar.gz',
-  linuxdeb:   './dl/MC-Toolbox-Linux-6.3.3.deb',
-  web:        BASE + 'MC-Toolbox-Web-6.3.0.zip',
-  webapp:     './app/index.html',
-  javaWin:    './dl/MC-Toolbox-Java-Windows-6.3.0.zip',
-  javaLinux:  './dl/MC-Toolbox-Java-Linux-6.3.0.tar.gz',
-  javaJar:    './dl/MC-Toolbox-Java-6.3.0.jar',
-  cppWin:     './dl/MC-Toolbox-Cpp-Windows-6.3.0.zip',
-  cppLinux:   './dl/MC-Toolbox-Cpp-Linux-6.3.0.tar.gz',
-  javaApk:    './dl/MC-Toolbox-Java-6.3.0-android.apk',
-  cppApk:     './dl/MC-Toolbox-Cpp-6.3.0-android.apk',
-  source:     BASE + 'MC-Toolbox-Source-6.3.0.zip'
-};
-
-document.querySelectorAll('[data-dl]').forEach(function (a) {
-  var key = a.getAttribute('data-dl');
-  if (LINKS[key]) {
-    a.href = LINKS[key];
-    if (key !== 'webapp') {
-      a.setAttribute('download', '');
-      a.setAttribute('rel', 'noopener');
-    } else {
-      a.setAttribute('target', '_blank');
-      a.setAttribute('rel', 'noopener');
-    }
-  }
-});
-
-/* 网页版未部署时的提示：只在当前是 file:// 或 app/ 返回 404 时出现。
-   部署后这段不会打扰用户。 */
-var webLinks = document.querySelectorAll('[data-dl="webapp"]');
-webLinks.forEach(function (a) {
-  a.addEventListener('click', function (e) {
-    if (location.protocol === 'file:') {
-      e.preventDefault();
-      alert('网页版需要先部署到网站服务器。把「网页版离线包」解压到本站 app/ 目录后，这个按钮就会直接打开。');
-    }
-  });
-});
-</script>
 </body>
 </html>
