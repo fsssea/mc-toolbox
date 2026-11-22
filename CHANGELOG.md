@@ -42,7 +42,7 @@
 ### 变更
 
 - 对外版本号统一为 **1.0.0 / BUILD 1**；官网、README、本日志与安装包文件名同步改成 1.0.0。
-- 三份发行包内 `assets/assets_app.js` 是同一个文件（md5 `c8997f90d8cb62fdef0c3e0d9b8e0a0e`）。
+- 三份发行包内 `assets/assets_app.js` 是同一个文件（md5 `c8997f90d8cb62fdef0c3e0d9b8e0a0e`（整改前）；整改后重打包为 `5cd21621c6a4d358104703682bfc04c1`）。
 - JAVA 重制版与 C++ 重制版仍在内部开发，本次不对外发布。
 
 ### 下载

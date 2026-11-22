@@ -16,7 +16,7 @@
 | 发布日期 | 2026-11-22 |
 | Android `applicationId` | `com.doubao.mctoolbox` |
 | Android `versionCode` | 80（沿用既有值，保证覆盖安装可升级） |
-| 三端 `assets/assets_app.js` | 同一份文件，md5 `c8997f90d8cb62fdef0c3e0d9b8e0a0e` |
+| 三端 `assets/assets_app.js` | 同一份文件，md5 `c8997f90d8cb62fdef0c3e0d9b8e0a0e`（整改前）；整改后重打包为 `5cd21621c6a4d358104703682bfc04c1` |
 | 许可 | MIT，全离线运行 |
 
 ## 三、平台 × 版本
