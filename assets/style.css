@@ -424,3 +424,10 @@ body.mci-lock{overflow:hidden}
 .mkgrid input[type=color]{height:38px;padding:2px 3px;cursor:pointer}
 .mkclose{width:36px;height:36px;padding:0!important;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center}
 .mkfield-title{font-size:12px;font-weight:600;color:var(--fg2);margin:0 0 8px}
+
+/* .mcstructure 多视图 */
+.stmodebar{gap:6px;align-items:center}
+.stmodebar button{padding:7px 12px;font-size:12px}
+.stmodebar .muted{font-size:11.5px;margin-left:4px}
+.stmodebar button[disabled]{opacity:.45;cursor:not-allowed}
+.stmodebar + .cards{margin-top:8px}

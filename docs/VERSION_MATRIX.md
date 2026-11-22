@@ -16,9 +16,10 @@
 | 发布日期 | 2026-11-22 |
 | Android `applicationId` | `com.doubao.mctoolbox` |
 | Android `versionCode` | 80（沿用既有值，保证覆盖安装可升级） |
-| 三端 `assets/assets_app.js` | 同一份文件，md5 `5cd21621c6a4d358104703682bfc04c1`（自研版构建，本次未改） |
+| 三端 `assets/assets_app.js` | 同一份文件，md5 `c586978372c5b37924f905cb0b1e4bcd`（531,677 B，含 `.mcstructure` 四视图） |
 | 内嵌汉化子应用 | `tianji-turn-addon` `f2c3165`（2026-11-21，`v2026.11.21-90`），MIT，位于 `assets/i18n/` |
 | 许可 | MIT，全离线运行 |
+| `.mcstructure` 编辑 | 切片可视化 + 原二进制 / 十进制 / 十六进制 / 纯英文代码四视图，4KB 分页 |
 
 ## 三、平台 × 版本
 
@@ -36,9 +37,7 @@
 
 ## 五、安卓端说明
 
-安卓包的对外文件名是 1.0.0；安装器里显示的 `versionName` 仍是内部迭代时写入的编号，
-本次未重建 APK（环境没有 build-tools，改它需要重新签名）。对外一律以 1.0.0 为准，
-下一轮打包会把 `versionName` 一起改成 1.0.0，`versionCode` 继续递增。
+安卓包的对外文件名与安装器显示的 `versionName` 均为 1.0.0；APK 已用原签名库重建并重签，`versionCode` 80 保持不变。
 
 ## 六、未来版本规划
 

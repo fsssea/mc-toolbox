@@ -24,7 +24,9 @@ export function parseStructure(u8) {
     nbt, size, palette, indices, entities, counts, bad,
     formatVersion: p.format_version ?? null,
     blockCount: layer0.filter(x => x >= 0).length,
-    plain: p
+    plain: p,
+    rawBytes: u8,
+    rawDirty: false
   };
 }
 
@@ -66,10 +68,12 @@ export function replaceBlockName(structure, from, to) {
     if (nameNode && nameNode.v === from) { nameNode.v = to; }
   }
   structure.counts = countFrom(structure);
+  structure.rawDirty = false;
   return n;
 }
 
 export function structureToBytes(structure) {
+  if (structure.rawDirty && structure.rawBytes) return structure.rawBytes;
   return writeNBT(structure.nbt, true);
 }
 
@@ -100,6 +104,7 @@ export function setBlock(structure, x, y, z, blockName) {
   const idxNode = structure.nbt.root.value.structure.v.block_indices.v[0];
   if (idxNode) idxNode.v[i] = pi;   // IntArray(11) 存的是数字；List<Int> 才存节点
   structure.counts = countFrom(structure);
+  structure.rawDirty = false;
   return i;
 }
 
@@ -110,5 +115,6 @@ export function clearBlock(structure, x, y, z) {
   const idxNode = structure.nbt.root.value.structure.v.block_indices.v[0];
   if (idxNode) idxNode.v[i] = -1;
   structure.counts = countFrom(structure);
+  structure.rawDirty = false;
   return i;
 }

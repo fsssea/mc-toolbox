@@ -25,6 +25,7 @@ import { buildSurface, renderSurface, describeColumn, simulateMissing, simStruct
 import { playerSummary, editPlayerNbt, appendKvToDb, editBookPages, editItemSlots } from './leveldbwrite.js';
 import { openLevelDb } from 'mcbe-leveldb-reader';
 import { setBlock, clearBlock } from './mcstructure.js';
+import { englishFromNbt, nbtFromEnglish, formatBinary, parseBinary, formatDecimal, parseDecimal, formatHex, parseHex } from './structure_codec.js';
 
 const $ = (id) => document.getElementById(id);
 const state = { archive: null, name: '', kind: '', selected: null, level: null, structure: null, stats: null };
@@ -857,6 +858,201 @@ function structColor(name) {
   return 'hsl(' + h + ',48%,48%)';
 }
 
+// ---- .mcstructure 多视图 ----
+const ST_PAGE_SIZE = 4096;
+const ST_MODE_LABELS = {
+  visual: '切片',
+  binary: '二进制',
+  decimal: '十进制',
+  hex: '十六进制',
+  code: '英文代码'
+};
+
+function structureModeBar(active) {
+  const modes = ['visual', 'binary', 'decimal', 'hex', 'code'];
+  return `<div class="edbar stmodebar">${modes.map(m =>
+    `<button data-stmode="${m}" class="${m === active ? 'primary' : 'ghost'}">${ST_MODE_LABELS[m]}</button>`
+  ).join('')}<span class="muted">同一份 .mcstructure，切换视图不会丢数据</span></div>`;
+}
+
+function bindStructureModeBar() {
+  document.querySelectorAll('#structureView [data-stmode]').forEach(btn => {
+    btn.onclick = () => {
+      const mode = btn.dataset.stmode;
+      if (mode === 'visual') renderStructure();
+      else if (mode === 'code') openStructureCode();
+      else openStructureBytes(mode, 0);
+    };
+  });
+}
+
+function structureBackButton() {
+  return `<button id="stModeBack" class="ghost">返回文件列表</button><span class="muted">${state.structurePath ? escapeHtml(state.structurePath) : (state.name || '独立结构文件')}</span>`;
+}
+
+function bindStructureBack() {
+  const back = document.getElementById('stModeBack');
+  if (back) back.onclick = () => {
+    $('structureView').style.display = 'none';
+    if (state.archive) { $('workspace').style.display = 'block'; }
+  };
+}
+
+function openStructureBytes(mode, pageStart = 0) {
+  const s = state.structure;
+  if (!s) return showError('还没有打开 .mcstructure');
+  mode = ['binary', 'decimal', 'hex'].includes(mode) ? mode : 'decimal';
+
+  const bytes = structureToBytes(s);
+  const total = bytes.length;
+  const lastStart = total ? Math.floor((total - 1) / ST_PAGE_SIZE) * ST_PAGE_SIZE : 0;
+  const start = Math.max(0, Math.min(lastStart, Math.floor(pageStart / ST_PAGE_SIZE) * ST_PAGE_SIZE));
+  const end = Math.min(total, start + ST_PAGE_SIZE);
+  const slice = bytes.subarray(start, end);
+  const text = mode === 'binary' ? formatBinary(slice) : mode === 'decimal' ? formatDecimal(slice) : formatHex(slice);
+  const unit = mode === 'binary' ? '位（每字节 8 位）' : mode === 'decimal' ? '十进制字节（0~255）' : '十六进制字节（两位一组）';
+
+  $('structureView').innerHTML = `
+    <div class="edbar">${structureBackButton()}</div>
+    ${structureModeBar(mode)}
+    <div class="cards">
+      <div class="card"><span>文件大小</span><b>${fmt(total)} B</b></div>
+      <div class="card"><span>当前页</span><b>${fmt(start)} – ${fmt(end - 1)}</b></div>
+      <div class="card"><span>页大小</span><b>${fmt(ST_PAGE_SIZE)} B</b></div>
+      <div class="card"><span>视图</span><b>${unit}</b></div>
+    </div>
+    <p class="muted">只显示当前页；写入只改这一页，不会动其它字节。十六进制可写 <code>0a ff</code>，十进制写 <code>10 255</code>，二进制写 <code>00001010 11111111</code>。</p>
+    <textarea id="stRawText" class="code" spellcheck="false" style="height:46vh"></textarea>
+    <div class="edbar">
+      <button id="stPrevPage" class="ghost" ${start <= 0 ? 'disabled' : ''}>◀ 上一页</button>
+      <button id="stNextPage" class="ghost" ${end >= total ? 'disabled' : ''}>下一页 ▶</button>
+      <label class="muted">跳转偏移 <input id="stPageJump" type="number" min="0" max="${Math.max(0, total - 1)}" value="${start}" style="width:120px"></label>
+      <button id="stGoPage" class="ghost">跳转</button>
+      <button id="stApplyRaw">写入本页</button>
+    </div>
+    <div class="edbar">
+      ${state.structurePath ? '<button id="stRawWriteBack" class="primary">保存回当前包</button>' : ''}
+      <button id="stRawExport" class="ghost">导出结构</button>
+      <span id="stRawMsg" class="muted"></span>
+    </div>`;
+
+  bindStructureModeBar();
+  bindStructureBack();
+  const ta = document.getElementById('stRawText');
+  ta.value = text;
+  let dirty = false;
+  ta.oninput = () => { dirty = true; const msg = document.getElementById('stRawMsg'); if (msg) msg.textContent = '本页有未写入的修改'; };
+
+  const go = (next) => {
+    if (dirty && !confirm('本页有未写入的修改，翻页会丢弃，确定继续？')) return;
+    openStructureBytes(mode, next);
+  };
+  const prev = document.getElementById('stPrevPage');
+  const next = document.getElementById('stNextPage');
+  if (prev) prev.onclick = () => go(start - ST_PAGE_SIZE);
+  if (next) next.onclick = () => go(start + ST_PAGE_SIZE);
+  document.getElementById('stGoPage').onclick = () => {
+    const v = Number(document.getElementById('stPageJump').value || 0);
+    go(v);
+  };
+
+  document.getElementById('stApplyRaw').onclick = () => {
+    try {
+      const chunk = mode === 'binary' ? parseBinary(ta.value) : mode === 'decimal' ? parseDecimal(ta.value) : parseHex(ta.value);
+      if (chunk.length !== end - start) throw new Error(`本页应为 ${end - start} 字节，当前解析出 ${chunk.length} 字节`);
+      const merged = new Uint8Array(bytes);
+      merged.set(chunk, start);
+      const ns = parseStructure(merged);
+      ns.rawDirty = true;
+      state.structure = ns;
+      state.stEdit = null;
+      log(`已写入 ${mode} 视图：offset ${start}~${end - 1}（${chunk.length} B）`);
+      openStructureBytes(mode, start);
+      const ok = document.getElementById('stRawMsg');
+      if (ok) ok.textContent = `已写入本页：${chunk.length} B`;
+    } catch (e) {
+      const msg = document.getElementById('stRawMsg');
+      if (msg) msg.textContent = '写入失败：' + e.message;
+      showError('结构字节写入失败：' + e.message);
+    }
+  };
+
+  const wb = document.getElementById('stRawWriteBack');
+  if (wb) wb.onclick = () => {
+    state.archive.setBytes(state.structurePath, structureToBytes(state.structure));
+    log('已写回：' + state.structurePath + '（记得导出 / 另存）');
+    document.getElementById('stRawMsg').textContent = '已写回当前包';
+  };
+  document.getElementById('stRawExport').onclick = async () => {
+    const name = await ask('导出结构文件', [{ key: 'name', label: '文件名', value: (state.name || 'structure').replace(/\.[^.]+$/, '') + '_edit.mcstructure' }]);
+    if (!name || !name.name) return;
+    $('structureView').style.display = 'block';
+    await saveBytes(name.name, structureToBytes(state.structure));
+  };
+}
+
+function openStructureCode() {
+  const s = state.structure;
+  if (!s) return showError('还没有打开 .mcstructure');
+  const nbt = s.rawDirty && s.rawBytes ? parseNBT(s.rawBytes, 0, true) : s.nbt;
+  let text;
+  try { text = englishFromNbt(nbt); } catch (e) { return showError('英文代码生成失败：' + e.message); }
+
+  $('structureView').innerHTML = `
+    <div class="edbar">${structureBackButton()}</div>
+    ${structureModeBar('code')}
+    <div class="cards">
+      <div class="card"><span>代码长度</span><b>${fmt(text.length)} 字符</b></div>
+      <div class="card"><span>根类型</span><b>Compound</b></div>
+      <div class="card"><span>文件大小</span><b>${fmt(s.rawDirty ? s.rawBytes.length : structureToBytes(s).length)} B</b></div>
+      <div class="card"><span>格式</span><b>English typed JSON</b></div>
+    </div>
+    <p class="muted">全英文类型名与键名；<code>Long</code> 用字符串保存，<code>Float/Double</code> 支持 <code>NaN / Infinity</code>。改完点“写入代码”，会自动编码回 .mcstructure 并重新解析。</p>
+    <div id="stCodeWrap"></div>
+    <div class="edbar">
+      <button id="stApplyCode">写入代码</button>
+      ${state.structurePath ? '<button id="stCodeWriteBack" class="primary">保存回当前包</button>' : ''}
+      <button id="stCodeExport" class="ghost">导出结构</button>
+      <span id="stCodeMsg" class="muted"></span>
+    </div>`;
+  bindStructureModeBar();
+  bindStructureBack();
+  const ed = codeEditor('structure.json', text, false);
+  document.getElementById('stCodeWrap').appendChild(ed.wrap);
+  ed.ta.style.minHeight = '52vh';
+  ed.ta.oninput = () => { ed.paint(); document.getElementById('stCodeMsg').textContent = '代码有未写入的修改'; };
+
+  document.getElementById('stApplyCode').onclick = () => {
+    try {
+      const res = nbtFromEnglish(ed.ta.value);
+      const bytes = writeNBT(res, true);
+      const ns = parseStructure(bytes);
+      ns.rawDirty = false;
+      state.structure = ns;
+      state.stEdit = null;
+      log('已写入英文代码：' + bytes.length + ' B');
+      openStructureCode();
+      const ok = document.getElementById('stCodeMsg');
+      if (ok) ok.textContent = '已写入代码：' + bytes.length + ' B';
+    } catch (e) {
+      document.getElementById('stCodeMsg').textContent = '写入失败：' + e.message;
+      showError('英文代码写入失败：' + e.message);
+    }
+  };
+  const wb = document.getElementById('stCodeWriteBack');
+  if (wb) wb.onclick = () => {
+    state.archive.setBytes(state.structurePath, structureToBytes(state.structure));
+    log('已写回：' + state.structurePath + '（记得导出 / 另存）');
+    document.getElementById('stCodeMsg').textContent = '已写回当前包';
+  };
+  document.getElementById('stCodeExport').onclick = async () => {
+    const name = await ask('导出结构文件', [{ key: 'name', label: '文件名', value: (state.name || 'structure').replace(/\.[^.]+$/, '') + '_edit.mcstructure' }]);
+    if (!name || !name.name) return;
+    $('structureView').style.display = 'block';
+    await saveBytes(name.name, structureToBytes(state.structure));
+  };
+}
+
 function renderStructure() {
   const s = state.structure, sum = structureSummary(s);
   const [sx, sy, sz] = s.size;
@@ -868,6 +1064,7 @@ function renderStructure() {
   const names = [...new Set(s.palette.map(b => b.name))].filter(Boolean);
   $('structureView').innerHTML = `
     <div class="edbar"><button id="stBack" class="ghost">返回文件列表</button><span class="muted">${state.structurePath ? escapeHtml(state.structurePath) : '独立结构文件'}</span></div>
+    ${structureModeBar('visual')}
     <div class="cards">
       <div class="card"><span>尺寸 X×Y×Z</span><b>${sum.size}</b></div>
       <div class="card"><span>方块数</span><b>${fmt(sum.blocks)}</b></div>
@@ -1022,6 +1219,7 @@ function renderStructure() {
     $('structureView').style.display = 'block';
     await saveBytes(name.name, structureToBytes(s));
   };
+  bindStructureModeBar();
 }
 
 async function renameSelected() {
