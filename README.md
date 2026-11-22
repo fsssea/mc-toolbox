@@ -7,18 +7,19 @@
 
 ![Verify](https://github.com/fsssea/mc-toolbox/actions/workflows/verify.yml/badge.svg)
 
-# MC工具箱 6.3.3
+# MC工具箱 1.0.0（正式版）
 
-## 三版本 × 三端（6.3.3 / BUILD 80）
+## 经典版 × 三端（1.0.0 / BUILD 1）
 
 | 版本 | Android | Windows | Linux | 内核源码 |
 | --- | --- | --- | --- | --- |
-| 经典版 · `com.doubao.mctoolbox` | [APK](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Classic-6.3.3-android.apk) | [ZIP](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Windows-6.3.3.zip) | [TAR.GZ](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Linux-6.3.3.tar.gz) · [DEB](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Linux-6.3.3.deb) | `assets_app.js`（JS） |
-| JAVA 重制版 · `com.mctoolbox.java` | [APK](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Java-6.3.0-android.apk) | [ZIP](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Java-Windows-6.3.0.zip) | [TAR.GZ](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Java-Linux-6.3.0.tar.gz) · [JAR](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Java-6.3.0.jar) | `kernel/java` |
-| C++ 重制版 · `com.mctoolbox.cpp` | [APK](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Cpp-6.3.0-android.apk) | [ZIP](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Cpp-Windows-6.3.0.zip) | [TAR.GZ](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Cpp-Linux-6.3.0.tar.gz) | `kernel/cpp` |
+| 经典版 · `com.doubao.mctoolbox` | [APK](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Classic-1.0.0-android.apk) | [ZIP](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Windows-1.0.0.zip) | [TAR.GZ](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Linux-1.0.0.tar.gz) · [DEB](https://fsssea.github.io/mc-toolbox/dl/MC-Toolbox-Linux-1.0.0.deb) | `assets_app.js`（JS） |
 
-三个 `applicationId` 互不相同，可同机共存；三套内核是各自独立重写的实现（格式规范参照公开的 brarchive 说明，未复制任何第三方应用源码），
-产出的 `.brarchive` / `.mcaddon` 逐字节一致，互相都能解开。C++ 版最强：自写 inflate/deflate、Windows 原生深色界面 + Linux GTK 界面、批量并行；安卓端同样带批量并行。
+1.0.0 是**第一个公开发布的版本**。此前的内部迭代没有对外发布、没有公开测试，仓库历史里保留为内部记录；
+对外公开版本号从 1.0.0 起算，官网、本文档与安装包统一使用 1.0.0。
+
+JAVA 重制版（`com.mctoolbox.java`）与 C++ 重制版（`com.mctoolbox.cpp`）仍在内部开发，
+**暂不对外发布**，因此不在下载表中提供链接。三个 `applicationId` 互不相同，日后正式发布时可同机共存。
 
 
 一个完全离线的 Minecraft 工具箱：安卓 APK（WebView + Java 桥）、Windows / Linux Electron 桌面版、网页 PWA，同一套前端。
@@ -30,6 +31,9 @@
 - 附加包汉化（内核来自 tianji-turn-addon，MIT；下载走系统「下载/MC工具箱」，WebView 内由 Java 桥落盘）
 - `@minecraft/server` 与 `@minecraft/server-ui` 脚本模拟器
 - 离线 Script API 文档与脚本体检器
+- 英文代码视图：`level.dat` 的 NBT 摊成「类型 路径 = 值」明文，保存自动编码回二进制
+- 长字段自动换行：超长世界名与 byte 数组按窗口宽度折行，手机端无需横向拖动
+- db 文件级编辑：非 NBT 文件按 0x 偏移列出英文串，支持十进制字节就地编辑与 4KB 分页
 - 代码编辑器：行号、当前行、行列状态、语法高亮、自动换行开关（只影响显示）
 - 主题、语言跟随系统；投屏全屏；键鼠快捷键；按钮音效
 - 安卓应用专属目录 `/storage/emulated/0/Android/data/com.doubao.mctoolbox/`
@@ -37,7 +41,7 @@
 
 ## 更新日志
 
-见 [CHANGELOG.md](CHANGELOG.md)：`6.3.3 · BUILD 80` 给英文代码视图加上自动换行，长字符串/长数组在手机上一行看不完时自动折行；`6.3.2 · BUILD 79` 给经典版三端加上「英文代码视图」（把 level.dat 的 NBT 翻成英文代码改，保存自动编码回二进制）；`6.3.1 · BUILD 78` 修好经典版 Windows / Linux 两端「db 点哪个文件都显示 .log」和「导出提示成功但文件没落盘」两个同源 bug，并给桌面端补上十进制字节编辑、保存前自动备份、拖拽打开；`6.3.0 · BUILD 77` 修好了汉化工具「下载」点了没反应（安卓与网页端同源问题），补上 C++ 版 Windows 原生界面；并修好 db 文件夹「点哪个文件都显示 .log」的问题，db / level.dat 现在能按十进制字节查看与编辑。
+见 [CHANGELOG.md](CHANGELOG.md)：1.0.0 是首个公开发布版本，把存档 `level.dat` 的 NBT 摊成「类型 路径 = 值」的英文代码（保存自动编码回二进制）、给英文代码视图加上长字段自动换行（手机上不用横拖）、并让 db 里的非 NBT 文件按 0x 偏移看英文串、按十进制字节就地编辑，改前自动备份整包。
 
 ## 目录
 

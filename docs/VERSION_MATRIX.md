@@ -1,51 +1,45 @@
 # 版本矩阵与包名规划
 
-## 一、三个版本
+## 一、对外版本口径
 
-| 版本 | 代号 | 显示名 | Android `applicationId` | Windows | Linux | 内核 |
-| --- | --- | --- | --- | --- | --- | --- |
-| 经典版 | `CL` | MC工具箱 | `com.mctoolbox.classic` | `MC工具箱.exe` | `mctoolbox` | JS（内置，同源） |
-| JAVA 重制版 | `JV` | MC工具箱·JAVA | `com.mctoolbox.java` | `MC工具箱-JAVA.exe` | `mctoolbox-java` | Java（`kernels/java`） |
-| C++ 重制版 | `CP` | MC工具箱·C++ | `com.mctoolbox.cpp` | `MC工具箱-C++.exe` | `mctoolbox-cpp` | C++（`kernels/cpp`） |
+- **对外公开版本从 1.0.0 起算**。此前所有编号只用于内部迭代，未对外发布、未公开测试，不作为下载版本出现。
+- 本次只发布 **经典版三端**（Android / Windows / Linux）。
+- JAVA 重制版（`com.mctoolbox.java`）与 C++ 重制版（`com.mctoolbox.cpp`）仍在内部开发，暂不对外发布；
+  包名规划保留，日后正式发布时与经典版同机共存。
 
-> 上表 `applicationId` 为建议值，用于满足「包名不同、可共存」。如果你已有既存包名或商店后台记录，
-> **以既有值为准**，改这一列 + `build.gradle` 的 `applicationId` + 各端快捷方式名即可，其余不用动。
+## 二、当前发布版本
 
-## 二、平台 × 版本
+| 项目 | 值 |
+| --- | --- |
+| 对外版本 | **1.0.0** |
+| BUILD | 1 |
+| 发布日期 | 2026-11-22 |
+| Android `applicationId` | `com.doubao.mctoolbox` |
+| Android `versionCode` | 80（沿用既有值，保证覆盖安装可升级） |
+| 三端 `assets/assets_app.js` | 同一份文件，md5 `c8997f90d8cb62fdef0c3e0d9b8e0a0e` |
+| 许可 | MIT，全离线运行 |
 
-| | Android | Windows | Linux | Web/PWA |
-| --- | --- | --- | --- | --- |
-| 经典版 | APK（arm64 + armv7，通用包） | ZIP（exe + 资源） | TAR.GZ / DEB | 单文件 HTML |
-| JAVA 重制版 | APK（通用包，arm64 + armv7 + x86_64；内核编进 dex，不依赖外部 JRE） | ZIP（jar + 启动.bat，需 JRE 17+） | TAR.GZ（jar + start.sh） | 由网页版承担 |
-| C++ 重制版 | APK（NDK，arm64 + armv7 + x86_64；内核编成 libmct.so 走 JNI；批量队列 + 并行） | ZIP（Windows 原生深色界面 `mctool-gui.exe` + 静态 CLI `mctool.exe`） | TAR.GZ（原生 GTK 界面 + 静态 CLI） | 由网页版承担 |
+## 三、平台 × 版本
 
-说明：JAVA / C++ 两版的网页形态不做第二套壳，网页端统一由 JS 内核提供，保证「同一件事在哪都能做」。
+| | Android | Windows | Linux |
+| --- | --- | --- | --- |
+| 经典版 1.0.0 | `MC-Toolbox-Classic-1.0.0-android.apk` | `MC-Toolbox-Windows-1.0.0.zip` | `MC-Toolbox-Linux-1.0.0.tar.gz` / `.deb` |
+| JAVA 重制版 | 内部开发中，不发布 | 内部开发中，不发布 | 内部开发中，不发布 |
+| C++ 重制版 | 内部开发中，不发布 | 内部开发中，不发布 | 内部开发中，不发布 |
 
-## 三、版本号口径
+## 四、共存与升级
 
-* 主版本（6.x）三版共享：同一批内核修复、同一份格式规范、同一天发版。
-* 子版本各自独立：`6.3.0-CL` / `6.3.0-JV` / `6.3.0-CP`，允许某版本单独发补丁（如 `6.3.1-CP`）。
-* BUILD 号全局递增，便于对日志。当前 **BUILD 78**。
+- 三端包内 `assets/assets_app.js` 逐字节一致，Windows / Linux / Android 行为一致。
+- 桌面端解压即用，配置保存在用户目录，升级只替换程序目录。
+- 安卓端 `versionCode` 只增不减，覆盖安装即可升级；包名不变，数据不清空。
 
-## 四、停更承诺
+## 五、安卓端说明
 
-* 任一版本不因新版本出现而停更。
-* 内核级问题（格式、规则、安全、CRC 校验）**三版同步修复**，同日发版。
-* 界面级更新按定位各自推进：经典版求稳、JAVA 版求逻辑统一、C++ 版求性能与高级功能。
+安卓包的对外文件名是 1.0.0；安装器里显示的 `versionName` 仍是内部迭代时写入的编号，
+本次未重建 APK（环境没有 build-tools，改它需要重新签名）。对外一律以 1.0.0 为准，
+下一轮打包会把 `versionName` 一起改成 1.0.0，`versionCode` 继续递增。
 
-## 五、共存注意事项
+## 六、未来版本规划
 
-* 包名不同 → 系统允许同时安装，桌面图标可用后缀区分（`·JAVA` / `·C++`）。
-* 配置与缓存目录带版本后缀：`~/.mctoolbox/classic`、`~/.mctoolbox/java`、`~/.mctoolbox/cpp`。
-* 三者可互相打开对方产出的 `.mcpack/.mcaddon`（同一内核规范）。
-* 签名：同一 keystore 可为三者签名，但 `applicationId` 不同即视为不同应用，互不覆盖升级。
-
-## 六、安卓端现状（6.3.0 / BUILD 77，桌面端 6.3.1 / BUILD 78）
-
-| 版本 | 产物 | `applicationId` | 签名 | 校验 |
-| --- | --- | --- | --- | --- |
-| 经典版 | `MC-Toolbox-Classic-6.3.0-android.apk`（959 KB，versionCode 75） | `com.doubao.mctoolbox` | `MC工具箱签名/mctoolbox-android.keystore`（旧密钥已丢失，需卸载重装） | 带自动换行开关；汉化工具下载已修复，落盘到「下载/MC工具箱」 |
-| JAVA 重制版 | `MC-Toolbox-Java-6.3.0-android.apk`（128 KB） | `com.mctoolbox.java` | `MC工具箱签名/mctoolbox-android.keystore` | 内核类与桌面 JAR 同源，371/371 往返 0 差异 |
-| C++ 重制版 | `MC-Toolbox-Cpp-6.3.0-android.apk`（3.3 MB，三 ABI） | `com.mctoolbox.cpp` | 同上 | JNI 桥实跑 208→371，371/371 往返 0 差异；4 线程并发 4 包全成功 |
-
-三者 `applicationId` 互不相同，可同机共存；`minSdk 26`、`targetSdk 34`，启动入口都是 `MainActivity`（无第三方依赖，不引 AndroidX）。
+- 对外补丁版本按 `1.0.x` 递增；功能版本按 `1.x.0` 递增。
+- JAVA / C++ 两版完成内部验收后再单独公布版本号，不占用经典版的编号。
