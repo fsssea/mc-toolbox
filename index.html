@@ -160,6 +160,7 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:12px;color
     <nav class="navlinks" aria-label="主导航">
       <a href="#changes">更新</a>
       <a href="#versions">下载</a>
+      <a href="./app/">网页版</a>
       <a href="#numbering">版本号</a>
       <a href="#faq">说明</a>
       <a href="#open">开源</a>
@@ -178,7 +179,7 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:12px;color
         <p class="lead">这是第一个公开发布的版本。经典版覆盖 Android、Windows、Linux 三端，共用同一个解析器与同一份 <span class="mono">assets_app.js</span>。存档里的 <span class="mono">level.dat</span> 不用再对着一串十进制字节看，直接翻成英文代码，改完保存自动编码回二进制。全离线，不联网也能用。</p>
         <div class="actions">
           <a class="btn pri" href="#versions">下载 1.0.0 <span class="mono" style="font-weight:400">· 三端</span></a>
-          <a class="btn sec" href="#changes">看这次改了什么</a>
+          <a class="btn sec" href="./app/">打开网页版 1.0.0</a>
         </div>
         <div class="hero-meta mono">
           <span>2026-11-22</span>
@@ -212,7 +213,7 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:12px;color
             <a class="m-a" href="./dl/MC-Toolbox-Linux-1.0.0.tar.gz" download>下载</a>
           </li>
         </ul>
-        <div class="m-foot"><span>经典版三端齐备 · JAVA / C++ 重制版内部开发中</span><a href="#numbering">为什么是 1.0.0</a></div>
+        <div class="m-foot"><span>经典版三端齐备 · 网页版 1.0.0 可直接用</span><a href="#numbering">为什么是 1.0.0</a></div>
       </aside>
     </div>
   </section>
@@ -270,6 +271,7 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:12px;color
             <li>界面常驻提示：db 是存档最重要的数据文件夹</li>
             <li>随便修改可能导致存档报废，先导出再改</li>
           </ul>
+          <img class="shot" src="./dbtext.png" alt="db 文件英文串视图截图" loading="lazy">
         </article>
       </div>
 
@@ -296,9 +298,9 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:12px;color
         </div>
         <div class="vbox">
           <div class="mono">PACKAGES</div>
-          <div class="big">3<span style="font-size:22px"> 端</span></div>
-          <small>Android · Windows · Linux</small>
-          <p style="margin-top:14px">JAVA 重制版与 C++ 重制版仍在内部开发，暂不对外发布；今天只发经典版三端。</p>
+          <div class="big">3<span style="font-size:22px"> 端 + 网页</span></div>
+          <small>Android · Windows · Linux · 网页版</small>
+          <p style="margin-top:14px">网页版（PWA）同样只提供经典版 1.0.0，与三个安装包共用同一份内核；不需要注册，打开即用。</p>
         </div>
       </div>
 
@@ -322,6 +324,11 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:12px;color
           <span class="os">Linux · deb</span>
           <span class="f">MC-Toolbox-Linux-1.0.0.deb · 73 MB · Debian / Ubuntu</span>
           <a href="./dl/MC-Toolbox-Linux-1.0.0.deb" download>下载 DEB</a>
+        </div>
+        <div class="trow">
+          <span class="os">网页版</span>
+          <span class="f">app/ · PWA · 1.0.0 · 与安装包同一份 assets_app.js · 可安装到桌面离线用</span>
+          <a href="./app/">打开网页版</a>
         </div>
       </div>
     </div>
@@ -364,7 +371,7 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:12px;color
       <div class="faq">
         <details open>
           <summary>三端装哪个？能一起装吗？</summary>
-          <p>按设备选：手机装 APK，Windows 解压 ZIP 直接用，Linux 用 tar.gz 或 deb。三端是不同设备上的同一款软件，包名与桌面端不冲突；同一台手机重复覆盖安装即可升级。</p>
+          <p>按设备选：手机装 APK，Windows 解压 ZIP 直接用，Linux 用 tar.gz 或 deb，不想装东西就开网页版（同样只有经典版 1.0.0）。三端是不同设备上的同一款软件，包名与桌面端不冲突；同一台手机重复覆盖安装即可升级。</p>
         </details>
         <details>
           <summary>英文代码改完，存档会不会坏？</summary>

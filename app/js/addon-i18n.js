@@ -79,57 +79,16 @@
     }
   }, true);
 
-  function b64ToBlob(b64) {
-    var bin = atob(String(b64 || '')), len = bin.length, arr = new Uint8Array(len);
-    for (var i = 0; i < len; i++) arr[i] = bin.charCodeAt(i);
-    return new Blob([arr], { type: 'application/octet-stream' });
-  }
-
-  // 浏览器里没有原生桥：在顶层文档里真下载，iframe / iOS 上也能落地
-  function saveToBrowser(name, b64) {
-    var blob = b64ToBlob(b64);
-    if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-      window.navigator.msSaveOrOpenBlob(blob, name);
-      return true;
-    }
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = name;
-    a.rel = 'noopener';
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function () {
-      try { document.body.removeChild(a); } catch (e) {}
-      URL.revokeObjectURL(url);
-    }, 4000);
-    return true;
-  }
-
-  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
   window.addEventListener('message', function (e) {
     var d = e.data || {};
-    // 只接受自己这个 iframe 发来的消息
-    if (frame && e.source && frame.contentWindow && e.source !== frame.contentWindow) return;
-    if (d.type === 'mc-i18n-save-b64') {
+    if (d.type === 'mc-i18n-save-b64' && window.AndroidBridge && window.AndroidBridge.saveBinary) {
       try {
-        if (window.AndroidBridge && window.AndroidBridge.saveBinary) {
-          var path = window.AndroidBridge.saveBinary(d.name, d.b64);
-          if (String(path).indexOf('ERR') === 0) toast('保存失败：' + path, true);
-          else toast('已保存到 ' + path);
-          return;
-        }
-        saveToBrowser(d.name, d.b64);
-        toast(isIOS ? '已开始下载：' + d.name + '（没反应就去「文件」App 里找一下）'
-                    : '已开始下载：' + d.name);
-      } catch (err) {
-        toast('保存失败：' + (err && err.message), true);
-      }
+        var path = window.AndroidBridge.saveBinary(d.name, d.b64);
+        if (String(path).indexOf('ERR') === 0) toast('保存失败：' + path, true);
+        else toast('已保存到应用目录：' + path);
+      } catch (err) { toast('保存失败：' + err.message, true); }
     } else if (d.type === 'mc-i18n-saved') {
-      toast('已保存到 ' + (d.path || d.name));
+      toast('已保存到应用目录：' + (d.path || d.name));
     } else if (d.type === 'mc-i18n-error') {
       toast('保存失败：' + (d.message || '未知错误'), true);
     }
