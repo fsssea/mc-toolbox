@@ -7,7 +7,19 @@
 - 漏洞看板：https://fsssea.github.io/mc-toolbox/feedback/#board
 - 漏洞档案：`https://fsssea.github.io/mc-toolbox/feedback/bug-N/`（第一条反馈为 BUG-1，编号固定不变；每条记录标注六种状态之一 ——「重要 · 待修 / 病又复发了 / 正在修复 / 已修复 / 设计的特性 / 不存在的漏洞」——以及受影响版本区间与修复版本）
 
+- **管理台（管理员定级 / 席位名册）**：https://fsssea.github.io/mc-toolbox/feedback/admin/
+
 漏洞数据在 `feedback/bugs.json`，页面由 `feedback/tools/gen_bugs.py` 生成：登记一条新漏洞 → 改 JSON → 跑脚本 → 提交 `feedback/bug-N/index.html`。
+
+新提交的漏洞先处于「待定 · 等待定级」这一预状态，由管理员从六种正式状态里定级后才进入看板排序。
+
+### 管理员体系（席位制 · 提案制）
+
+- 名册与规则写在 `feedback/admins.json`：`seats: 10`、`wrong_call_limit: 10`、两位创始人为最高管理员（不占席位）。
+- 反馈站开放注册后**前 10 位通过审核的申请者**获得管理员权限；申请与定级都通过 GitHub Issue 提案（`admin-request` / `status-vote` / `admin-strike` / `admin-revoke`），由创始人复核后改写 `admins.json` 生效。
+- 管理员唯一的权力是把「待定」漏洞定级为六种状态之一，并写明依据；不能下架、不能改标题、不能封人。
+- 定级被创始人驳回一次记 1 次误判，**超过 10 次（第 11 次起）永久取消管理员权限**，不可重新申请；席位撤销后不回收、不补位，名册公开可复核。
+- 站点是纯静态页，没有后端与登录，页面只负责登记与生成提案，**不会伪造登录或权限**。
 - 下载：https://github.com/fsssea/mc-toolbox/releases
 
 > **语言 / Language**：官网与反馈站支持 简体中文 · 繁體中文 · English · 日本語 · 한국어，默认跟随系统语言，页面右上角可手动切换（也可用 `?lang=en` 这类参数固定语言）。
