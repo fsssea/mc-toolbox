@@ -2,6 +2,7 @@
 ## 官网与下载
 
 - 官网：https://fsssea.github.io/mc-toolbox/
+- **哔哩哔哩唯一官方账号**：[@一只想飞的巨型大嘴花](https://space.bilibili.com/3546753368329112/)（space id `3546753368329112`，唯一发布渠道，同名账号均非官方）
 - 网页版：https://fsssea.github.io/mc-toolbox/app/
 - **反馈中心（报 bug / 提建议的唯一官方入口）**：https://fsssea.github.io/mc-toolbox/feedback/
 - 漏洞看板：https://fsssea.github.io/mc-toolbox/feedback/#board
