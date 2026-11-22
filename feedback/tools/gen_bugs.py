@@ -18,8 +18,9 @@ import json, os, sys, io
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(BASE, "bugs.json")
 
-STATUS = ["important", "regression", "fixing", "fixed", "bydesign", "invalid"]
+STATUS = ["pending", "important", "regression", "fixing", "fixed", "bydesign", "invalid"]
 STATUS_ZH = {
+    "pending": "待定 · 等待定级",
     "important": "重要 · 待修",
     "regression": "病又复发了",
     "fixing": "正在修复",
@@ -39,7 +40,7 @@ TEMPLATE = r"""<!DOCTYPE html>
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
 :root{{--paper:#e8edf3;--ink:#101820;--muted:#5b6875;--line:#aeb9c5;--blue:#1859d8;
---important:#c0392b;--regression:#a5315f;--fixing:#c07a1c;--fixed:#3f9d6a;--bydesign:#1859d8;--invalid:#6b7785;--max:1000px;}}
+--important:#c0392b;--regression:#a5315f;--fixing:#c07a1c;--fixed:#3f9d6a;--bydesign:#1859d8;--invalid:#6b7785;--pending:#55607a;--max:1000px;}}
 *{{box-sizing:border-box}}
 body{{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-size:16px;line-height:1.75}}
 .mono{{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace}}
@@ -73,6 +74,7 @@ h1{{font-size:clamp(26px,3.6vw,40px);line-height:1.22;letter-spacing:-.02em;marg
 .badge.fixed{{color:var(--fixed);border-color:var(--fixed)}} .badge.fixed i{{background:var(--fixed)}}
 .badge.bydesign{{color:var(--bydesign);border-color:var(--bydesign)}} .badge.bydesign i{{background:var(--bydesign)}}
 .badge.invalid{{color:var(--invalid);border-color:var(--invalid)}} .badge.invalid i{{background:var(--invalid)}}
+.badge.pending{{color:var(--pending);border-color:var(--pending)}} .badge.pending i{{background:var(--pending)}}
 .meta{{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:26px 0 0}}
 .meta div{{background:#f1f5f9;padding:12px 14px}}
 .meta .k{{font-size:11px;color:var(--muted);letter-spacing:.06em}}
@@ -186,6 +188,7 @@ footer{{border-top:1px solid var(--line);margin-top:20px;padding:20px 0 40px;fon
     regression: [['tl.report','done'],['tl.reg1','done'],['tl.reg2','now'],['tl.reg3','']],
     fixing:     [['tl.report','done'],['tl.confirm','done'],['tl.fixing','now'],['tl.fixed','']],
     fixed:      [['tl.report','done'],['tl.confirm','done'],['tl.fixing','done'],['tl.fixed','done']],
+    pending:    [['tl.report','done'],['tl.pending','now']],
     bydesign:   [['tl.report','done'],['tl.bydesign','done']],
     invalid:    [['tl.report','done'],['tl.invalid','done']]
   }};

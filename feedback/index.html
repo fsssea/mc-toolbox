@@ -32,7 +32,7 @@ a{color:inherit}
 .links a[aria-current="page"]{border-color:var(--blue);color:var(--blue)}
 .lang{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
 .lang select{font:inherit;font-size:12px;padding:5px 8px;border:1px solid var(--line);border-radius:3px;background:#fff;color:var(--ink)}
-@media(max-width:780px){.links{display:none}.brand span{display:none}}
+@media(max-width:780px){.links{order:3;width:100%;margin-left:0;gap:16px;overflow-x:auto;padding:6px 0 8px}.links a{white-space:nowrap}.brand span{display:none}.nav-in{flex-wrap:wrap;height:auto;min-height:62px;padding-top:12px;padding-bottom:0;row-gap:0}.lang{margin-left:auto}}
 
 .hero{padding:64px 0 48px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
 .hero::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:
@@ -89,7 +89,7 @@ input:focus,textarea:focus,select:focus{outline:2px solid rgba(24,89,216,.35);bo
 .links-sec h2{color:#fff}
 .links-sec .sec-label{color:#8fb8ff}
 .links-sec .sec-desc{color:var(--panel-muted)}
-.linkgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.linkgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
 .lcard{border:1px solid var(--panel-line);padding:18px;text-decoration:none;color:var(--panel-fg);background:rgba(255,255,255,.02);transition:.15s}
 .lcard:hover{border-color:#8fb8ff;transform:translateY(-2px)}
 .lcard .mono{font-size:10px;letter-spacing:.14em;color:#8fb8ff}
@@ -120,6 +120,8 @@ footer{border-top:1px solid var(--line);padding:22px 0 36px;font-size:12px;color
 @media(max-width:640px){.bugrow{grid-template-columns:1fr;gap:6px}.bugrow .num{order:1}}
 
 .stat.regression .d{background:#a5315f}.stat.bydesign .d{background:#1859d8}.stat.invalid .d{background:#6b7785}
+.stat.pending .d{background:#55607a}
+.sbadge.pending{color:#55607a;border-color:#55607a}
 .sbadge.regression{color:#a5315f;border-color:#a5315f}
 .sbadge.bydesign{color:#1859d8;border-color:#1859d8}
 .sbadge.invalid{color:#6b7785;border-color:#6b7785}
@@ -142,10 +144,10 @@ footer{border-top:1px solid var(--line);padding:22px 0 36px;font-size:12px;color
       <a href="../" data-i18n="nav.home">官网</a>
       <a href="../#versions" data-i18n="nav.download">下载</a>
       <a href="../feedback/" aria-current="page" data-i18n="nav.feedback">反馈</a>
+      <a href="./admin/" data-i18n="nav.admin">管理台</a>
       <a href="https://github.com/fsssea/mc-toolbox" data-i18n="nav.repo">开源仓库</a>
     </nav>
     <div class="lang">
-      <span data-i18n="nav.lang">语言</span>
       <select id="langSel" aria-label="Language"></select>
     </div>
   </div>
@@ -174,6 +176,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 36px;font-size:12px;color
       <div class="board-stats" id="boardStats"></div>
       <div class="buglist" id="bugList"><p class="bugempty" data-i18n="board.empty">还没有登记的漏洞。</p></div>
       <div class="legend" id="legend">
+        <div class="lg"><span class="sbadge pending" data-i18n="status.pending">待定 · 等待定级</span><p data-i18n="legend.pending">刚提交时的状态，由管理员定级为下面六种之一。</p></div>
         <div class="lg"><span class="sbadge important" data-i18n="status.important">重要 · 待修</span><p data-i18n="legend.important">已确认，影响面大，排在修复队列最前。</p></div>
         <div class="lg"><span class="sbadge regression" data-i18n="status.regression">病又复发了</span><p data-i18n="legend.regression">之前修好过，但新版本里又出现了，按新漏洞重新登记。</p></div>
         <div class="lg"><span class="sbadge fixing" data-i18n="status.fixing">正在修复</span><p data-i18n="legend.fixing">已经动手改，验证用例补完就合入。</p></div>
@@ -330,7 +333,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 36px;font-size:12px;color
   <section class="links-sec" id="links">
     <div class="wrap">
       <div class="sec-label mono">LINKS / 相关入口</div>
-      <h2 data-i18n="links.h">四个入口，各管一件事。</h2>
+      <h2 data-i18n="links.h">五个入口，各管一件事。</h2>
       <p class="sec-desc" data-i18n="links.desc">下载去官网，报问题留在这里，看源码去仓库，更新记录在日志里。</p>
       <div class="linkgrid">
         <a class="lcard" href="../">
@@ -342,6 +345,11 @@ footer{border-top:1px solid var(--line);padding:22px 0 36px;font-size:12px;color
           <span class="mono">FEEDBACK</span>
           <b data-i18n="links.fb">反馈中心</b>
           <small data-i18n="links.fb.d">当前页面，报 bug 与建议</small>
+        </a>
+        <a class="lcard" href="./admin/">
+          <span class="mono">ADMIN</span>
+          <b data-i18n="links.admin">管理台</b>
+          <small data-i18n="links.admin.d">前十位管理员的名册与定级</small>
         </a>
         <a class="lcard" href="https://github.com/fsssea/mc-toolbox">
           <span class="mono">SOURCE / MIT</span>
@@ -379,10 +387,15 @@ const I18N = {
     "form.label":"REPORT / 提交反馈","how.label":"HOW TO / 怎么写才有用","faq.label":"FAQ / 常见问题",
     "board.label":"BOARD / 漏洞看板",
     "board.h":"每条漏洞一个固定编号，修到哪一步都看得见。",
-    "board.d":"提交后登记成 BUG-N，固定链接是 feedback/bug-N/，编号一旦分配就不再变。这里按「重要待修 → 病又复发了 → 正在修复 → 已修复 → 设计的特性 → 不存在的漏洞」排，并标出它出现在哪些版本。",
+    "board.d":"先进入「待定」，管理员定级后归入下面六种之一。提交后登记成 BUG-N，固定链接是 feedback/bug-N/，编号一旦分配就不再变。这里按「重要待修 → 病又复发了 → 正在修复 → 已修复 → 设计的特性 → 不存在的漏洞」排，并标出它出现在哪些版本。",
     "board.empty":"还没有登记的漏洞。",
     "board.note":"状态和修复版本由维护者更新；一条漏洞从「重要 · 待修」走到「已修复」，过程都会留在它自己的页面上。",
     "board.total":"全部",
+    "nav.admin":"管理台",
+    "status.pending":"待定 · 等待定级",
+    "legend.pending":"刚提交时的状态，由管理员定级为下面六种之一。",
+    "links.admin":"管理台",
+    "links.admin.d":"前十位管理员的名册与定级",
     "status.regression":"病又复发了",
     "status.bydesign":"设计的特性",
     "status.invalid":"不存在的漏洞",
@@ -422,7 +435,7 @@ const I18N = {
     "faq.q2":"多久会修？","faq.a2":"崩溃、存档写坏这类先修；界面与体验类按批次排。修好后会在对应 Issue 里回一句「已在 1.0.x 修复」，你可以回来查。",
     "faq.q3":"能提功能建议和汉化问题吗？","faq.a3":"可以，类型选「功能建议」。汉化缺词、错译请附上原文与截图，方便直接改。",
     "faq.q4":"会不会把我存档传上去？","faq.a4":"不会自动上传。软件全离线运行；只有你自己在 Issue 里主动附加的文件才会公开，贴之前请先脱敏。",
-    "links.h":"四个入口，各管一件事。","links.desc":"下载去官网，报问题留在这里，看源码去仓库，更新记录在日志里。",
+    "links.h":"五个入口，各管一件事。","links.desc":"下载去官网，报问题留在这里，看源码去仓库，更新记录在日志里。",
     "links.site":"官网","links.site.d":"下载 1.0.0 三端与网页版",
     "links.fb":"反馈中心","links.fb.d":"当前页面，报 bug 与建议",
     "links.repo":"开源仓库","links.repo.d":"源码、Issue、版本历史",
@@ -442,10 +455,15 @@ const I18N = {
     "form.label":"REPORT / 提交回饋","how.label":"HOW TO / 怎麼寫才有用","faq.label":"FAQ / 常見問題",
     "board.label":"BOARD / 漏洞看板",
     "board.h":"每條漏洞一個固定編號，修到哪一步都看得見。",
-    "board.d":"提交後登記成 BUG-N，固定連結是 feedback/bug-N/，編號一旦分配就不再變。這裡依「重要待修 → 病又復發了 → 修復中 → 已修復 → 設計的特性 → 不存在的漏洞」排，並標出它出現在哪些版本。",
+    "board.d":"先進入「待定」，管理員定級後歸入下面六種之一。提交後登記成 BUG-N，固定連結是 feedback/bug-N/，編號一旦分配就不再變。這裡依「重要待修 → 病又復發了 → 修復中 → 已修復 → 設計的特性 → 不存在的漏洞」排，並標出它出現在哪些版本。",
     "board.empty":"還沒有登記的漏洞。",
     "board.note":"狀態與修復版本由維護者更新；一條漏洞從「重要 · 待修」走到「已修復」，過程都會留在它自己的頁面上。",
     "board.total":"全部",
+    "nav.admin":"管理台",
+    "status.pending":"待定 · 等待定級",
+    "legend.pending":"剛提交時的狀態，由管理員定級為下面六種之一。",
+    "links.admin":"管理台",
+    "links.admin.d":"前十位管理員的名冊與定級",
     "status.regression":"病又復發了",
     "status.bydesign":"設計的特性",
     "status.invalid":"不存在的漏洞",
@@ -484,7 +502,7 @@ const I18N = {
     "faq.q2":"多久會修？","faq.a2":"當機、存檔寫壞這類先修；介面與體驗類按批次排。修好後會在對應 Issue 回一句「已在 1.0.x 修復」，你可以回來查。",
     "faq.q3":"能提功能建議和漢化問題嗎？","faq.a3":"可以，類型選「功能建議」。漢化缺詞、錯譯請附上原文與截圖，方便直接改。",
     "faq.q4":"會不會把我存檔傳上去？","faq.a4":"不會自動上傳。軟體全離線執行；只有你自己在 Issue 裡主動附加的檔案才會公開，貼之前請先去識別化。",
-    "links.h":"四個入口，各管一件事。","links.desc":"下載去官網，回報問題留在這裡，看原始碼去倉庫，更新記錄在日誌裡。",
+    "links.h":"五個入口，各管一件事。","links.desc":"下載去官網，回報問題留在這裡，看原始碼去倉庫，更新記錄在日誌裡。",
     "links.site":"官網","links.site.d":"下載 1.0.0 三端與網頁版",
     "links.fb":"回饋中心","links.fb.d":"目前頁面，回報 bug 與建議",
     "links.repo":"開源倉庫","links.repo.d":"原始碼、Issue、版本歷史",
@@ -504,10 +522,15 @@ const I18N = {
     "form.label":"REPORT / NEW ISSUE","how.label":"HOW TO / REPORT WELL","faq.label":"FAQ / COMMON QUESTIONS",
     "board.label":"BOARD / BUG BOARD",
     "board.h":"One fixed ID per bug — you can see how far the fix got.",
-    "board.d":"Each report becomes BUG-N with a permanent page at feedback/bug-N/; IDs never change once assigned. Sorted important → regression → fixing → fixed → by design → not a bug, with the versions it appeared in.",
+    "board.d":"New reports start as pending until an admin grades them into one of the six below. Each report becomes BUG-N with a permanent page at feedback/bug-N/; IDs never change once assigned. Sorted important → regression → fixing → fixed → by design → not a bug, with the versions it appeared in.",
     "board.empty":"No bugs registered yet.",
     "board.note":"Status and fix version are maintained by the maintainer; a bug's whole journey stays on its own page.",
     "board.total":"All",
+    "nav.admin":"Admin console",
+    "status.pending":"Pending · awaiting grade",
+    "legend.pending":"The state right after submission; an admin grades it into one of the six below.",
+    "links.admin":"Admin console",
+    "links.admin.d":"First ten admins, roster and grading",
     "status.regression":"Regression — it's back",
     "status.bydesign":"By design",
     "status.invalid":"Not a bug",
@@ -547,7 +570,7 @@ const I18N = {
     "faq.q2":"How fast is a fix?","faq.a2":"Crashes and world corruption first; UI and polish items in batches. The issue gets a note when fixed (\"fixed in 1.0.x\").",
     "faq.q3":"Feature requests and translation issues?","faq.a3":"Yes, pick \"Feature request\". For missing or wrong translations, include source text and a screenshot.",
     "faq.q4":"Will my world be uploaded?","faq.a4":"Not automatically. The app runs fully offline; only files you attach to an issue become public — redact first.",
-    "links.h":"Four doors, one job each.","links.desc":"Downloads on the site, problems here, source in the repo, history in the changelog.",
+    "links.h":"Five doors, one job each.","links.desc":"Downloads on the site, problems here, source in the repo, history in the changelog.",
     "links.site":"Official site","links.site.d":"Download 1.0.0 for three platforms + web",
     "links.fb":"Feedback center","links.fb.d":"This page — bugs and suggestions",
     "links.repo":"Source repo","links.repo.d":"Code, issues, version history",
@@ -567,10 +590,15 @@ const I18N = {
     "form.label":"REPORT / 送信","how.label":"HOW TO / 書き方のコツ","faq.label":"FAQ / よくある質問",
     "board.label":"BOARD / 不具合一覧",
     "board.h":"1 件ごとに固定 ID、修正の進み具合まで見える。",
-    "board.d":"送信すると BUG-N として登録され、ページは feedback/bug-N/ に固定。ID は変わりません。重要 → 再発 → 修正中 → 修正済み → 仕様どおり → 不具合ではない の順に並べ、発生したバージョンも表示します。",
+    "board.d":"新規報告はまず「保留中」に入り、管理者が下の 6 種のいずれかに格付けします。送信すると BUG-N として登録され、ページは feedback/bug-N/ に固定。ID は変わりません。重要 → 再発 → 修正中 → 修正済み → 仕様どおり → 不具合ではない の順に並べ、発生したバージョンも表示します。",
     "board.empty":"登録された不具合はまだありません。",
     "board.note":"状態と修正バージョンはメンテナが更新します。対応の過程は各ページに残ります。",
     "board.total":"すべて",
+    "nav.admin":"管理コンソール",
+    "status.pending":"保留中 · 格付け待ち",
+    "legend.pending":"送信直後の状態。管理者が下の 6 種のいずれかに格付けします。",
+    "links.admin":"管理コンソール",
+    "links.admin.d":"先着 10 名の名簿と格付け",
     "status.regression":"再発",
     "status.bydesign":"仕様どおり",
     "status.invalid":"不具合ではない",
@@ -610,7 +638,7 @@ const I18N = {
     "faq.q2":"いつ直りますか？","faq.a2":"クラッシュやワールド破損を優先、UI や改善はまとめて。修正後は Issue に「1.0.x で修正済み」と追記します。",
     "faq.q3":"要望や翻訳の指摘も可？","faq.a3":"可能です。「機能要望」を選んでください。翻訳の欠落・誤訳は原文とスクショを添えてください。",
     "faq.q4":"ワールドはアップロードされますか？","faq.a4":"自動では送信しません。完全オフライン動作です。Issue に自分で添付したファイルだけが公開されます。",
-    "links.h":"4 つの入口、役割は 1 つずつ。","links.desc":"ダウンロードは公式、不具合はここ、コードはリポジトリ、履歴は更新ログ。",
+    "links.h":"5 つの入口、役割は 1 つずつ。","links.desc":"ダウンロードは公式、不具合はここ、コードはリポジトリ、履歴は更新ログ。",
     "links.site":"公式サイト","links.site.d":"1.0.0 の 3 端末と Web 版",
     "links.fb":"フィードバック","links.fb.d":"このページ：不具合と要望",
     "links.repo":"ソースリポジトリ","links.repo.d":"コード・Issue・履歴",
@@ -630,10 +658,15 @@ const I18N = {
     "form.label":"REPORT / 제출","how.label":"HOW TO / 작성 요령","faq.label":"FAQ / 자주 묻는 질문",
     "board.label":"BOARD / 버그 보드",
     "board.h":"버그마다 고정 ID, 어디까지 고쳤는지 보입니다.",
-    "board.d":"제출하면 BUG-N 으로 등록되고 페이지는 feedback/bug-N/ 로 고정됩니다. ID 는 바뀌지 않습니다. 중요 → 재발 → 수정 중 → 수정 완료 → 설계상 동작 → 버그 아님 순으로 정렬하며 발생 버전도 표시합니다.",
+    "board.d":"새 보고는 먼저 「보류」로 들어가고, 관리자가 아래 6 종 중 하나로 등급을 정합니다. 제출하면 BUG-N 으로 등록되고 페이지는 feedback/bug-N/ 로 고정됩니다. ID 는 바뀌지 않습니다. 중요 → 재발 → 수정 중 → 수정 완료 → 설계상 동작 → 버그 아님 순으로 정렬하며 발생 버전도 표시합니다.",
     "board.empty":"등록된 버그가 없습니다.",
     "board.note":"상태와 수정 버전은 관리자가 갱신합니다. 처리 과정은 각 페이지에 남습니다.",
     "board.total":"전체",
+    "nav.admin":"관리 콘솔",
+    "status.pending":"대기 · 등급 판정 대기",
+    "legend.pending":"제출 직후 상태. 관리자가 아래 여섯 상태 중 하나로 판정합니다.",
+    "links.admin":"관리 콘솔",
+    "links.admin.d":"선착순 10명 명부와 등급 판정",
     "status.regression":"재발",
     "status.bydesign":"설계상 동작",
     "status.invalid":"버그 아님",
@@ -673,7 +706,7 @@ const I18N = {
     "faq.q2":"얼마나 빨리 고쳐지나요?","faq.a2":"크래시·월드 손상 우선, UI·개선은 묶음 처리. 수정되면 해당 Issue 에 \"1.0.x 에서 수정됨\"을 남깁니다.",
     "faq.q3":"기능 제안과 번역 문제도 되나요?","faq.a3":"됩니다. '기능 제안'을 선택하세요. 번역 누락·오역은 원문과 스크린샷을 첨부해 주세요.",
     "faq.q4":"제 월드가 업로드되나요?","faq.a4":"자동 업로드는 없습니다. 완전 오프라인 실행이며, Issue 에 직접 첨부한 파일만 공개됩니다.",
-    "links.h":"네 개의 입구, 역할은 하나씩.","links.desc":"다운로드는 공식 사이트, 문제는 여기, 코드는 저장소, 기록은 변경 로그.",
+    "links.h":"다섯 개의 입구, 역할은 하나씩.","links.desc":"다운로드는 공식 사이트, 문제는 여기, 코드는 저장소, 기록은 변경 로그.",
     "links.site":"공식 사이트","links.site.d":"1.0.0 세 플랫폼 + 웹",
     "links.fb":"피드백 센터","links.fb.d":"이 페이지 — 버그와 제안",
     "links.repo":"소스 저장소","links.repo.d":"코드·Issue·버전 기록",
@@ -688,6 +721,7 @@ const LANG_NAMES = {"zh-Hans":"简体中文","zh-Hant":"繁體中文","en":"Engl
 const SUPPORTED = Object.keys(I18N);
 
 function detectLang(){
+  try { const q = new URLSearchParams(location.search).get('lang'); if (q && I18N[q]) return q; } catch(e){}
   const saved = localStorage.getItem('mcbox-lang');
   if (saved && I18N[saved]) return saved;
   const list = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'en']);
@@ -720,14 +754,15 @@ function renderBoard(data){
   if (idEl) idEl.textContent = 'BUG-' + NEXT.id;
   if (urlEl) urlEl.textContent = 'https://fsssea.github.io/mc-toolbox/feedback/bug-' + NEXT.id + '/';
 
-  const order = {important:0, regression:1, fixing:2, fixed:3, bydesign:4, invalid:5};
+  const order = {pending:0, important:1, regression:2, fixing:3, fixed:4, bydesign:5, invalid:6};
   const sorted = bugs.slice().sort((a,b)=> (order[a.status] - order[b.status]) || (a.id - b.id));
-  const counts = { all: bugs.length, important:0, fixing:0, fixed:0 };
+  const counts = { all: bugs.length, pending:0, important:0, regression:0, fixing:0, fixed:0, bydesign:0, invalid:0 };
   bugs.forEach(b => counts[b.status] = (counts[b.status]||0) + 1);
   const stats = document.getElementById('boardStats');
   if (stats){
     stats.innerHTML = [
       ['all', counts.all, t('board.total')],
+      ['pending', counts.pending, t('status.pending')],
       ['important', counts.important, t('status.important')],
       ['regression', counts.regression, t('status.regression')],
       ['fixing', counts.fixing, t('status.fixing')],

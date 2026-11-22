@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>管理台 · MC工具箱 1.0.0</title>
+<meta name="description" content="MC工具箱反馈站管理台：管理员名册、前十位席位、给漏洞定级、误判计分与创始人复核规则。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23101820'/%3E%3Cpath d='M8 11l8-4 8 4v10l-8 4-8-4z' fill='none' stroke='%23e9eff6' stroke-width='2'/%3E%3Cpath d='M8 11l8 4 8-4M16 15v10' fill='none' stroke='%231859d8' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{--paper:#e8edf3;--ink:#101820;--muted:#5b6875;--line:#aeb9c5;--blue:#1859d8;--panel:#111a24;--panel-fg:#e9f0f7;--panel-muted:#9fb0c1;--panel-line:#2b3947;--ok:#3f9d6a;--warn:#c07a1c;--bad:#c0392b;--max:1060px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 26px}
+.nav{position:sticky;top:0;z-index:20;background:rgba(232,237,243,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav-in{max-width:var(--max);margin:0 auto;padding:0 26px;height:62px;display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none;flex:0 0 auto}
+.brand svg{display:block;flex:0 0 auto}
+.brand b{font-weight:900;font-size:16px}
+.brand span{font-size:11px;color:var(--muted);border-left:1px solid var(--line);padding-left:8px}
+.links{display:flex;gap:15px;margin-left:auto;font-size:13px}
+.links a{text-decoration:none;color:#2c3742;padding:3px 0;border-bottom:2px solid transparent}
+.links a[aria-current]{border-color:var(--blue);color:var(--blue)}
+.lang select{font:inherit;font-size:12px;padding:5px 8px;border:1px solid var(--line);background:#fff}
+@media(max-width:860px){.links{order:3;width:100%;margin-left:0;gap:15px;overflow-x:auto;padding:6px 0 8px}.links a{white-space:nowrap}.brand span{display:none}.nav-in{flex-wrap:wrap;height:auto;min-height:62px;padding-top:12px;padding-bottom:0;row-gap:0}}
+.hero{padding:56px 0 36px;border-bottom:1px solid var(--line)}
+.kicker{display:flex;gap:9px;align-items:center;font-size:11px;letter-spacing:.14em;color:var(--muted);margin-bottom:14px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--blue)}
+h1{font-size:clamp(30px,4.4vw,48px);line-height:1.18;letter-spacing:-.03em;margin:0 0 16px;font-weight:900}
+h1 em{font-style:normal;color:var(--blue)}
+.lead{max-width:46em;color:#31404c;margin:0 0 26px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.stat{background:#f1f5f9;padding:14px 16px}
+.stat .k{font-size:11px;color:var(--muted);letter-spacing:.08em}
+.stat .v{font-size:26px;font-weight:900;line-height:1.2}
+.stat .s{font-size:11px;color:var(--muted)}
+@media(max-width:760px){.stats{grid-template-columns:1fr}}
+section{padding:46px 0}
+h2{font-size:clamp(22px,2.6vw,28px);font-weight:900;letter-spacing:-.02em;margin:0 0 8px}
+.sec-desc{color:var(--muted);font-size:14px;max-width:48em;margin:0 0 24px}
+.card{border:1px solid var(--line);background:#f1f5f9;padding:20px}
+.founders{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.fcard{background:var(--panel);color:var(--panel-fg);border:1px solid #0a1119;padding:16px}
+.fcard .t{font-size:10px;letter-spacing:.14em;color:#8fb8ff}
+.fcard .n{font-size:16px;font-weight:900;margin:6px 0 2px}
+.fcard .g{font-size:12px;color:var(--panel-muted)}
+@media(max-width:760px){.founders{grid-template-columns:1fr}}
+.seats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.seat{border:1px solid var(--line);background:#fff;padding:10px 11px;min-height:78px;display:flex;flex-direction:column;gap:3px}
+.seat .n{font-size:10px;color:var(--muted);letter-spacing:.06em}
+.seat .g{font-size:12px;font-weight:700;word-break:break-all}
+.seat .w{font-size:11px;color:var(--muted)}
+.seat.empty{background:repeating-linear-gradient(135deg,#f6f8fb,#f6f8fb 6px,#eef2f7 6px,#eef2f7 12px);color:#8b98a5}
+.seat.revoked{border-color:#d8b4b4;background:#fbf0f0}
+.seat .bar{height:4px;background:#dfe6ee;margin-top:auto}
+.seat .bar i{display:block;height:100%;background:var(--warn)}
+@media(max-width:900px){.seats{grid-template-columns:repeat(2,1fr)}}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-size:13px;font-weight:700}
+.hint{font-size:11px;color:var(--muted);font-weight:400}
+input[type=text],textarea,select{font:inherit;font-size:14px;padding:10px 12px;border:1px solid var(--line);background:#fff;width:100%;border-radius:2px}
+textarea{min-height:80px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.row{grid-template-columns:1fr}}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid transparent;padding:11px 18px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;border-radius:2px}
+.btn.pri{background:var(--blue);color:#fff;box-shadow:4px 4px 0 #0b2c63}
+.btn.sec{background:transparent;border-color:var(--ink)}
+.btn.ghost{background:#fff;border-color:var(--line);font-weight:500}
+.note{font-size:12px;color:var(--muted);margin-top:12px}
+.note strong{color:var(--warn)}
+.rules{list-style:none;margin:0;padding:0;counter-reset:r}
+.rules li{border-top:1px solid var(--line);padding:14px 0 14px 44px;position:relative;font-size:14px;color:#2f3d49}
+.rules li::before{counter-increment:r;content:counter(r,decimal-leading-zero);position:absolute;left:0;top:14px;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--blue)}
+.rules li.hot{border-left:3px solid var(--bad);padding-left:41px;background:#fbf0f0}
+.pending{font-size:12px;color:var(--muted);padding:14px;border:1px dashed var(--line);background:#fff}
+footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:12px;color:var(--muted)}
+.foot-in{max-width:var(--max);margin:0 auto;padding:0 26px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:10px 18px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:50}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="../../"><svg viewBox="0 0 32 32" style="width:24px;height:24px"><path d="M6 10l10-5 10 5v12l-10 5-10-5z" fill="none" stroke="#101820" stroke-width="2"/><path d="M6 10l10 5 10-5M16 15v12" fill="none" stroke="#1859d8" stroke-width="2"/></svg><b>MC工具箱</b><span class="mono">v1.0.0</span></a>
+    <nav class="links">
+      <a href="../../" data-i18n="nav.home">官网</a>
+      <a href="../" data-i18n="nav.feedback">反馈</a>
+      <a href="../#board" data-i18n="nav.board">漏洞看板</a>
+      <a href="./" aria-current="page" data-i18n="nav.admin">管理台</a>
+      <a href="https://github.com/fsssea/mc-toolbox" data-i18n="nav.repo">开源仓库</a>
+    </nav>
+    <div class="lang"><select id="langSel" aria-label="Language"></select></div>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="wrap">
+      <div class="kicker mono"><span class="dot"></span><span data-i18n="hero.kicker">ADMIN / 管理台 · 前十位席位</span></div>
+      <h1 data-i18n="hero.title">管理员只做一件事：<em>给漏洞定级</em>。</h1>
+      <p class="lead" data-i18n="hero.lead">前十位通过审核的申请者拿到管理员权限。权限只有一项：把「待定」漏洞定成六种状态之一，并写清理由。两位创始人复核定级，误判超过 10 次永久取消权限。</p>
+      <div class="stats">
+        <div class="stat"><div class="k mono" data-i18n="stat.seats">管理员席位</div><div class="v"><span id="seatUsed">0</span> / <span id="seatTotal">10</span></div><div class="s" data-i18n="stat.seats.s">前十位，撤销后不回收</div></div>
+        <div class="stat"><div class="k mono" data-i18n="stat.strikes">误判上限</div><div class="v">10</div><div class="s" data-i18n="stat.strikes.s">第 11 次永久取消</div></div>
+        <div class="stat"><div class="k mono" data-i18n="stat.founders">最高管理员</div><div class="v">2</div><div class="s" data-i18n="stat.founders.s">创始人，复核不抢席位</div></div>
+      </div>
+    </div>
+  </div>
+
+  <section id="roster">
+    <div class="wrap">
+      <h2 data-i18n="roster.h">管理员名册</h2>
+      <p class="sec-desc" data-i18n="roster.d">名册来自仓库里的公开文件，谁在任、谁被撤销、谁记了几次误判，都写在这里，没有隐藏名单。</p>
+      <div class="founders" id="founders"></div>
+      <div class="seats" id="seats"></div>
+      <p class="note" data-i18n="roster.note">误判计数由创始人在驳回 Issue 里登记；申诉成立的，创始人可撤销该次记录，撤销理由必须写在同一条 Issue 里。</p>
+    </div>
+  </section>
+
+  <section id="apply">
+    <div class="wrap">
+      <h2 data-i18n="apply.h">申请成为管理员</h2>
+      <p class="sec-desc" data-i18n="apply.d">填 GitHub 用户名和一句申请理由，会生成一条申请 Issue；创始人按 Issue 提交顺序审核，前十位通过者入册。</p>
+      <div class="card">
+        <div class="row">
+          <div class="field">
+            <label for="aGithub" data-i18n="apply.github">GitHub 用户名</label>
+            <input id="aGithub" type="text" placeholder="octocat" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="aReason" data-i18n="apply.reason">申请理由 <span class="hint" data-i18n="apply.reason.h">（一句话）</span></label>
+            <input id="aReason" type="text" data-i18n-ph="apply.reason.ph" placeholder="例：经常看存档报错，能稳定判断是 bug 还是用法问题">
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:10px">
+          <label style="display:flex;gap:8px;align-items:flex-start;font-weight:400;font-size:13px">
+            <input id="aAgree" type="checkbox" style="width:auto;margin-top:3px">
+            <span data-i18n="apply.agree">我接受规则：只能定级、不能下架；误判累计超过 10 次永久取消，且不可重新申请。</span>
+          </label>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn pri" id="btnApply" type="button" data-i18n="apply.btn">生成管理员申请</button>
+          <button class="btn ghost" id="btnApplyCopy" type="button" data-i18n="apply.copy">复制申请全文</button>
+        </div>
+        <p class="note" id="seatNote" data-i18n="apply.note">提交后在 GitHub 里确认发布即可；席位按通过审核的先后顺序发放。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="vote">
+    <div class="wrap">
+      <h2 data-i18n="vote.h">状态审批台</h2>
+      <p class="sec-desc" data-i18n="vote.d">管理员在这里给「待定」漏洞定级：选六种状态之一，写一句判断依据，生成审批提案交给创始人合并。</p>
+      <div class="card">
+        <div class="row">
+          <div class="field">
+            <label for="vBug" data-i18n="vote.bug">待定漏洞</label>
+            <select id="vBug"><option value="" data-i18n="vote.nobug">暂无待定漏洞</option></select>
+          </div>
+          <div class="field">
+            <label for="vStatus" data-i18n="vote.status">定级</label>
+            <select id="vStatus">
+              <option value="important" data-i18n="status.important">重要 · 待修</option>
+              <option value="regression" data-i18n="status.regression">病又复发了</option>
+              <option value="fixing" data-i18n="status.fixing">正在修复</option>
+              <option value="fixed" data-i18n="status.fixed">已修复</option>
+              <option value="bydesign" data-i18n="status.bydesign">设计的特性</option>
+              <option value="invalid" data-i18n="status.invalid">不存在的漏洞</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="vWhy" data-i18n="vote.why">判断依据</label>
+          <textarea id="vWhy" data-i18n-ph="vote.why.ph" placeholder="例：用 1.0.0 的 Linux 包复现，存档 .log 超 30KB 时崩；属崩溃类，应优先修。"></textarea>
+        </div>
+        <div class="field">
+          <label for="vAdmin" data-i18n="vote.admin">你的 GitHub 用户名</label>
+          <input id="vAdmin" type="text" placeholder="octocat" autocomplete="off">
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn pri" id="btnVote" type="button" data-i18n="vote.btn">生成定级提案</button>
+          <button class="btn ghost" id="btnVoteCopy" type="button" data-i18n="vote.copy">复制提案全文</button>
+        </div>
+        <p class="note" data-i18n="vote.note">提案不会直接改数据：创始人合并后 <span class="mono">bugs.json</span> 才生效，页面随之重新生成。管理员没有直接写库的权限，这是刻意的。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="rules">
+    <div class="wrap">
+      <h2 data-i18n="rules.h">规则：十次误判，永久出局</h2>
+      <p class="sec-desc" data-i18n="rules.d">下面六条是全部规则，没有口头补充。有异议就在对应 Issue 里申诉，别在评论区吵。</p>
+      <ul class="rules">
+        <li data-i18n="rules.1">前十位通过审核的申请者获得管理员权限；席位只发一次，被撤销后不回收、不补位。</li>
+        <li data-i18n="rules.2">管理员权限只有一项：把「待定」漏洞定级为六种状态之一，并写明判断依据。</li>
+        <li data-i18n="rules.3">不能下架漏洞、不能改标题、不能删别人反馈、不能封人；越权操作一律由创始人撤销。</li>
+        <li class="hot" data-i18n="rules.4">乱指挥按次计：每次定级被创始人驳回记 1 次误判；累计超过 10 次（第 11 次起）永久取消管理员权限，且不可重新申请。</li>
+        <li data-i18n="rules.5">误判计数公开展示在名册上；申诉成立的，创始人撤销该次记录，理由写在同一条 Issue 里。</li>
+        <li data-i18n="rules.6">两位创始人是最高管理员，不占席位，负责审核申请、复核定级、执行撤销；他们之间互相复核，不给自己记分。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="founder">
+    <div class="wrap">
+      <h2 data-i18n="founder.h">创始人复核区</h2>
+      <p class="sec-desc" data-i18n="founder.d">最高管理员用下面两条快捷入口登记误判与撤销，全部留痕在 GitHub Issue 里，公开可查。</p>
+      <div class="card">
+        <div class="row">
+          <div class="field">
+            <label for="fAdmin" data-i18n="founder.admin">管理员 GitHub 用户名</label>
+            <input id="fAdmin" type="text" placeholder="octocat" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="fBug" data-i18n="founder.bug">相关漏洞编号 <span class="hint">BUG-N</span></label>
+            <input id="fBug" type="text" placeholder="BUG-2" autocomplete="off">
+          </div>
+        </div>
+        <div class="field">
+          <label for="fWhy" data-i18n="founder.why">理由</label>
+          <textarea id="fWhy" data-i18n-ph="founder.why.ph" placeholder="例：把存档兼容问题定成「不存在的漏洞」，与复现步骤矛盾。"></textarea>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn sec" id="btnStrike" type="button" data-i18n="founder.strike">登记 1 次误判</button>
+          <button class="btn sec" id="btnRevoke" type="button" data-i18n="founder.revoke">撤销管理员权限</button>
+        </div>
+        <p class="note" data-i18n="founder.note">登记后由创始人改 <span class="mono">admins.json</span> 的计数；满 11 次把 <span class="mono">revoked</span> 置为 true 并重生成页面。</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot-in">
+    <span data-i18n="foot.copy">© 2026 MC工具箱 contributors · MIT License</span>
+    <span class="mono">ADMIN / seats 10 / wrong-call limit 10</span>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const I18N = {
+  "zh-Hans": {
+    "meta.title": "管理台 · MC工具箱 1.0.0",
+    "nav.home":"官网","nav.feedback":"反馈","nav.board":"漏洞看板","nav.admin":"管理台","nav.repo":"开源仓库","nav.lang":"语言",
+    "hero.kicker":"ADMIN / 管理台 · 前十位席位",
+    "hero.title":"管理员只做一件事：<em>给漏洞定级</em>。",
+    "hero.lead":"前十位通过审核的申请者拿到管理员权限。权限只有一项：把「待定」漏洞定成六种状态之一，并写清理由。两位创始人复核定级，误判超过 10 次永久取消权限。",
+    "stat.seats":"管理员席位","stat.seats.s":"前十位，撤销后不回收","stat.strikes":"误判上限","stat.strikes.s":"第 11 次永久取消","stat.founders":"最高管理员","stat.founders.s":"创始人，复核不抢席位",
+    "roster.h":"管理员名册","roster.d":"名册来自仓库里的公开文件，谁在任、谁被撤销、谁记了几次误判，都写在这里，没有隐藏名单。",
+    "roster.note":"误判计数由创始人在驳回 Issue 里登记；申诉成立的，创始人可撤销该次记录，撤销理由必须写在同一条 Issue 里。",
+    "roster.founder":"最高管理员 · 创始人","roster.seat":"席位 {n}","roster.empty":"空位 · 等你申请","roster.wrong":"误判 {n} / 10","roster.revoked":"已永久取消","roster.vacant":"未填 GitHub",
+    "apply.h":"申请成为管理员","apply.d":"填 GitHub 用户名和一句申请理由，会生成一条申请 Issue；创始人按 Issue 提交顺序审核，前十位通过者入册。",
+    "apply.github":"GitHub 用户名","apply.reason":"申请理由","apply.reason.h":"（一句话）","apply.reason.ph":"例：经常看存档报错，能稳定判断是 bug 还是用法问题",
+    "apply.agree":"我接受规则：只能定级、不能下架；误判累计超过 10 次永久取消，且不可重新申请。",
+    "apply.btn":"生成管理员申请","apply.copy":"复制申请全文","apply.note":"提交后在 GitHub 里确认发布即可；席位按通过审核的先后顺序发放。",
+    "apply.full":"席位已满，本次会登记为候补；有人被撤销也不补位。",
+    "apply.need":"先填 GitHub 用户名和申请理由，并勾选同意规则。",
+    "vote.h":"状态审批台","vote.d":"管理员在这里给「待定」漏洞定级：选六种状态之一，写一句判断依据，生成审批提案交给创始人合并。",
+    "vote.bug":"待定漏洞","vote.nobug":"暂无待定漏洞","vote.status":"定级","vote.why":"判断依据",
+    "vote.why.ph":"例：用 1.0.0 的 Linux 包复现，存档 .log 超 30KB 时崩；属崩溃类，应优先修。",
+    "vote.admin":"你的 GitHub 用户名","vote.btn":"生成定级提案","vote.copy":"复制提案全文",
+    "vote.note":"提案不会直接改数据：创始人合并后 bugs.json 才生效，页面随之重新生成。管理员没有直接写库的权限，这是刻意的。",
+    "vote.need":"先选漏洞、填判断依据和你的 GitHub 用户名。",
+    "rules.h":"规则：十次误判，永久出局",
+    "rules.d":"下面六条是全部规则，没有口头补充。有异议就在对应 Issue 里申诉，别在评论区吵。",
+    "rules.1":"前十位通过审核的申请者获得管理员权限；席位只发一次，被撤销后不回收、不补位。",
+    "rules.2":"管理员权限只有一项：把「待定」漏洞定级为六种状态之一，并写明判断依据。",
+    "rules.3":"不能下架漏洞、不能改标题、不能删别人反馈、不能封人；越权操作一律由创始人撤销。",
+    "rules.4":"乱指挥按次计：每次定级被创始人驳回记 1 次误判；累计超过 10 次（第 11 次起）永久取消管理员权限，且不可重新申请。",
+    "rules.5":"误判计数公开展示在名册上；申诉成立的，创始人撤销该次记录，理由写在同一条 Issue 里。",
+    "rules.6":"两位创始人是最高管理员，不占席位，负责审核申请、复核定级、执行撤销；他们之间互相复核，不给自己记分。",
+    "founder.h":"创始人复核区","founder.d":"最高管理员用下面两条快捷入口登记误判与撤销，全部留痕在 GitHub Issue 里，公开可查。",
+    "founder.admin":"管理员 GitHub 用户名","founder.bug":"相关漏洞编号","founder.why":"理由",
+    "founder.why.ph":"例：把存档兼容问题定成「不存在的漏洞」，与复现步骤矛盾。",
+    "founder.strike":"登记 1 次误判","founder.revoke":"撤销管理员权限",
+    "founder.note":"登记后由创始人改 admins.json 的计数；满 11 次把 revoked 置为 true 并重生成页面。",
+    "foot.copy":"© 2026 MC工具箱 contributors · MIT License",
+    "toast.copied":"已复制","toast.opened":"已打开 GitHub，确认后提交",
+    "status.important":"重要 · 待修","status.regression":"病又复发了","status.fixing":"正在修复","status.fixed":"已修复","status.bydesign":"设计的特性","status.invalid":"不存在的漏洞"
+  },
+  "zh-Hant": {
+    "meta.title": "管理台 · MC工具箱 1.0.0",
+    "nav.home":"官網","nav.feedback":"回饋","nav.board":"漏洞看板","nav.admin":"管理台","nav.repo":"開源倉庫","nav.lang":"語言",
+    "hero.kicker":"ADMIN / 管理台 · 前十位席位",
+    "hero.title":"管理員只做一件事：<em>給漏洞定級</em>。",
+    "hero.lead":"前十位通過審核的申請者取得管理員權限。權限只有一項：把「待定」漏洞定成六種狀態之一，並寫清理由。兩位創始人覆核定級，誤判超過 10 次永久取消權限。",
+    "stat.seats":"管理員席位","stat.seats.s":"前十位，撤銷後不回收","stat.strikes":"誤判上限","stat.strikes.s":"第 11 次永久取消","stat.founders":"最高管理員","stat.founders.s":"創始人，覆核不搶席位",
+    "roster.h":"管理員名冊","roster.d":"名冊來自倉庫裡的公開檔案，誰在任、誰被撤銷、誰記了幾次誤判，都寫在這裡，沒有隱藏名單。",
+    "roster.note":"誤判計數由創始人在駁回 Issue 裡登記；申訴成立的，創始人可撤銷該次紀錄，理由必須寫在同一條 Issue 裡。",
+    "roster.founder":"最高管理員 · 創始人","roster.seat":"席位 {n}","roster.empty":"空位 · 等你申請","roster.wrong":"誤判 {n} / 10","roster.revoked":"已永久取消","roster.vacant":"未填 GitHub",
+    "apply.h":"申請成為管理員","apply.d":"填 GitHub 使用者名稱和一句申請理由，會產生一條申請 Issue；創始人依 Issue 提交順序審核，前十位通過者入冊。",
+    "apply.github":"GitHub 使用者名稱","apply.reason":"申請理由","apply.reason.h":"（一句話）","apply.reason.ph":"例：常看存檔報錯，能穩定判斷是 bug 還是用法問題",
+    "apply.agree":"我接受規則：只能定級、不能下架；誤判累計超過 10 次永久取消，且不可重新申請。",
+    "apply.btn":"產生管理員申請","apply.copy":"複製申請全文","apply.note":"提交後在 GitHub 裡確認發布即可；席位依通過審核的先後順序發放。",
+    "apply.full":"席位已滿，本次登記為候補；有人被撤銷也不補位。",
+    "apply.need":"先填 GitHub 使用者名稱與申請理由，並勾選同意規則。",
+    "vote.h":"狀態審批台","vote.d":"管理員在這裡給「待定」漏洞定級：選六種狀態之一，寫一句判斷依據，產生審批提案交給創始人合併。",
+    "vote.bug":"待定漏洞","vote.nobug":"暫無待定漏洞","vote.status":"定級","vote.why":"判斷依據",
+    "vote.why.ph":"例：用 1.0.0 的 Linux 套件重現，存檔 .log 超過 30KB 時崩潰；屬崩潰類，應優先修。",
+    "vote.admin":"你的 GitHub 使用者名稱","vote.btn":"產生定級提案","vote.copy":"複製提案全文",
+    "vote.note":"提案不會直接改資料：創始人合併後 bugs.json 才生效，頁面随之重新產生。管理員沒有直接寫庫的權限，這是刻意的。",
+    "vote.need":"先選漏洞、填判斷依據和你的 GitHub 使用者名稱。",
+    "rules.h":"規則：十次誤判，永久出局",
+    "rules.d":"下面六條是全部規則，沒有口頭補充。有異議就在對應 Issue 裡申訴，別在留言區吵。",
+    "rules.1":"前十位通過審核的申請者取得管理員權限；席位只發一次，被撤銷後不回收、不補位。",
+    "rules.2":"管理員權限只有一項：把「待定」漏洞定級為六種狀態之一，並寫明判斷依據。",
+    "rules.3":"不能下架漏洞、不能改標題、不能刪別人回饋、不能封人；越權操作一律由創始人撤銷。",
+    "rules.4":"亂指揮按次計：每次定級被創始人駁回記 1 次誤判；累計超過 10 次（第 11 次起）永久取消管理員權限，且不可重新申請。",
+    "rules.5":"誤判計數公開發布在名冊上；申訴成立的，創始人撤銷該次紀錄，理由寫在同一條 Issue 裡。",
+    "rules.6":"兩位創始人是最高管理員，不佔席位，負責審核申請、覆核定級、執行撤銷；他們之間互相覆核，不給自己記分。",
+    "founder.h":"創始人覆核區","founder.d":"最高管理員用下面兩條快捷入口登記誤判與撤銷，全部留痕在 GitHub Issue 裡，公開可查。",
+    "founder.admin":"管理員 GitHub 使用者名稱","founder.bug":"相關漏洞編號","founder.why":"理由",
+    "founder.why.ph":"例：把存檔相容問題定成「不存在的漏洞」，與重現步驟矛盾。",
+    "founder.strike":"登記 1 次誤判","founder.revoke":"撤銷管理員權限",
+    "founder.note":"登記後由創始人改 admins.json 的計數；滿 11 次把 revoked 置為 true 並重新產生頁面。",
+    "foot.copy":"© 2026 MC工具箱 contributors · MIT License",
+    "toast.copied":"已複製","toast.opened":"已開啟 GitHub，確認後提交",
+    "status.important":"重要 · 待修","status.regression":"病又復發了","status.fixing":"修復中","status.fixed":"已修復","status.bydesign":"設計的特性","status.invalid":"不存在的漏洞"
+  },
+  "en": {
+    "meta.title": "Admin console · MC Toolbox 1.0.0",
+    "nav.home":"Home","nav.feedback":"Feedback","nav.board":"Bug board","nav.admin":"Admin console","nav.repo":"Source","nav.lang":"Language",
+    "hero.kicker":"ADMIN / FIRST 10 SEATS",
+    "hero.title":"Admins do one thing: <em>grade the bug</em>.",
+    "hero.lead":"The first ten approved applicants get admin rights. The only power is to move a pending bug into one of six statuses, with a written reason. Two founders review every grade; more than 10 wrong calls means permanent removal.",
+    "stat.seats":"Admin seats","stat.seats.s":"First ten only — revoked seats are not refilled","stat.strikes":"Wrong-call limit","stat.strikes.s":"The 11th call removes you","stat.founders":"Supreme admins","stat.founders.s":"Founders — review, no seat",
+    "roster.h":"Admin roster","roster.d":"The roster comes from a public file in the repo. Who serves, who was revoked, how many wrong calls — no hidden list.",
+    "roster.note":"Wrong calls are logged by a founder in the rejection issue; if an appeal holds, the founder removes that entry and writes why in the same issue.",
+    "roster.founder":"Supreme admin · founder","roster.seat":"Seat {n}","roster.empty":"Open seat — apply","roster.wrong":"wrong calls {n} / 10","roster.revoked":"Permanently removed","roster.vacant":"GitHub not set",
+    "apply.h":"Apply to be an admin",
+    "apply.d":"Enter your GitHub handle and one-line reason; an application issue is created. Founders review in submission order — the first ten approved are seated.",
+    "apply.github":"GitHub username","apply.reason":"Why you","apply.reason.h":"(one line)","apply.reason.ph":"e.g. I read crash logs often and can tell a bug from a usage mistake",
+    "apply.agree":"I accept the rules: grade only, never take bugs down; more than 10 wrong calls means permanent removal with no re-application.",
+    "apply.btn":"Create admin application","apply.copy":"Copy application","apply.note":"Confirm and submit on GitHub; seats go out in approval order.",
+    "apply.full":"Seats are full — this goes on the waitlist. Revoked seats are never refilled.",
+    "apply.need":"Fill in your GitHub handle and reason, and tick the rules.",
+    "vote.h":"Status review desk","vote.d":"Admins grade pending bugs here: pick one of six statuses, write the reasoning, and a proposal goes to the founders to merge.",
+    "vote.bug":"Pending bug","vote.nobug":"No pending bugs","vote.status":"Grade","vote.why":"Reasoning",
+    "vote.why.ph":"e.g. Reproduced on 1.0.0 Linux with a >30 KB save .log; crash class, fix first.",
+    "vote.admin":"Your GitHub username","vote.btn":"Create grade proposal","vote.copy":"Copy proposal",
+    "vote.note":"Proposals never write data: bugs.json changes only when a founder merges, then pages are regenerated. Admins deliberately have no direct write access.",
+    "vote.need":"Pick a bug, add reasoning and your GitHub handle.",
+    "rules.h":"Rules: ten wrong calls and you're out",
+    "rules.d":"The six rules below are the whole rulebook — no verbal extras. Appeal in the issue, not in comments.",
+    "rules.1":"The first ten approved applicants get admin rights; seats are issued once and never refilled after removal.",
+    "rules.2":"The only power is to grade a pending bug into one of six statuses, with a written reason.",
+    "rules.3":"No taking bugs down, no retitling, no deleting other reports, no bans; any overreach is revoked by a founder.",
+    "rules.4":"Wrong calls are counted: each founder-rejected grade adds one. More than ten (from the 11th) means permanent removal, no re-application.",
+    "rules.5":"Wrong-call counts are public on the roster; a successful appeal removes that entry, with the reason written in the same issue.",
+    "rules.6":"The two founders are supreme admins, hold no seats, handle approvals, grade reviews and removals; they review each other and do not score themselves.",
+    "founder.h":"Founder review",
+    "founder.d":"Supreme admins use these two shortcuts to log a wrong call or a removal; everything stays in GitHub issues, publicly readable.",
+    "founder.admin":"Admin GitHub username","founder.bug":"Related bug ID","founder.why":"Reason",
+    "founder.why.ph":"e.g. Graded a save-compat issue as \"not a bug\" despite clear repro steps.",
+    "founder.strike":"Log 1 wrong call","founder.revoke":"Remove admin rights",
+    "founder.note":"A founder then edits admins.json counters; at 11, set revoked to true and regenerate the pages.",
+    "foot.copy":"© 2026 MC Toolbox contributors · MIT License",
+    "toast.copied":"Copied","toast.opened":"GitHub opened — submit there",
+    "status.important":"Important · open","status.regression":"Regression — it's back","status.fixing":"Fixing","status.fixed":"Fixed","status.bydesign":"By design","status.invalid":"Not a bug"
+  },
+  "ja": {
+    "meta.title": "管理コンソール · MC工具箱 1.0.0",
+    "nav.home":"公式サイト","nav.feedback":"フィードバック","nav.board":"不具合一覧","nav.admin":"管理コンソール","nav.repo":"ソース","nav.lang":"言語",
+    "hero.kicker":"ADMIN / 先着 10 席",
+    "hero.title":"管理者の仕事は 1 つ：<em>不具合の格付け</em>。",
+    "hero.lead":"審査を通った先着 10 名に管理者権限を付与。権限は「保留中」の不具合を 6 種のいずれかに格付けし、根拠を書くことだけ。2 名の創設者が全格付けを再確認し、誤判定が 10 回を超えると永久解除されます。",
+    "stat.seats":"管理者席","stat.seats.s":"先着 10 名、解除後も補充なし","stat.strikes":"誤判定上限","stat.strikes.s":"11 回目で永久解除","stat.founders":"最高管理者","stat.founders.s":"創設者。席は持たず再確認のみ",
+    "roster.h":"管理者名簿","roster.d":"名簿はリポジトリの公開ファイル。誰が在任、誰が解除、誤判定が何回か、すべてここに載ります。",
+    "roster.note":"誤判定は却下 Issue で創設者が記録。異議が認められた場合は同じ Issue に理由を書いて取り消します。",
+    "roster.founder":"最高管理者 · 創設者","roster.seat":"席 {n}","roster.empty":"空席 · 申請できます","roster.wrong":"誤判定 {n} / 10","roster.revoked":"永久解除済み","roster.vacant":"GitHub 未登録",
+    "apply.h":"管理者に応募する",
+    "apply.d":"GitHub ユーザー名と一言の理由を入力すると応募 Issue が作られます。創設者が提出順に審査し、先着 10 名が就任。",
+    "apply.github":"GitHub ユーザー名","apply.reason":"応募理由","apply.reason.h":"（一言）","apply.reason.ph":"例：クラッシュログをよく見ており、不具合か使い方の問題かを判断できる",
+    "apply.agree":"規則に同意します：格付けのみ、不具合の取下げ不可、誤判定 10 回超で永久解除・再応募不可。",
+    "apply.btn":"応募 Issue を作成","apply.copy":"応募文をコピー","apply.note":"GitHub で確認して送信してください。席は承認順に付与されます。",
+    "apply.full":"席は満員です。今回は補欠として登録されます（解除が出ても補充なし）。",
+    "apply.need":"GitHub ユーザー名と理由を入力し、規則に同意してください。",
+    "vote.h":"状態審査デスク","vote.d":"「保留中」の不具合を 6 種のいずれかに格付けし、根拠を書いて提案を作成。創設者がマージして反映します。",
+    "vote.bug":"保留中の不具合","vote.nobug":"保留中の不具合はありません","vote.status":"格付け","vote.why":"根拠",
+    "vote.why.ph":"例：1.0.0 Linux 版で 30KB 超のセーブ .log を開くと落ちる。クラッシュ系なので優先修正。",
+    "vote.admin":"あなたの GitHub ユーザー名","vote.btn":"格付け提案を作成","vote.copy":"提案文をコピー",
+    "vote.note":"提案はデータを直接書きません。創設者がマージして初めて bugs.json が変わり、ページが再生成されます。管理者に書き込み権限がないのは意図的です。",
+    "vote.need":"不具合・根拠・GitHub ユーザー名を入力してください。",
+    "rules.h":"規則：誤判定 10 回で永久追放",
+    "rules.d":"以下の 6 条がすべて。口頭の補足はありません。異議は該当 Issue で申し立ててください。",
+    "rules.1":"審査を通った先着 10 名に管理者権限。席は一度きりで、解除後も回収・補充しません。",
+    "rules.2":"権限は 1 つだけ：「保留中」の不具合を 6 種のいずれかに格付けし、根拠を明記する。",
+    "rules.3":"不具合の取下げ、タイトル変更、他人の報告削除、BAN は不可。越権は創設者が解除します。",
+    "rules.4":"誤判定は回数制：格付けが創設者に却下されるたびに 1 回。累計 10 回超（11 回目から）で永久解除、再応募不可。",
+    "rules.5":"誤判定数は名簿で公開。異議が認められれば創設者がその記録を取り消し、理由を同じ Issue に残します。",
+    "rules.6":"2 名の創設者が最高管理者で席を持たず、応募審査・格付け再確認・解除を担当。互いに再確認し、自分に点数は付けません。",
+    "founder.h":"創設者レビュー",
+    "founder.d":"最高管理者は下の 2 つの入口で誤判定と解除を記録。すべて GitHub Issue に残り、公開で確認できます。",
+    "founder.admin":"管理者の GitHub ユーザー名","founder.bug":"関連する不具合 ID","founder.why":"理由",
+    "founder.why.ph":"例：再現手順が明確なセーブ互換問題を「不具合ではない」と格付けした。",
+    "founder.strike":"誤判定を 1 回記録","founder.revoke":"管理者権限を解除",
+    "founder.note":"記録後、創設者が admins.json の回数を更新。11 回で revoked を true にし、ページを再生成します。",
+    "foot.copy":"© 2026 MC工具箱 contributors · MIT License",
+    "toast.copied":"コピーしました","toast.opened":"GitHub を開きました。確認して送信してください",
+    "status.important":"重要 · 未対応","status.regression":"再発","status.fixing":"修正中","status.fixed":"修正済み","status.bydesign":"仕様どおり","status.invalid":"不具合ではない"
+  },
+  "ko": {
+    "meta.title": "관리 콘솔 · MC工具箱 1.0.0",
+    "nav.home":"공식 사이트","nav.feedback":"피드백","nav.board":"버그 보드","nav.admin":"관리 콘솔","nav.repo":"소스","nav.lang":"언어",
+    "hero.kicker":"ADMIN / 선착순 10석",
+    "hero.title":"관리자는 한 가지만: <em>버그 등급 판정</em>.",
+    "hero.lead":"심사를 통과한 선착순 10명에게 관리자 권한을 줍니다. 권한은 '대기' 버그를 여섯 상태 중 하나로 정하고 이유를 쓰는 것뿐입니다. 창립자 2명이 모든 판정을 재검토하며, 오판이 10회를 넘으면 영구 해제됩니다.",
+    "stat.seats":"관리자 좌석","stat.seats.s":"선착순 10명, 해제 후 재충원 없음","stat.strikes":"오판 한도","stat.strikes.s":"11번째에 영구 해제","stat.founders":"최고 관리자","stat.founders.s":"창립자, 좌석 없이 재검토",
+    "roster.h":"관리자 명부","roster.d":"명부는 저장소의 공개 파일입니다. 누가 재임, 누가 해제, 오판 몇 회인지 모두 여기 적힙니다.",
+    "roster.note":"오판은 창립자가 반려 Issue 에 기록합니다. 이의가 인정되면 같은 Issue 에 이유를 남기고 그 기록을 취소합니다.",
+    "roster.founder":"최고 관리자 · 창립자","roster.seat":"좌석 {n}","roster.empty":"빈 좌석 · 신청 가능","roster.wrong":"오판 {n} / 10","roster.revoked":"영구 해제됨","roster.vacant":"GitHub 미등록",
+    "apply.h":"관리자 신청",
+    "apply.d":"GitHub 사용자명과 한 줄 이유를 적으면 신청 Issue 가 만들어집니다. 창립자가 제출 순으로 심사해 선착순 10명이 취임합니다.",
+    "apply.github":"GitHub 사용자명","apply.reason":"신청 이유","apply.reason.h":"(한 줄)","apply.reason.ph":"예: 크래시 로그를 자주 보며 버그와 사용법 문제를 구분할 수 있음",
+    "apply.agree":"규칙에 동의합니다: 등급 판정만, 버그 내리기 불가, 오판 10회 초과 시 영구 해제·재신청 불가.",
+    "apply.btn":"관리자 신청 Issue 만들기","apply.copy":"신청문 복사","apply.note":"GitHub 에서 확인 후 제출하세요. 좌석은 승인 순서대로 나갑니다.",
+    "apply.full":"좌석이 찼습니다. 이번은 대기로 등록되며, 해제가 나와도 재충원하지 않습니다.",
+    "apply.need":"GitHub 사용자명과 이유를 입력하고 규칙에 동의하세요.",
+    "vote.h":"상태 심사 데스크","vote.d":"'대기' 버그를 여섯 상태 중 하나로 정하고 근거를 적어 제안을 만듭니다. 창립자가 병합해야 반영됩니다.",
+    "vote.bug":"대기 중인 버그","vote.nobug":"대기 중인 버그 없음","vote.status":"등급","vote.why":"근거",
+    "vote.why.ph":"예: 1.0.0 Linux 판에서 30KB 초과 세이브 .log 를 열면 튕김. 크래시 계열이라 우선 수정.",
+    "vote.admin":"내 GitHub 사용자명","vote.btn":"등급 제안 만들기","vote.copy":"제안문 복사",
+    "vote.note":"제안은 데이터를 직접 쓰지 않습니다. 창립자가 병합해야 bugs.json 이 바뀌고 페이지가 다시 생성됩니다. 관리자에게 쓰기 권한이 없는 것은 의도된 설계입니다.",
+    "vote.need":"버그, 근거, GitHub 사용자명을 입력하세요.",
+    "rules.h":"규칙: 오판 10회면 영구 퇴출",
+    "rules.d":"아래 6개가 전부입니다. 구두 보충은 없습니다. 이의는 해당 Issue 에서 제기하세요.",
+    "rules.1":"심사를 통과한 선착순 10명에게 관리자 권한. 좌석은 1회만 발급되고 해제 후 회수·충원하지 않습니다.",
+    "rules.2":"권한은 하나: '대기' 버그를 여섯 상태 중 하나로 정하고 근거를 명시.",
+    "rules.3":"버그 내리기, 제목 변경, 타인 보고 삭제, 차단 불가. 월권은 창립자가 해제합니다.",
+    "rules.4":"오판은 횟수제: 판정이 창립자에게 반려될 때마다 1회. 누적 10회 초과(11번째부터) 영구 해제, 재신청 불가.",
+    "rules.5":"오판 수는 명부에 공개. 이의가 인정되면 창립자가 그 기록을 취소하고 이유를 같은 Issue 에 남깁니다.",
+    "rules.6":"창립자 2명이 최고 관리자로 좌석 없이 신청 심사·판정 재검토·해제를 담당하며, 서로 재검토하고 자신에게 점수를 매기지 않습니다.",
+    "founder.h":"창립자 검토",
+    "founder.d":"최고 관리자는 아래 두 입구로 오판과 해제를 기록합니다. 모두 GitHub Issue 에 남아 공개로 확인됩니다.",
+    "founder.admin":"관리자 GitHub 사용자명","founder.bug":"관련 버그 ID","founder.why":"이유",
+    "founder.why.ph":"예: 재현 절차가 명확한 세이브 호환 문제를 '버그 아님'으로 판정.",
+    "founder.strike":"오판 1회 기록","founder.revoke":"관리자 권한 해제",
+    "founder.note":"기록 후 창립자가 admins.json 의 횟수를 수정. 11회면 revoked 를 true 로 바꾸고 페이지를 재생성합니다.",
+    "foot.copy":"© 2026 MC工具箱 contributors · MIT License",
+    "toast.copied":"복사했습니다","toast.opened":"GitHub 를 열었습니다. 확인 후 제출하세요",
+    "status.important":"중요 · 대기","status.regression":"재발","status.fixing":"수정 중","status.fixed":"수정 완료","status.bydesign":"설계상 동작","status.invalid":"버그 아님"
+  }
+};
+
+const LANG_NAMES = {"zh-Hans":"简体中文","zh-Hant":"繁體中文","en":"English","ja":"日本語","ko":"한국어"};
+const SUPPORTED = Object.keys(I18N);
+let CUR = 'zh-Hans';
+const STATE = { admins: [], seats: 10, limit: 10, founders: [], bugs: [] };
+
+function t(k){ return (I18N[CUR] && I18N[CUR][k]) || I18N['zh-Hans'][k] || k; }
+function esc(v){ return String(v == null ? '' : v).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function detect(){
+  try { const q = new URLSearchParams(location.search).get('lang'); if (q && I18N[q]) return q; } catch(e){}
+  const saved = localStorage.getItem('mcbox-lang');
+  if (saved && I18N[saved]) return saved;
+  const list = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'en'];
+  for (const raw of list){
+    const s = String(raw).toLowerCase();
+    if (s.startsWith('zh')) return /hant|tw|hk|mo/.test(s) ? 'zh-Hant' : 'zh-Hans';
+    if (s.startsWith('ja')) return 'ja';
+    if (s.startsWith('ko')) return 'ko';
+    if (s.startsWith('en')) return 'en';
+  }
+  return 'en';
+}
+
+function renderFounders(){
+  const box = document.getElementById('founders');
+  box.innerHTML = (STATE.founders || []).map(f =>
+    '<div class="fcard"><div class="t mono">SUPREME ADMIN</div><div class="n">'+esc(typeof f.name === 'object' ? (f.name[CUR] || f.name['en'] || '') : (f.name || ''))+'</div><div class="g mono">'+(f.github ? '@'+esc(f.github) : esc(t('roster.vacant')))+'</div></div>'
+  ).join('');
+}
+
+function renderSeats(){
+  const box = document.getElementById('seats');
+  const seats = STATE.seats || 10;
+  const admins = STATE.admins || [];
+  const html = [];
+  for (let i = 0; i < seats; i++){
+    const a = admins[i];
+    if (!a){
+      html.push('<div class="seat empty"><div class="n mono">SEAT '+String(i+1).padStart(2,'0')+'</div><div class="g">'+esc(t('roster.empty'))+'</div></div>');
+    } else {
+      const wrong = a.wrong_calls || 0;
+      const pct = Math.min(100, Math.round(wrong / (STATE.limit || 10) * 100));
+      html.push('<div class="seat'+(a.revoked ? ' revoked' : '')+'">'
+        + '<div class="n mono">SEAT '+String(i+1).padStart(2,'0')+'</div>'
+        + '<div class="g mono">@'+esc(a.github)+'</div>'
+        + '<div class="w">'+(a.revoked ? esc(t('roster.revoked')) : esc(t('roster.wrong').replace('{n}', wrong)))+'</div>'
+        + '<div class="bar"><i style="width:'+pct+'%"></i></div>'
+        + '</div>');
+    }
+  }
+  box.innerHTML = html.join('');
+  document.getElementById('seatUsed').textContent = String(admins.length);
+  document.getElementById('seatTotal').textContent = String(seats);
+  document.getElementById('seatNote').textContent = admins.length >= seats ? t('apply.full') : t('apply.note');
+}
+
+function renderPendingBugs(){
+  const sel = document.getElementById('vBug');
+  const pending = (STATE.bugs || []).filter(b => b.status === 'pending');
+  if (!pending.length){
+    sel.innerHTML = '<option value="">'+esc(t('vote.nobug'))+'</option>';
+    return;
+  }
+  sel.innerHTML = pending.map(b => '<option value="'+b.id+'">BUG-'+b.id+' · '+esc((b.title && (b.title[CUR] || b.title['zh-Hans'])) || '')+'</option>').join('');
+}
+
+function apply(lang){
+  CUR = lang;
+  document.documentElement.lang = lang === 'zh-Hans' ? 'zh-CN' : lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (I18N[lang][k] !== undefined) el.innerHTML = I18N[lang][k];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const k = el.getAttribute('data-i18n-ph');
+    if (I18N[lang][k] !== undefined) el.setAttribute('placeholder', I18N[lang][k]);
+  });
+  document.title = t('meta.title');
+  document.getElementById('langSel').value = lang;
+  renderFounders(); renderSeats(); renderPendingBugs();
+  localStorage.setItem('mcbox-lang', lang);
+}
+
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+function openIssue(title, body, labels){
+  const url = 'https://github.com/fsssea/mc-toolbox/issues/new?title=' + encodeURIComponent(title)
+    + '&body=' + encodeURIComponent(body) + '&labels=' + encodeURIComponent(labels);
+  window.open(url, '_blank', 'noopener');
+  toast(t('toast.opened'));
+}
+
+async function copyText(text){
+  try { await navigator.clipboard.writeText(text); toast(t('toast.copied')); }
+  catch(e){
+    const ta = document.createElement('textarea'); ta.value = text;
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    toast(t('toast.copied'));
+  }
+}
+
+function applicationBody(handle, reason, full){
+  return [
+    '### 管理员申请 / Admin application',
+    '',
+    '- GitHub: @' + handle,
+    '- 席位 / Seats: ' + STATE.admins.length + ' / ' + STATE.seats,
+    '- 类型 / Type: ' + (full ? 'waitlist' : 'seat'),
+    '',
+    '### 申请理由 / Why',
+    reason,
+    '',
+    '---',
+    '- [ ] 已阅读并接受管理员规则（只能定级、误判 10 次永久取消）',
+    '- [ ] 创始人已核对 GitHub 账号归属'
+  ].join('\n');
+}
+
+function voteBody(admin, bugId, status, why){
+  return [
+    '### 状态定级提案 / Status grade',
+    '',
+    '- Bug: BUG-' + bugId,
+    '- 提案 / Proposed status: **' + status + '** (`' + status + '`)',
+    '- 管理员 / Admin: @' + admin,
+    '',
+    '### 判断依据 / Reasoning',
+    why,
+    '',
+    '---',
+    '- [ ] 创始人复核通过（合并后更新 bugs.json 并重生成 bug-' + bugId + ' 页面）',
+    '- [ ] 若驳回：在下面写原因，并给该管理员记 1 次误判'
+  ].join('\n');
+}
+
+function founderBody(kind, admin, bug, why){
+  return [
+    '### ' + (kind === 'strike' ? '误判记录 / Wrong call' : '撤销权限 / Revoke admin'),
+    '',
+    '- 管理员 / Admin: @' + admin,
+    bug ? ('- 相关漏洞 / Bug: ' + bug) : '',
+    '',
+    '### 理由 / Reason',
+    why,
+    '',
+    '---',
+    kind === 'strike'
+      ? '- [ ] 已更新 admins.json：该管理员 wrong_calls +1\n- [ ] 若累计 > 10，将 revoked 置为 true'
+      : '- [ ] 已更新 admins.json：revoked = true, permanent = true\n- [ ] 已重生成 /feedback/admin/ 页面'
+  ].filter(Boolean).join('\n');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const sel = document.getElementById('langSel');
+  SUPPORTED.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = LANG_NAMES[c]; sel.appendChild(o); });
+  sel.addEventListener('change', () => apply(sel.value));
+  apply(detect());
+
+  Promise.all([
+    fetch('../admins.json', {cache:'no-store'}).then(r => r.json()).catch(() => ({})),
+    fetch('../bugs.json', {cache:'no-store'}).then(r => r.json()).catch(() => ({bugs: []}))
+  ]).then(([adminsData, bugsData]) => {
+    STATE.admins = adminsData.admins || [];
+    STATE.seats = adminsData.seats || 10;
+    STATE.limit = adminsData.wrong_call_limit || 10;
+    STATE.founders = adminsData.founders || [];
+    STATE.bugs = bugsData.bugs || [];
+    renderFounders(); renderSeats(); renderPendingBugs();
+  });
+
+  document.getElementById('btnApply').addEventListener('click', () => {
+    const handle = document.getElementById('aGithub').value.trim().replace(/^@/, '');
+    const reason = document.getElementById('aReason').value.trim();
+    const agree = document.getElementById('aAgree').checked;
+    if (!handle || !reason || !agree){ toast(t('apply.need')); return; }
+    const full = STATE.admins.length >= STATE.seats;
+    openIssue((full ? '[管理员候补] ' : '[管理员申请] ') + '@' + handle, applicationBody(handle, reason, full), full ? 'admin-waitlist' : 'admin-request');
+  });
+  document.getElementById('btnApplyCopy').addEventListener('click', () => {
+    const handle = document.getElementById('aGithub').value.trim().replace(/^@/, '');
+    const reason = document.getElementById('aReason').value.trim();
+    if (!handle || !reason){ toast(t('apply.need')); return; }
+    copyText('【管理员申请】@' + handle + '\n\n' + applicationBody(handle, reason, false));
+  });
+
+  document.getElementById('btnVote').addEventListener('click', () => {
+    const bug = document.getElementById('vBug').value;
+    const status = document.getElementById('vStatus').value;
+    const why = document.getElementById('vWhy').value.trim();
+    const admin = document.getElementById('vAdmin').value.trim().replace(/^@/, '');
+    if (!bug || !why || !admin){ toast(t('vote.need')); return; }
+    openIssue('[状态审批] BUG-' + bug + ' → ' + status, voteBody(admin, bug, status, why), 'status-vote');
+  });
+  document.getElementById('btnVoteCopy').addEventListener('click', () => {
+    const bug = document.getElementById('vBug').value;
+    const why = document.getElementById('vWhy').value.trim();
+    const admin = document.getElementById('vAdmin').value.trim().replace(/^@/, '');
+    if (!bug || !why || !admin){ toast(t('vote.need')); return; }
+    copyText(voteBody(admin, bug, document.getElementById('vStatus').value, why));
+  });
+
+  document.getElementById('btnStrike').addEventListener('click', () => {
+    const admin = document.getElementById('fAdmin').value.trim().replace(/^@/, '');
+    const bug = document.getElementById('fBug').value.trim();
+    const why = document.getElementById('fWhy').value.trim();
+    if (!admin || !why){ toast(t('vote.need')); return; }
+    openIssue('[误判记录] @' + admin + (bug ? ' · ' + bug : ''), founderBody('strike', admin, bug, why), 'admin-strike');
+  });
+  document.getElementById('btnRevoke').addEventListener('click', () => {
+    const admin = document.getElementById('fAdmin').value.trim().replace(/^@/, '');
+    const bug = document.getElementById('fBug').value.trim();
+    const why = document.getElementById('fWhy').value.trim();
+    if (!admin || !why){ toast(t('vote.need')); return; }
+    openIssue('[撤销管理员] @' + admin, founderBody('revoke', admin, bug, why), 'admin-revoke');
+  });
+});
+</script>
+</body>
+</html>
