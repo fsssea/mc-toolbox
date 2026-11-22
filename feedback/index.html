@@ -118,6 +118,17 @@ footer{border-top:1px solid var(--line);padding:22px 0 36px;font-size:12px;color
 .sbadge.fixed{color:#3f9d6a;border-color:#3f9d6a}
 .bugempty{font-size:13px;color:var(--muted);padding:18px 0}
 @media(max-width:640px){.bugrow{grid-template-columns:1fr;gap:6px}.bugrow .num{order:1}}
+
+.stat.regression .d{background:#a5315f}.stat.bydesign .d{background:#1859d8}.stat.invalid .d{background:#6b7785}
+.sbadge.regression{color:#a5315f;border-color:#a5315f}
+.sbadge.bydesign{color:#1859d8;border-color:#1859d8}
+.sbadge.invalid{color:#6b7785;border-color:#6b7785}
+.legend{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0 6px}
+.lg{border:1px solid var(--line);background:#fff;padding:12px 14px}
+.lg .sbadge{display:inline-block;margin-bottom:6px}
+.lg p{margin:0;font-size:12px;color:#3a4854;line-height:1.65}
+@media(max-width:820px){.legend{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.legend{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -159,9 +170,17 @@ footer{border-top:1px solid var(--line);padding:22px 0 36px;font-size:12px;color
     <div class="wrap">
       <div class="sec-label mono" data-i18n="board.label">BOARD / 漏洞看板</div>
       <h2 data-i18n="board.h">每条漏洞一个固定编号，修到哪一步都看得见。</h2>
-      <p class="sec-desc" data-i18n="board.d">提交后登记成 BUG-N，固定链接是 feedback/bug-N/，编号一旦分配就不再变。这里按「重要待修 → 正在修复 → 已修复」排，并标出它出现在哪些版本。</p>
+      <p class="sec-desc" data-i18n="board.d">提交后登记成 BUG-N，固定链接是 feedback/bug-N/，编号一旦分配就不再变。这里按「重要待修 → 病又复发了 → 正在修复 → 已修复 → 设计的特性 → 不存在的漏洞」排，并标出它出现在哪些版本。</p>
       <div class="board-stats" id="boardStats"></div>
       <div class="buglist" id="bugList"><p class="bugempty" data-i18n="board.empty">还没有登记的漏洞。</p></div>
+      <div class="legend" id="legend">
+        <div class="lg"><span class="sbadge important" data-i18n="status.important">重要 · 待修</span><p data-i18n="legend.important">已确认，影响面大，排在修复队列最前。</p></div>
+        <div class="lg"><span class="sbadge regression" data-i18n="status.regression">病又复发了</span><p data-i18n="legend.regression">之前修好过，但新版本里又出现了，按新漏洞重新登记。</p></div>
+        <div class="lg"><span class="sbadge fixing" data-i18n="status.fixing">正在修复</span><p data-i18n="legend.fixing">已经动手改，验证用例补完就合入。</p></div>
+        <div class="lg"><span class="sbadge fixed" data-i18n="status.fixed">已修复</span><p data-i18n="legend.fixed">修复已随公开发布版本上线，页面会写明修复版本。</p></div>
+        <div class="lg"><span class="sbadge bydesign" data-i18n="status.bydesign">设计的特性</span><p data-i18n="legend.bydesign">看起来像 bug，但这是刻意设计的行为，页面会写清原因。</p></div>
+        <div class="lg"><span class="sbadge invalid" data-i18n="status.invalid">不存在的漏洞</span><p data-i18n="legend.invalid">无法复现、用法问题或环境问题，不构成漏洞。</p></div>
+      </div>
       <p class="note" data-i18n="board.note">状态和修复版本由维护者更新；一条漏洞从「重要 · 待修」走到「已修复」，过程都会留在它自己的页面上。</p>
     </div>
   </section>
@@ -360,10 +379,19 @@ const I18N = {
     "form.label":"REPORT / 提交反馈","how.label":"HOW TO / 怎么写才有用","faq.label":"FAQ / 常见问题",
     "board.label":"BOARD / 漏洞看板",
     "board.h":"每条漏洞一个固定编号，修到哪一步都看得见。",
-    "board.d":"提交后登记成 BUG-N，固定链接是 feedback/bug-N/，编号一旦分配就不再变。这里按「重要待修 → 正在修复 → 已修复」排，并标出它出现在哪些版本。",
+    "board.d":"提交后登记成 BUG-N，固定链接是 feedback/bug-N/，编号一旦分配就不再变。这里按「重要待修 → 病又复发了 → 正在修复 → 已修复 → 设计的特性 → 不存在的漏洞」排，并标出它出现在哪些版本。",
     "board.empty":"还没有登记的漏洞。",
     "board.note":"状态和修复版本由维护者更新；一条漏洞从「重要 · 待修」走到「已修复」，过程都会留在它自己的页面上。",
     "board.total":"全部",
+    "status.regression":"病又复发了",
+    "status.bydesign":"设计的特性",
+    "status.invalid":"不存在的漏洞",
+    "legend.important":"已确认，影响面大，排在修复队列最前。",
+    "legend.regression":"之前修好过，但新版本里又出现了，按新漏洞重新登记。",
+    "legend.fixing":"已经动手改，验证用例补完就合入。",
+    "legend.fixed":"修复已随公开发布版本上线，页面会写明修复版本。",
+    "legend.bydesign":"看起来像 bug，但这是刻意设计的行为，页面会写清原因。",
+    "legend.invalid":"无法复现、用法问题或环境问题，不构成漏洞。",
     "status.important":"重要 · 待修",
     "status.fixing":"正在修复",
     "status.fixed":"已修复",
@@ -414,10 +442,19 @@ const I18N = {
     "form.label":"REPORT / 提交回饋","how.label":"HOW TO / 怎麼寫才有用","faq.label":"FAQ / 常見問題",
     "board.label":"BOARD / 漏洞看板",
     "board.h":"每條漏洞一個固定編號，修到哪一步都看得見。",
-    "board.d":"提交後登記成 BUG-N，固定連結是 feedback/bug-N/，編號一旦分配就不再變。這裡依「重要待修 → 修復中 → 已修復」排，並標出它出現在哪些版本。",
+    "board.d":"提交後登記成 BUG-N，固定連結是 feedback/bug-N/，編號一旦分配就不再變。這裡依「重要待修 → 病又復發了 → 修復中 → 已修復 → 設計的特性 → 不存在的漏洞」排，並標出它出現在哪些版本。",
     "board.empty":"還沒有登記的漏洞。",
     "board.note":"狀態與修復版本由維護者更新；一條漏洞從「重要 · 待修」走到「已修復」，過程都會留在它自己的頁面上。",
     "board.total":"全部",
+    "status.regression":"病又復發了",
+    "status.bydesign":"設計的特性",
+    "status.invalid":"不存在的漏洞",
+    "legend.important":"已確認，影響面大，排在修復隊列最前。",
+    "legend.regression":"先前修好過，但新版本裡又出現，按新漏洞重新登記。",
+    "legend.fixing":"已經動手改，驗證案例補完就合入。",
+    "legend.fixed":"修復已隨公開發布版本上線，頁面會寫明修復版本。",
+    "legend.bydesign":"看起來像 bug，但這是刻意設計的行為，頁面會寫清原因。",
+    "legend.invalid":"無法重現、用法問題或環境問題，不構成漏洞。",
     "status.important":"重要 · 待修",
     "status.fixing":"修復中",
     "status.fixed":"已修復",
@@ -467,10 +504,19 @@ const I18N = {
     "form.label":"REPORT / NEW ISSUE","how.label":"HOW TO / REPORT WELL","faq.label":"FAQ / COMMON QUESTIONS",
     "board.label":"BOARD / BUG BOARD",
     "board.h":"One fixed ID per bug — you can see how far the fix got.",
-    "board.d":"Each report becomes BUG-N with a permanent page at feedback/bug-N/; IDs never change once assigned. Sorted important → fixing → fixed, with the versions it appeared in.",
+    "board.d":"Each report becomes BUG-N with a permanent page at feedback/bug-N/; IDs never change once assigned. Sorted important → regression → fixing → fixed → by design → not a bug, with the versions it appeared in.",
     "board.empty":"No bugs registered yet.",
     "board.note":"Status and fix version are maintained by the maintainer; a bug's whole journey stays on its own page.",
     "board.total":"All",
+    "status.regression":"Regression — it's back",
+    "status.bydesign":"By design",
+    "status.invalid":"Not a bug",
+    "legend.important":"Confirmed and high-impact — first in the fix queue.",
+    "legend.regression":"Fixed before, back in a newer version; tracked again as a new record.",
+    "legend.fixing":"Work underway; ships once the regression test is added.",
+    "legend.fixed":"Shipped in a public release; the fix version is shown on the page.",
+    "legend.bydesign":"Looks like a bug but is intentional; the record explains why.",
+    "legend.invalid":"Not reproducible, or a usage / environment issue — not a bug.",
     "status.important":"Important · open",
     "status.fixing":"Fixing",
     "status.fixed":"Fixed",
@@ -521,10 +567,19 @@ const I18N = {
     "form.label":"REPORT / 送信","how.label":"HOW TO / 書き方のコツ","faq.label":"FAQ / よくある質問",
     "board.label":"BOARD / 不具合一覧",
     "board.h":"1 件ごとに固定 ID、修正の進み具合まで見える。",
-    "board.d":"送信すると BUG-N として登録され、ページは feedback/bug-N/ に固定。ID は変わりません。重要 → 修正中 → 修正済みの順に並べ、発生したバージョンも表示します。",
+    "board.d":"送信すると BUG-N として登録され、ページは feedback/bug-N/ に固定。ID は変わりません。重要 → 再発 → 修正中 → 修正済み → 仕様どおり → 不具合ではない の順に並べ、発生したバージョンも表示します。",
     "board.empty":"登録された不具合はまだありません。",
     "board.note":"状態と修正バージョンはメンテナが更新します。対応の過程は各ページに残ります。",
     "board.total":"すべて",
+    "status.regression":"再発",
+    "status.bydesign":"仕様どおり",
+    "status.invalid":"不具合ではない",
+    "legend.important":"確認済みで影響大。修正キューの先頭に置きます。",
+    "legend.regression":"以前は修正済みだが新バージョンで再発。新しい記録として登録します。",
+    "legend.fixing":"修正作業中。検証ケースを追加してから反映します。",
+    "legend.fixed":"公開版でリリース済み。修正バージョンを記載します。",
+    "legend.bydesign":"不具合に見えますが仕様どおりの動作。理由をページに記載します。",
+    "legend.invalid":"再現不可、使い方や環境の問題で不具合には当たりません。",
     "status.important":"重要 · 未対応",
     "status.fixing":"修正中",
     "status.fixed":"修正済み",
@@ -575,10 +630,19 @@ const I18N = {
     "form.label":"REPORT / 제출","how.label":"HOW TO / 작성 요령","faq.label":"FAQ / 자주 묻는 질문",
     "board.label":"BOARD / 버그 보드",
     "board.h":"버그마다 고정 ID, 어디까지 고쳤는지 보입니다.",
-    "board.d":"제출하면 BUG-N 으로 등록되고 페이지는 feedback/bug-N/ 로 고정됩니다. ID 는 바뀌지 않습니다. 중요 → 수정 중 → 수정 완료 순으로 정렬하며 발생 버전도 표시합니다.",
+    "board.d":"제출하면 BUG-N 으로 등록되고 페이지는 feedback/bug-N/ 로 고정됩니다. ID 는 바뀌지 않습니다. 중요 → 재발 → 수정 중 → 수정 완료 → 설계상 동작 → 버그 아님 순으로 정렬하며 발생 버전도 표시합니다.",
     "board.empty":"등록된 버그가 없습니다.",
     "board.note":"상태와 수정 버전은 관리자가 갱신합니다. 처리 과정은 각 페이지에 남습니다.",
     "board.total":"전체",
+    "status.regression":"재발",
+    "status.bydesign":"설계상 동작",
+    "status.invalid":"버그 아님",
+    "legend.important":"확인되었고 영향이 큼. 수정 대기열 맨 앞.",
+    "legend.regression":"이전에 고쳤지만 새 버전에서 다시 나타남. 새 기록으로 등록.",
+    "legend.fixing":"수정 작업 중. 검증 케이스 추가 후 반영.",
+    "legend.fixed":"공개 릴리스에 반영됨. 수정 버전을 표시.",
+    "legend.bydesign":"버그처럼 보이지만 의도된 동작. 이유를 페이지에 설명.",
+    "legend.invalid":"재현 불가 또는 사용법·환경 문제로 버그가 아님.",
     "status.important":"중요 · 대기",
     "status.fixing":"수정 중",
     "status.fixed":"수정 완료",
@@ -656,7 +720,7 @@ function renderBoard(data){
   if (idEl) idEl.textContent = 'BUG-' + NEXT.id;
   if (urlEl) urlEl.textContent = 'https://fsssea.github.io/mc-toolbox/feedback/bug-' + NEXT.id + '/';
 
-  const order = {important:0, fixing:1, fixed:2};
+  const order = {important:0, regression:1, fixing:2, fixed:3, bydesign:4, invalid:5};
   const sorted = bugs.slice().sort((a,b)=> (order[a.status] - order[b.status]) || (a.id - b.id));
   const counts = { all: bugs.length, important:0, fixing:0, fixed:0 };
   bugs.forEach(b => counts[b.status] = (counts[b.status]||0) + 1);
@@ -665,8 +729,11 @@ function renderBoard(data){
     stats.innerHTML = [
       ['all', counts.all, t('board.total')],
       ['important', counts.important, t('status.important')],
+      ['regression', counts.regression, t('status.regression')],
       ['fixing', counts.fixing, t('status.fixing')],
-      ['fixed', counts.fixed, t('status.fixed')]
+      ['fixed', counts.fixed, t('status.fixed')],
+      ['bydesign', counts.bydesign, t('status.bydesign')],
+      ['invalid', counts.invalid, t('status.invalid')]
     ].map(([cls,n,label]) => '<div class="stat '+cls+'"><span class="d"></span><b>'+n+'</b>'+esc(label)+'</div>').join('');
   }
   const list = document.getElementById('bugList');
