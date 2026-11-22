@@ -1,5 +1,7 @@
 // 一键汉化：texts/*.lang、UI 字符串、术语表
 import { TERMS } from './dict.js';
+import { Archive } from './archive.js';
+import { parseZip } from './zip.js';
 
 const CJK = /[\u4e00-\u9fff]/;
 const ZH_KEYS = ['zh_CN', 'zh_cn', 'zh-Hans', 'zh_hans'];
@@ -105,8 +107,8 @@ export function localizePack(archive, packPrefix) {
   return { status: 'localized', translated: n, created: !all.includes(target), file: target };
 }
 
-// 扫描整包：行为包 / 资源包分别汉化
-export function localizeArchive(archive) {
+// 扫描单层包：行为包 / 资源包分别汉化
+function localizeFlat(archive) {
   const reports = [];
   const packs = new Set();
   for (const p of archive.paths()) {
@@ -116,6 +118,51 @@ export function localizeArchive(archive) {
   // 单个 .mcpack 直接放 manifest.json 的情况
   if (!packs.size) packs.add('');
   for (const pk of packs) reports.push({ pack: pk || '(根目录包)', ...localizePack(archive, pk) });
+  return reports;
+}
+
+// 扫描整包：先处理外层，再把内嵌的 .mcpack / .mcaddon 解开处理并写回
+export function localizeArchive(archive) {
+  const reports = localizeFlat(archive);
+
+  for (const f of archive.files) {
+    if (!/\.(mcpack|mcaddon)$/i.test(f.path)) continue;
+    if (!f.data || f.data.length < 22) continue;
+    try {
+      const zip = parseZip(f.data);
+      const sub = new Archive('zip', zip.entries
+        .filter(e => !e.name.endsWith('/'))
+        .map(e => ({ path: e.name, data: zip.read(e) })));
+
+      const inner = localizeFlat(sub);
+      const innerUi = [];
+      for (const p of sub.paths()) {
+        if (/\.json$/i.test(p) && /(^|\/)ui\//.test(p)) {
+          const n = localizeUiJson(sub, p);
+          if (n) innerUi.push(`${p} (${n} 处)`);
+        }
+      }
+
+      const changed = inner.some(r => r.status === 'localized');
+      if (!changed && !innerUi.length) {
+        if (inner.length) {
+          for (const r of inner) reports.push({ ...r, pack: `${f.path} :: ${r.pack}`, nested: true });
+        } else {
+          reports.push({ pack: f.path, status: 'no-lang', nested: true });
+        }
+        continue;
+      }
+
+      f.data = sub.toBytes();
+      for (const r of inner) {
+        reports.push({ ...r, pack: `${f.path} :: ${r.pack}`, nested: true });
+      }
+      if (innerUi.length) reports.push({ pack: `${f.path} :: UI`, status: 'localized', translated: innerUi.length, file: innerUi.join('、'), nested: true });
+    } catch (e) {
+      reports.push({ pack: f.path, status: 'error', nested: true, note: e.message });
+    }
+  }
+
   return reports;
 }
 

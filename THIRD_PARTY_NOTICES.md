@@ -1,35 +1,18 @@
 # 第三方组件与许可
 
-本项目以 MIT 许可开源。以下组件按各自许可分发，保留原始版权声明。
+本项目以 MIT 许可开源。当前发布物不内嵌第三方汉化子应用；界面、打包与汉化逻辑均为本项目自行实现。
 
-## tianji-turn-addon（附加包汉化内核）
+## 已移除的历史组件（不随当前版本分发）
 
-- 来源：https://github.com/zanesu154-rgb/tianji-turn-addon
-- 作者：zanesu154-rgb
-- 许可：MIT
-- 位置：`assets/i18n/`
-- 说明：附加包汉化页面、AST 脚本本地化、世界存档本地化逻辑来自该项目。本项目做了离线化、下载桥接、移动端适配与入口整合，不是原样复制。
+`tianji-turn-addon`（附加包汉化工具，作者 zanesu154-rgb，MIT）曾在 1.0.0 的早期构建中作为独立子应用放在 `assets/i18n/`。
 
-完整许可见 `assets/i18n/LICENSE-tianji-turn-addon.txt`。
+由于该子应用与上游在样式、世界存档与脚本处理模块上存在大段原样代码，1.0.1 起已整体移除，不再随 APK、桌面端或网页版分发；「附加包汉化」入口改由本项目 `src/lang.js` / `src/hanhua.js` 的自研离线词库实现。
 
-## JSZip
+- 历史来源：https://github.com/zanesu154-rgb/tianji-turn-addon
+- 历史许可：MIT
+- 当前状态：未打包、未部署、未在运行时代码中引用
 
-- 来源：https://github.com/Stuk/jszip
-- 许可：MIT 或 GPLv3（本项目按 MIT 使用）
-- 位置：`assets/i18n/vendor/jszip.min.js`
-
-## JSON5
-
-- 来源：https://github.com/json5/json5
-- 许可：MIT
-- 位置：`assets/i18n/vendor/json5.min.js`
-
-## Acorn
-
-- 来源：https://github.com/acornjs/acorn
-- 许可：MIT
-- 位置：`assets/i18n/vendor/acorn.js`
-- 完整许可见 `assets/i18n/vendor/acorn.LICENSE`。
+如果未来重新引入其中任何代码，必须同时附上完整 MIT 许可文本与版权声明。
 
 ## 字体与图标
 

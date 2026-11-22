@@ -50,7 +50,7 @@ JAVA 重制版（`com.mctoolbox.java`）与 C++ 重制版（`com.mctoolbox.cpp`�
 
 - 附加包 / 地图 / 皮肤 / 披风 / 结构 / 存档浏览与编辑
 - 基岩版存档互转、Java NBT / region 读写、附加包 ⇄ 模组转换
-- 附加包汉化（内核来自 tianji-turn-addon，MIT；下载走系统「下载/MC工具箱」，WebView 内由 Java 桥落盘）
+- 附加包汉化（自研离线词库：`texts/*.lang` + JSON 文案；不处理脚本硬编码与世界存档）
 - `@minecraft/server` 与 `@minecraft/server-ui` 脚本模拟器
 - 离线 Script API 文档与脚本体检器
 - 英文代码视图：`level.dat` 的 NBT 摊成「类型 路径 = 值」明文，保存自动编码回二进制
@@ -69,7 +69,7 @@ JAVA 重制版（`com.mctoolbox.java`）与 C++ 重制版（`com.mctoolbox.cpp`�
 
 ```
 index.html / style.css / assets_app.js   主界面（打包后位于 assets/）
-assets/                                  Web 前端、汉化子应用、离线依赖
+assets/                                  Web 前端、离线依赖
 src/                                     前端模块源码
 android/                                 AndroidManifest、Java 桥、资源（经典版）
 kernel/cpp/                              C++ 内核（自写 inflate/deflate、zip、brarchive、converter、CLI、GTK 界面）
@@ -115,13 +115,14 @@ npm run dist  # 生成 dist/ 下的 Windows 包
 
 把 `assets/` 作为静态站点根目录部署即可；`assets/sw.js` 是构建时生成的离线缓存清单。PWA 安装与 Service Worker 需要 HTTPS 或 localhost。
 
-## 汉化子应用的移植方式
+## 汉化实现方式
 
-1. 阅读上游源码与测试，确认依赖为 JSZip、JSON5、acorn 与经典脚本。
-2. 复制到 `assets/i18n/`，先把 CDN 依赖换成本地 `vendor/`，去掉统计脚本。
-3. 修复 WebView 不兼容：用 `bridge.js` 覆写下载逻辑，安卓走 `AndroidBridge.saveBinary`，浏览器保留 Blob 下载；另加 base64 回退。
-4. 父页面用全屏 iframe 浮层接入，保留原按钮 id 以兼容压缩 bundle 的硬绑定，并拦截旧点击。
-5. 补移动端样式、返回键关闭、保存结果 toast，并跑上游测试与离线加载测试。
+汉化由本项目自行实现，不内嵌第三方汉化子应用：
+
+1. `src/lang.js` 负责解析 `texts/*.lang`、按离线词库逐条替换，并处理 JSON UI 里的 `text` / `label` / `title` 等文案字段。
+2. `src/dict.js` 保存自建术语表；`src/hanhua.js` 在整包范围内按行为包 / 资源包分别生成 `zh_CN.lang`。
+3. 主界面「附加包汉化」按钮直接对当前打开的包执行，不再打开 iframe。
+4. 当前范围不含脚本硬编码文本、世界存档 NBT 文本与 AST 改写；这些能力未引入第三方代码，后续如需支持将另行自研。
 
 ## 回归测试
 

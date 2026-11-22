@@ -1183,6 +1183,7 @@ async function runLocalize() {
   }
   for (const r of reports) {
     if (r.status === 'no-lang') log(`· ${r.pack}：没有 texts/*.lang，跳过`);
+    else if (r.status === 'error') log(`· ${r.pack}：子包解析失败（${r.note || '未知错误'}）`);
     else if (r.status === 'already-zh') log(`· ${r.pack}：${r.where} 里已有中文，按规则不重复汉化`);
     else log(`· ${r.pack}：已生成 ${r.file}，翻译 ${r.translated} 条`);
   }
