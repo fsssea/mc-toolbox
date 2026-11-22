@@ -1,0 +1,78 @@
+/* MC工具箱 漏洞档案页 i18n（bug.html 模板共用） */
+window.BUG_I18N = {
+  "zh-Hans": {
+    "nav.home":"官网","nav.download":"下载","nav.feedback":"反馈","nav.board":"漏洞看板","nav.repo":"开源仓库","nav.lang":"语言",
+    "back":"← 返回漏洞看板",
+    "kicker":"BUG / 官方漏洞档案",
+    "label.id":"漏洞编号","label.status":"状态","label.area":"模块","label.platforms":"平台",
+    "label.affects":"受影响版本","label.fixedin":"修复版本","label.issue":"关联 Issue",
+    "noissue":"尚未关联 Issue，可直接在反馈中心新建",
+    "status.important":"重要 · 待修","status.fixing":"正在修复","status.fixed":"已修复",
+    "sec.summary":"问题是什么","sec.impact":"影响范围","sec.fix":"修复方式","sec.timeline":"处理进度",
+    "tl.report":"收到反馈并登记编号","tl.confirm":"确认复现，纳入修复队列","tl.fixing":"修复中，补验证用例","tl.fixed":"修复完成，随公开发布版本上线",
+    "range":"出现在 {from} ~ {to}",
+    "board.more":"看全部漏洞",
+    "foot.disclaimer":"本页是官方漏洞档案，编号固定不变；新的问题请回到反馈中心提交，登记后会生成新的 bug-N 页面。",
+    "copy.link":"复制本页链接","toast.copied":"链接已复制"
+  },
+  "zh-Hant": {
+    "nav.home":"官網","nav.download":"下載","nav.feedback":"回饋","nav.board":"漏洞看板","nav.repo":"開源倉庫","nav.lang":"語言",
+    "back":"← 返回漏洞看板",
+    "kicker":"BUG / 官方漏洞檔案",
+    "label.id":"漏洞編號","label.status":"狀態","label.area":"模組","label.platforms":"平台",
+    "label.affects":"受影響版本","label.fixedin":"修復版本","label.issue":"關聯 Issue",
+    "noissue":"尚未關聯 Issue，可直接在回饋中心新建",
+    "status.important":"重要 · 待修","status.fixing":"修復中","status.fixed":"已修復",
+    "sec.summary":"問題是什麼","sec.impact":"影響範圍","sec.fix":"修復方式","sec.timeline":"處理進度",
+    "tl.report":"收到回饋並登記編號","tl.confirm":"確認重現，納入修復隊列","tl.fixing":"修復中，補驗證案例","tl.fixed":"修復完成，隨公開發布版本上線",
+    "range":"出現在 {from} ~ {to}",
+    "board.more":"看全部漏洞",
+    "foot.disclaimer":"本頁是官方漏洞檔案，編號固定不變；新問題請回到回饋中心提交，登記後會產生新的 bug-N 頁面。",
+    "copy.link":"複製本頁連結","toast.copied":"連結已複製"
+  },
+  "en": {
+    "nav.home":"Home","nav.download":"Download","nav.feedback":"Feedback","nav.board":"Bug board","nav.repo":"Source","nav.lang":"Language",
+    "back":"← Back to the bug board",
+    "kicker":"BUG / OFFICIAL RECORD",
+    "label.id":"Bug ID","label.status":"Status","label.area":"Area","label.platforms":"Platforms",
+    "label.affects":"Affected versions","label.fixedin":"Fixed in","label.issue":"Linked issue",
+    "noissue":"No issue linked yet — open one from the feedback center",
+    "status.important":"Important · open","status.fixing":"Fixing","status.fixed":"Fixed",
+    "sec.summary":"What went wrong","sec.impact":"Impact","sec.fix":"Fix","sec.timeline":"Progress",
+    "tl.report":"Reported and registered","tl.confirm":"Reproduced, queued for a fix","tl.fixing":"Fix in progress, tests added","tl.fixed":"Fixed and shipped in the public release",
+    "range":"Seen in {from} ~ {to}",
+    "board.more":"See all bugs",
+    "foot.disclaimer":"This is the official record; the ID never changes. New problems go through the feedback center and get their own bug-N page once registered.",
+    "copy.link":"Copy this link","toast.copied":"Link copied"
+  },
+  "ja": {
+    "nav.home":"公式サイト","nav.download":"ダウンロード","nav.feedback":"フィードバック","nav.board":"不具合一覧","nav.repo":"ソース","nav.lang":"言語",
+    "back":"← 不具合一覧に戻る",
+    "kicker":"BUG / 公式記録",
+    "label.id":"不具合 ID","label.status":"状態","label.area":"モジュール","label.platforms":"プラットフォーム",
+    "label.affects":"影響バージョン","label.fixedin":"修正バージョン","label.issue":"関連 Issue",
+    "noissue":"関連 Issue は未登録。フィードバックセンターから作成できます",
+    "status.important":"重要 · 未対応","status.fixing":"修正中","status.fixed":"修正済み",
+    "sec.summary":"症状","sec.impact":"影響範囲","sec.fix":"修正内容","sec.timeline":"進捗",
+    "tl.report":"報告を受け、ID を登録","tl.confirm":"再現確認、修正キューに追加","tl.fixing":"修正中、検証ケースを追加","tl.fixed":"修正完了、公開版でリリース",
+    "range":"{from} ~ {to} に発生",
+    "board.more":"一覧を見る",
+    "foot.disclaimer":"公式記録のため ID は変わりません。新しい問題はフィードバックセンターから送信し、登録後に bug-N ページが作られます。",
+    "copy.link":"このページの URL をコピー","toast.copied":"コピーしました"
+  },
+  "ko": {
+    "nav.home":"공식 사이트","nav.download":"다운로드","nav.feedback":"피드백","nav.board":"버그 보드","nav.repo":"소스","nav.lang":"언어",
+    "back":"← 버그 보드로",
+    "kicker":"BUG / 공식 기록",
+    "label.id":"버그 ID","label.status":"상태","label.area":"모듈","label.platforms":"플랫폼",
+    "label.affects":"영향 버전","label.fixedin":"수정 버전","label.issue":"연결된 Issue",
+    "noissue":"연결된 Issue 없음 — 피드백 센터에서 새로 만들 수 있습니다",
+    "status.important":"중요 · 대기","status.fixing":"수정 중","status.fixed":"수정 완료",
+    "sec.summary":"증상","sec.impact":"영향 범위","sec.fix":"수정 내용","sec.timeline":"진행 상황",
+    "tl.report":"보고 접수 및 ID 등록","tl.confirm":"재현 확인, 수정 대기열 반영","tl.fixing":"수정 중, 검증 케이스 추가","tl.fixed":"수정 완료, 공개 릴리스에 반영",
+    "range":"{from} ~ {to} 에서 발생",
+    "board.more":"전체 보기",
+    "foot.disclaimer":"공식 기록이라 ID 는 바뀌지 않습니다. 새 문제는 피드백 센터에서 보내면 등록 후 bug-N 페이지가 생성됩니다.",
+    "copy.link":"이 페이지 링크 복사","toast.copied":"링크 복사됨"
+  }
+};

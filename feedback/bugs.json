@@ -1,0 +1,44 @@
+{
+  "next_id": 2,
+  "updated": "2026-11-22",
+  "bugs": [
+    {
+      "id": 1,
+      "status": "fixed",
+      "area": { "zh-Hans": "编辑视图", "zh-Hant": "編輯檢視", "en": "Editor view", "ja": "編集ビュー", "ko": "편집 보기" },
+      "title": {
+        "zh-Hans": "英文代码视图长字段不折行，手机端必须横向拖动才能看全",
+        "zh-Hant": "英文程式碼檢視長欄位不折行，手機端必須橫向拖動才能看全",
+        "en": "Long fields in the code view did not wrap, forcing horizontal scrolling on phones",
+        "ja": "コードビューの長い項目が折り返されず、スマホで横スクロールが必要だった",
+        "ko": "코드 보기의 긴 항목이 줄바꿈되지 않아 휴대폰에서 가로 스크롤이 필요했음"
+      },
+      "summary": {
+        "zh-Hans": "level.dat 里的长世界名、成串 byte 数组在窄屏上被推到屏幕外，打开只能看到一行开头，必须横拖才能读完整段。",
+        "zh-Hant": "level.dat 裡很長的世界名稱、成串 byte 陣列在窄螢幕上被推到畫面外，打開只看得到第一行開頭，必須橫拖才能讀完整段。",
+        "en": "Long level names and byte arrays in level.dat were pushed off-screen on narrow displays; only the start of the first line was visible without dragging sideways.",
+        "ja": "level.dat の長いワールド名や byte 配列が狭い画面で画面外に押し出され、横にドラッグしないと全文が読めませんでした。",
+        "ko": "level.dat 의 긴 월드 이름과 byte 배열이 좁은 화면에서 화면 밖으로 밀려나 가로로 끌어야만 전체를 읽을 수 있었습니다."
+      },
+      "impact": {
+        "zh-Hans": "只影响阅读与定位，不影响保存逻辑；改错字段的风险反而更高。",
+        "zh-Hant": "只影響閱讀與定位，不影響儲存邏輯；改錯欄位的風險反而更高。",
+        "en": "Readability and navigation only; saving logic was never affected, but mis-editing risk went up.",
+        "ja": "閲覧と位置決めだけの問題で保存処理には影響なし。ただし誤編集のリスクは上がっていました。",
+        "ko": "가독성과 위치 확인만의 문제로 저장 로직에는 영향이 없었지만 잘못 고칠 위험은 커졌습니다."
+      },
+      "fix": {
+        "zh-Hans": "按窗口宽度自动折行，横向滚动条关闭，渲染后滚动位置归零；折行只作用于显示，编码与写回逻辑不变。",
+        "zh-Hant": "依視窗寬度自動折行，橫向捲軸關閉，算圖後捲動位置歸零；折行只作用於顯示，編碼與寫回邏輯不變。",
+        "en": "Fields now wrap to the window width, horizontal scrolling is off, and scroll position resets after render. Wrapping is display-only; encoding and write-back are unchanged.",
+        "ja": "ウィンドウ幅で自動折り返し、横スクロールを無効化し、描画後にスクロール位置をリセット。折り返しは表示のみで、エンコードと書き戻しは不変です。",
+        "ko": "창 너비에 맞춰 자동 줄바꿈하고 가로 스크롤을 끄며 렌더 후 스크롤 위치를 초기화합니다. 표시에만 적용되고 인코딩·되쓰기는 그대로입니다."
+      },
+      "platforms": ["Android", "Windows", "Linux", "Web"],
+      "affected_from": { "zh-Hans": "内部构建", "zh-Hant": "內部建置", "en": "internal builds", "ja": "内部ビルド", "ko": "내부 빌드" },
+      "affected_to": { "zh-Hans": "1.0.0 之前", "zh-Hant": "1.0.0 之前", "en": "before 1.0.0", "ja": "1.0.0 以前", "ko": "1.0.0 이전" },
+      "fixed_in": "1.0.0",
+      "issue": null
+    }
+  ]
+}

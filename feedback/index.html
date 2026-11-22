@@ -100,6 +100,24 @@ footer{border-top:1px solid var(--line);padding:22px 0 36px;font-size:12px;color
 .foot-in{max-width:var(--max);margin:0 auto;padding:0 26px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:3px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:50}
 .toast.show{opacity:1;transform:translate(-50%,0)}
+
+.board-stats{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 20px}
+.stat{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;padding:8px 13px;font-size:12px;color:#31404c}
+.stat b{font-family:"IBM Plex Mono",monospace;font-size:15px}
+.stat .d{width:7px;height:7px;border-radius:50%;display:inline-block;background:var(--line)}
+.stat.important .d{background:#c0392b}.stat.fixing .d{background:#c07a1c}.stat.fixed .d{background:#3f9d6a}
+.buglist{border-top:1px solid var(--line)}
+.bugrow{display:grid;grid-template-columns:96px 1fr auto;gap:16px;align-items:center;padding:15px 14px;border-bottom:1px solid var(--line);text-decoration:none;color:inherit;background:linear-gradient(90deg,rgba(255,255,255,.55),rgba(255,255,255,0));transition:.15s}
+.bugrow:hover{background:#fff;padding-left:18px}
+.bugrow .num{font-size:12px;letter-spacing:.06em;color:var(--blue)}
+.bugrow .t{display:block;font-size:14px;font-weight:700;line-height:1.45}
+.bugrow .r{display:block;font-size:11px;color:var(--muted);margin-top:4px;font-family:"IBM Plex Mono",monospace}
+.sbadge{font-size:11px;font-weight:700;padding:4px 9px;border:1px solid;background:#fff;white-space:nowrap}
+.sbadge.important{color:#c0392b;border-color:#c0392b}
+.sbadge.fixing{color:#c07a1c;border-color:#c07a1c}
+.sbadge.fixed{color:#3f9d6a;border-color:#3f9d6a}
+.bugempty{font-size:13px;color:var(--muted);padding:18px 0}
+@media(max-width:640px){.bugrow{grid-template-columns:1fr;gap:6px}.bugrow .num{order:1}}
 </style>
 </head>
 <body>
@@ -133,6 +151,18 @@ footer{border-top:1px solid var(--line);padding:22px 0 36px;font-size:12px;color
         <span class="chip" data-i18n="hero.chip2">版本 1.0.0 / BUILD 1</span>
         <span class="chip" data-i18n="hero.chip3">安卓 · Windows · Linux · 网页版</span>
       </div>
+    </div>
+  </section>
+
+
+  <section id="board">
+    <div class="wrap">
+      <div class="sec-label mono" data-i18n="board.label">BOARD / 漏洞看板</div>
+      <h2 data-i18n="board.h">每条漏洞一个固定编号，修到哪一步都看得见。</h2>
+      <p class="sec-desc" data-i18n="board.d">提交后登记成 BUG-N，固定链接是 feedback/bug-N/，编号一旦分配就不再变。这里按「重要待修 → 正在修复 → 已修复」排，并标出它出现在哪些版本。</p>
+      <div class="board-stats" id="boardStats"></div>
+      <div class="buglist" id="bugList"><p class="bugempty" data-i18n="board.empty">还没有登记的漏洞。</p></div>
+      <p class="note" data-i18n="board.note">状态和修复版本由维护者更新；一条漏洞从「重要 · 待修」走到「已修复」，过程都会留在它自己的页面上。</p>
     </div>
   </section>
 
@@ -206,6 +236,15 @@ footer{border-top:1px solid var(--line);padding:22px 0 36px;font-size:12px;color
               <span data-i18n="form.public">允许公开这条 Issue（推荐，方便别人搜到同样的问题）</span>
             </label>
           </div>
+        </div>
+
+        <div class="field" style="margin-top:4px">
+          <label data-i18n="form.bugid">将登记的漏洞编号</label>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <span class="mono" id="bugIdLabel" style="border:1px solid #101820;background:#fff;padding:8px 12px;font-size:13px;letter-spacing:.06em">BUG-?</span>
+            <span class="mono" id="bugUrl" style="font-size:11px;color:#5b6875;word-break:break-all"></span>
+          </div>
+          <span class="hint" data-i18n="form.bugid.hint">编号按提交顺序分配，第一个反馈的漏洞为 BUG-1；提交后页面地址固定为 feedback/bug-N/。</span>
         </div>
 
         <div class="actions">
@@ -319,6 +358,19 @@ const I18N = {
     "hero.chip1":"免注册浏览 · 提交需 GitHub 账号","hero.chip2":"版本 1.0.0 / BUILD 1","hero.chip3":"安卓 · Windows · Linux · 网页版",
     "form.h":"填好这五项，基本就不会来回问了。",
     "form.label":"REPORT / 提交反馈","how.label":"HOW TO / 怎么写才有用","faq.label":"FAQ / 常见问题",
+    "board.label":"BOARD / 漏洞看板",
+    "board.h":"每条漏洞一个固定编号，修到哪一步都看得见。",
+    "board.d":"提交后登记成 BUG-N，固定链接是 feedback/bug-N/，编号一旦分配就不再变。这里按「重要待修 → 正在修复 → 已修复」排，并标出它出现在哪些版本。",
+    "board.empty":"还没有登记的漏洞。",
+    "board.note":"状态和修复版本由维护者更新；一条漏洞从「重要 · 待修」走到「已修复」，过程都会留在它自己的页面上。",
+    "board.total":"全部",
+    "status.important":"重要 · 待修",
+    "status.fixing":"正在修复",
+    "status.fixed":"已修复",
+    "board.range.short":"受影响 {from} ~ {to}",
+    "board.view":"打开档案",
+    "form.bugid":"将登记的漏洞编号",
+    "form.bugid.hint":"编号按提交顺序分配，第一个反馈的漏洞为 BUG-1；提交后页面地址固定为 feedback/bug-N/。",
     "form.desc":"生成的内容会先填进 GitHub 的 Issue 表单，你确认后再点提交；不想用 GitHub，也可以复制全文发到 B 站私信或视频评论区置顶留言。",
     "form.type":"反馈类型","form.type.bug":"Bug / 崩溃","form.type.reg":"功能异常 / 回退","form.type.compat":"兼容性（存档 / 附加包 / 系统）","form.type.idea":"功能建议","form.type.other":"其他",
     "form.platform":"平台","form.pf.android":"Android（APK）","form.pf.win":"Windows（ZIP）","form.pf.linux":"Linux（tar.gz / deb）","form.pf.web":"网页版（PWA）",
@@ -360,6 +412,19 @@ const I18N = {
     "hero.chip1":"免註冊瀏覽 · 提交需 GitHub 帳號","hero.chip2":"版本 1.0.0 / BUILD 1","hero.chip3":"Android · Windows · Linux · 網頁版",
     "form.h":"填好這五項，基本上就不用來回問了。",
     "form.label":"REPORT / 提交回饋","how.label":"HOW TO / 怎麼寫才有用","faq.label":"FAQ / 常見問題",
+    "board.label":"BOARD / 漏洞看板",
+    "board.h":"每條漏洞一個固定編號，修到哪一步都看得見。",
+    "board.d":"提交後登記成 BUG-N，固定連結是 feedback/bug-N/，編號一旦分配就不再變。這裡依「重要待修 → 修復中 → 已修復」排，並標出它出現在哪些版本。",
+    "board.empty":"還沒有登記的漏洞。",
+    "board.note":"狀態與修復版本由維護者更新；一條漏洞從「重要 · 待修」走到「已修復」，過程都會留在它自己的頁面上。",
+    "board.total":"全部",
+    "status.important":"重要 · 待修",
+    "status.fixing":"修復中",
+    "status.fixed":"已修復",
+    "board.range.short":"受影響 {from} ~ {to}",
+    "board.view":"開啟檔案",
+    "form.bugid":"將登記的漏洞編號",
+    "form.bugid.hint":"編號依提交順序分配，第一個回饋的漏洞為 BUG-1；提交後頁面位址固定為 feedback/bug-N/。",
     "form.desc":"產生的內容會先填進 GitHub 的 Issue 表單，你確認後再送出；不想用 GitHub，也可以複製全文發到 B 站私訊或影片留言區置頂留言。",
     "form.type":"回饋類型","form.type.bug":"Bug / 當機","form.type.reg":"功能異常 / 退化","form.type.compat":"相容性（存檔 / 附加包 / 系統）","form.type.idea":"功能建議","form.type.other":"其他",
     "form.platform":"平台","form.pf.android":"Android（APK）","form.pf.win":"Windows（ZIP）","form.pf.linux":"Linux（tar.gz / deb）","form.pf.web":"網頁版（PWA）",
@@ -400,6 +465,19 @@ const I18N = {
     "hero.chip1":"Read without signing in · GitHub account needed to submit","hero.chip2":"Version 1.0.0 / BUILD 1","hero.chip3":"Android · Windows · Linux · Web",
     "form.h":"Five fields, and we usually won't need to ask again.",
     "form.label":"REPORT / NEW ISSUE","how.label":"HOW TO / REPORT WELL","faq.label":"FAQ / COMMON QUESTIONS",
+    "board.label":"BOARD / BUG BOARD",
+    "board.h":"One fixed ID per bug — you can see how far the fix got.",
+    "board.d":"Each report becomes BUG-N with a permanent page at feedback/bug-N/; IDs never change once assigned. Sorted important → fixing → fixed, with the versions it appeared in.",
+    "board.empty":"No bugs registered yet.",
+    "board.note":"Status and fix version are maintained by the maintainer; a bug's whole journey stays on its own page.",
+    "board.total":"All",
+    "status.important":"Important · open",
+    "status.fixing":"Fixing",
+    "status.fixed":"Fixed",
+    "board.range.short":"Seen in {from} ~ {to}",
+    "board.view":"Open record",
+    "form.bugid":"Bug ID to be assigned",
+    "form.bugid.hint":"IDs follow submission order — the first report is BUG-1. The page URL is fixed at feedback/bug-N/ once submitted.",
     "form.desc":"The text is filled into GitHub's new-issue form first; you review it, then submit. No GitHub? Copy the text and send it in a Bilibili DM or pinned comment.",
     "form.type":"Type","form.type.bug":"Bug / crash","form.type.reg":"Regression / broken feature","form.type.compat":"Compatibility (world / add-on / OS)","form.type.idea":"Feature request","form.type.other":"Other",
     "form.platform":"Platform","form.pf.android":"Android (APK)","form.pf.win":"Windows (ZIP)","form.pf.linux":"Linux (tar.gz / deb)","form.pf.web":"Web (PWA)",
@@ -441,6 +519,19 @@ const I18N = {
     "hero.chip1":"閲覧は登録不要 · 送信には GitHub アカウントが必要","hero.chip2":"バージョン 1.0.0 / BUILD 1","hero.chip3":"Android · Windows · Linux · Web",
     "form.h":"5 項目埋めれば、ほぼ聞き返しません。",
     "form.label":"REPORT / 送信","how.label":"HOW TO / 書き方のコツ","faq.label":"FAQ / よくある質問",
+    "board.label":"BOARD / 不具合一覧",
+    "board.h":"1 件ごとに固定 ID、修正の進み具合まで見える。",
+    "board.d":"送信すると BUG-N として登録され、ページは feedback/bug-N/ に固定。ID は変わりません。重要 → 修正中 → 修正済みの順に並べ、発生したバージョンも表示します。",
+    "board.empty":"登録された不具合はまだありません。",
+    "board.note":"状態と修正バージョンはメンテナが更新します。対応の過程は各ページに残ります。",
+    "board.total":"すべて",
+    "status.important":"重要 · 未対応",
+    "status.fixing":"修正中",
+    "status.fixed":"修正済み",
+    "board.range.short":"{from} ~ {to} に発生",
+    "board.view":"記録を開く",
+    "form.bugid":"登録される不具合 ID",
+    "form.bugid.hint":"ID は送信順。最初の報告が BUG-1 で、ページは feedback/bug-N/ に固定されます。",
     "form.desc":"入力内容は GitHub の Issue 作成画面に流し込み、確認後に送信します。GitHub を使わない場合は全文をコピーして Bilibili の DM や固定コメントへ。",
     "form.type":"種類","form.type.bug":"不具合 / クラッシュ","form.type.reg":"機能の異常 / 退行","form.type.compat":"互換性（ワールド / アドオン / OS）","form.type.idea":"機能要望","form.type.other":"その他",
     "form.platform":"プラットフォーム","form.pf.android":"Android（APK）","form.pf.win":"Windows（ZIP）","form.pf.linux":"Linux（tar.gz / deb）","form.pf.web":"Web（PWA）",
@@ -482,6 +573,19 @@ const I18N = {
     "hero.chip1":"읽기는 로그인 불필요 · 제출은 GitHub 계정 필요","hero.chip2":"버전 1.0.0 / BUILD 1","hero.chip3":"Android · Windows · Linux · 웹",
     "form.h":"다섯 칸만 채우면 다시 묻지 않습니다.",
     "form.label":"REPORT / 제출","how.label":"HOW TO / 작성 요령","faq.label":"FAQ / 자주 묻는 질문",
+    "board.label":"BOARD / 버그 보드",
+    "board.h":"버그마다 고정 ID, 어디까지 고쳤는지 보입니다.",
+    "board.d":"제출하면 BUG-N 으로 등록되고 페이지는 feedback/bug-N/ 로 고정됩니다. ID 는 바뀌지 않습니다. 중요 → 수정 중 → 수정 완료 순으로 정렬하며 발생 버전도 표시합니다.",
+    "board.empty":"등록된 버그가 없습니다.",
+    "board.note":"상태와 수정 버전은 관리자가 갱신합니다. 처리 과정은 각 페이지에 남습니다.",
+    "board.total":"전체",
+    "status.important":"중요 · 대기",
+    "status.fixing":"수정 중",
+    "status.fixed":"수정 완료",
+    "board.range.short":"{from} ~ {to} 에서 발생",
+    "board.view":"기록 열기",
+    "form.bugid":"등록될 버그 ID",
+    "form.bugid.hint":"ID 는 제출 순서대로. 첫 보고가 BUG-1 이며 페이지는 feedback/bug-N/ 로 고정됩니다.",
     "form.desc":"작성 내용은 GitHub Issue 작성 화면에 먼저 채워지고, 확인 후 제출합니다. GitHub 이 없다면 전문을 복사해 Bilibili DM 이나 고정 댓글로 보내주세요.",
     "form.type":"유형","form.type.bug":"버그 / 크래시","form.type.reg":"기능 이상 / 회귀","form.type.compat":"호환성(월드 / 애드온 / OS)","form.type.idea":"기능 제안","form.type.other":"기타",
     "form.platform":"플랫폼","form.pf.android":"Android(APK)","form.pf.win":"Windows(ZIP)","form.pf.linux":"Linux(tar.gz / deb)","form.pf.web":"웹(PWA)",
@@ -534,6 +638,66 @@ function detectLang(){
 }
 
 let CUR = 'zh-Hans';
+const NEXT = { id: null, bugs: [] };
+
+function esc(v){ return String(v == null ? '' : v).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function loc(obj){
+  if (!obj) return '';
+  if (typeof obj === 'string') return obj;
+  return obj[CUR] || obj['en'] || obj['zh-Hans'] || '';
+}
+
+function renderBoard(data){
+  const bugs = (data && data.bugs) || [];
+  NEXT.bugs = bugs;
+  NEXT.id = (data && data.next_id) || (bugs.length ? Math.max(...bugs.map(b=>b.id)) + 1 : 1);
+  const idEl = document.getElementById('bugIdLabel');
+  const urlEl = document.getElementById('bugUrl');
+  if (idEl) idEl.textContent = 'BUG-' + NEXT.id;
+  if (urlEl) urlEl.textContent = 'https://fsssea.github.io/mc-toolbox/feedback/bug-' + NEXT.id + '/';
+
+  const order = {important:0, fixing:1, fixed:2};
+  const sorted = bugs.slice().sort((a,b)=> (order[a.status] - order[b.status]) || (a.id - b.id));
+  const counts = { all: bugs.length, important:0, fixing:0, fixed:0 };
+  bugs.forEach(b => counts[b.status] = (counts[b.status]||0) + 1);
+  const stats = document.getElementById('boardStats');
+  if (stats){
+    stats.innerHTML = [
+      ['all', counts.all, t('board.total')],
+      ['important', counts.important, t('status.important')],
+      ['fixing', counts.fixing, t('status.fixing')],
+      ['fixed', counts.fixed, t('status.fixed')]
+    ].map(([cls,n,label]) => '<div class="stat '+cls+'"><span class="d"></span><b>'+n+'</b>'+esc(label)+'</div>').join('');
+  }
+  const list = document.getElementById('bugList');
+  if (!list) return;
+  if (!sorted.length){
+    list.innerHTML = '<p class="bugempty">'+esc(t('board.empty'))+'</p>';
+    return;
+  }
+  list.innerHTML = sorted.map(function(b){
+    const from = loc(b.affected_from), to = loc(b.affected_to);
+    return '<a class="bugrow" href="bug-'+b.id+'/">'
+      + '<span class="num mono">BUG-'+b.id+'</span>'
+      + '<span><span class="t">'+esc(loc(b.title))+'</span>'
+      + '<span class="r">'+esc(t('board.range.short').replace('{from}', from).replace('{to}', to))+'</span></span>'
+      + '<span class="sbadge '+b.status+'">'+esc(t('status.'+b.status))+'</span>'
+      + '</a>';
+  }).join('');
+}
+
+function loadBugs(){
+  fetch('bugs.json', {cache:'no-store'})
+    .then(r => r.json())
+    .then(renderBoard)
+    .catch(function(){
+      NEXT.id = 1;
+      const idEl = document.getElementById('bugIdLabel');
+      const urlEl = document.getElementById('bugUrl');
+      if (idEl) idEl.textContent = 'BUG-1';
+      if (urlEl) urlEl.textContent = 'https://fsssea.github.io/mc-toolbox/feedback/bug-1/';
+    });
+}
 function t(key){ return (I18N[CUR] && I18N[CUR][key]) || I18N['zh-Hans'][key] || key; }
 
 function apply(lang){
@@ -548,6 +712,7 @@ function apply(lang){
     if (I18N[lang][k] !== undefined) el.setAttribute('placeholder', I18N[lang][k]);
   });
   document.title = t('meta.title');
+  if (NEXT.bugs && NEXT.bugs.length) renderBoard({bugs: NEXT.bugs, next_id: NEXT.id});
   const desc = document.querySelector('meta[name=description]');
   if (desc) desc.setAttribute('content', t('hero.lead').replace(/<[^>]+>/g,''));
   const sel = document.getElementById('langSel');
@@ -570,6 +735,7 @@ function buildBody(){
   L.push('');
   L.push('- Version: ' + ver);
   L.push('- Platform: ' + plat);
+  if (NEXT.id){ L.push('- Bug ID: BUG-' + NEXT.id); L.push('- Record: https://fsssea.github.io/mc-toolbox/feedback/bug-' + NEXT.id + '/'); }
   L.push('- Public: ' + (pub ? 'yes' : 'no'));
   L.push('');
   L.push('### ' + t('form.descLabel'));
@@ -591,6 +757,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     sel.appendChild(o);
   });
   apply(detectLang());
+  loadBugs();
   sel.addEventListener('change', ()=>apply(sel.value));
 
   const toast = (msg)=>{ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'), 2200); };
@@ -600,7 +767,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const desc = document.getElementById('fDesc').value.trim();
     if (!title || !desc){ toast(t('toast.empty')); return; }
     const label = t('issue.label.' + document.getElementById('fType').value);
-    const url = 'https://github.com/fsssea/mc-toolbox/issues/new?title=' + encodeURIComponent('[1.0.0] ' + title)
+    const prefix = NEXT.id ? '[BUG-' + NEXT.id + '] ' : '[1.0.0] ';
+    const url = 'https://github.com/fsssea/mc-toolbox/issues/new?title=' + encodeURIComponent(prefix + title)
       + '&body=' + encodeURIComponent(buildBody()) + '&labels=' + encodeURIComponent(label);
     window.open(url, '_blank', 'noopener');
   });
